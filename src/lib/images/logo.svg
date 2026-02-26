@@ -1,0 +1,28 @@
+					<svg
+						width="64"
+						height="48"
+						viewBox="0 0 64 48"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+					>
+						<text
+							x="50%"
+							y="55%"
+							text-anchor="middle"
+							font-family="Open Sans, Arial, sans-serif"
+							font-size="28"
+							font-weight="bold"
+							letter-spacing="4"
+							fill="currentColor"
+							dy=".3em">dsc</text
+						>
+						<rect
+							x="16"
+							y="38"
+							width="32"
+							height="3"
+							rx="1.5"
+							fill="var(--color-secondary-500)"
+							opacity="0.15"
+						/>
+					</svg>
