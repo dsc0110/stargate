@@ -177,9 +177,12 @@
 
 						<fieldset class="flex justify-end">
 							<Dialog.CloseTrigger class="btn preset-tonal">Cancel</Dialog.CloseTrigger>
-							<button type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}>
+							<Dialog.CloseTrigger type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}>
 								{submitting ? 'Saving...' : 'Submit'}
-							</button>
+							</Dialog.CloseTrigger>
+							<!-- <button type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}> -->
+								<!-- {submitting ? 'Saving...' : 'Submit'} -->
+							<!-- </button> -->
 						</fieldset>
 					</form>
 				</Dialog.Description>
