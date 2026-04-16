@@ -22,12 +22,29 @@
 </svelte:head>
 
 <!-- <SubHeader /> -->
-<div class="flex preset-outlined-surface-200-800 p-4 mb-4 justify-between items-center">
-	<p>350.000€</p>
-	<div class="flex btn-group p-2 md:flex-row">
-		<button type="button" class="btn capitalize" class:preset-filled={active == 'chart'} onclick={() => (active = 'chart')}><ChartLine /></button>
-		<button type="button" class="btn capitalize" class:preset-filled={active == 'table'} onclick={() => (active = 'table')}><Table /></button>
-		<AddAsset />
+<div class="flex p-4 mb-4 justify-between items-center">
+
+	<div class="card preset-filled-surface-100-900 p-4 text-center">
+		<span class="text-2xl">350.781€</span>
+		<p class="text-primary-500">current</p>
+	</div>
+
+	<div class="card preset-filled-surface-100-900 p-4 text-center">
+		<span class="text-2xl">January 2035</span>
+		<p class="text-primary-500">millionaire date</p>
+	</div>
+
+	<div class="card preset-filled-surface-100-900 p-4 text-center">
+		<span class="text-2xl">100k€</span>
+		<p class="text-primary-500">y2y</p>
+	</div>
+
+	<div class="card preset-filled-surface-100-900 p-4 text-center">
+		<div class="flex btn-group p-2 md:flex-row">
+			<button type="button" class="btn capitalize" class:preset-filled={active == 'chart'} onclick={() => (active = 'chart')}><ChartLine /></button>
+			<button type="button" class="btn capitalize" class:preset-filled={active == 'table'} onclick={() => (active = 'table')}><Table /></button>
+			<AddAsset />
+		</div>
 	</div>
 </div>
 
