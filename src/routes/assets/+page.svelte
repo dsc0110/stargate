@@ -2,7 +2,7 @@
 	import AssetsTable from './table.svelte';
 	import AssetsChart from './chart.svelte';
 	import AddAsset from './add.svelte';
-	import { Table, ChartLine } from '@lucide/svelte';
+	import { Table, ChartLine, Wallet, Target, TrendingUp } from '@lucide/svelte';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -22,34 +22,70 @@
 </svelte:head>
 
 <!-- <SubHeader /> -->
-<div id="subheader" class="flex flex-wrap lg:flex-nowrap p-4 mb-4 justify-between items-center gap-4">
-	<!-- Cards Container -->
-	<div class="flex w-full lg:w-auto gap-4 justify-between lg:justify-start">
-		<div class="card preset-filled-surface-100-900 p-4 text-center">
-			<span class="text-l">350.781€</span>
-			<p class="text-primary-500 text-xs">current</p>
+<div id="subheader" class="mb-6">
+	<!-- Metrics Cards -->
+	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-6">
+		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
+			<div class="space-y-1">
+				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">350.781€</h3>
+				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Current Portfolio Value</p>
+			</div>
 		</div>
 
-		<div class="card preset-filled-surface-100-900 p-4 text-center">
-			<span class="text-l">January 2035</span>
-			<p class="text-primary-500 text-xs">1 mio</p>
+		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
+			<div class="space-y-1">
+				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">1M€</h3>
+				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Target by January 2035</p>
+			</div>
 		</div>
 
-		<div class="card preset-filled-surface-100-900 p-4 text-center">
-			<span class="text-l">100k€</span>
-			<p class="text-primary-500 text-xs">y2y</p>
+		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
+			<div class="space-y-1">
+				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">+100k€</h3>
+				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Year over Year Growth</p>
+			</div>
 		</div>
 	</div>
 
-	<!-- Buttons Container -->
-	<div class="preset-filled-surface-100-900 p-2 lg:p-4 text-center w-full lg:w-auto">
-		<div class="flex btn-group p-2 justify-between">
-			<div class="flex">
-				<button type="button" class="btn capitalize" class:preset-filled={active == 'chart'} onclick={() => (active = 'chart')}><ChartLine /></button>
-				<button type="button" class="btn capitalize" class:preset-filled={active == 'table'} onclick={() => (active = 'table')}><Table /></button>
+	<!-- Controls Section -->
+	<div class="flex justify-between items-center gap-4">
+		<div class="flex items-center space-x-4">
+			<div class="preset-filled-surface-100-900 rounded-xl p-1 border border-gray-200 dark:border-gray-700">
+				<div class="flex">
+					<button
+						type="button"
+						class="btn rounded-lg px-3 py-2 transition-all duration-200"
+						class:preset-filled={active == 'chart'}
+						class:text-primary-600={active == 'chart'}
+						class:bg-primary-50={active == 'chart'}
+						class:dark:bg-primary-900={active == 'chart'}
+						class:dark:text-primary-400={active == 'chart'}
+						class:text-gray-600={active != 'chart'}
+						class:hover:bg-gray-100={active != 'chart'}
+						class:dark:hover:bg-gray-800={active != 'chart'}
+						onclick={() => (active = 'chart')}
+					>
+						<ChartLine class="w-4 h-4" />
+					</button>
+					<button
+						type="button"
+						class="btn rounded-lg px-3 py-2 transition-all duration-200"
+						class:preset-filled={active == 'table'}
+						class:text-primary-600={active == 'table'}
+						class:bg-primary-50={active == 'table'}
+						class:dark:bg-primary-900={active == 'table'}
+						class:dark:text-primary-400={active == 'table'}
+						class:text-gray-600={active != 'table'}
+						class:hover:bg-gray-100={active != 'table'}
+						class:dark:hover:bg-gray-800={active != 'table'}
+						onclick={() => (active = 'table')}
+					>
+						<Table class="w-4 h-4" />
+					</button>
+				</div>
 			</div>
-			<AddAsset />
 		</div>
+		<AddAsset />
 	</div>
 </div>
 
