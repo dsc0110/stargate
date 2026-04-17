@@ -32,7 +32,7 @@
 
 		<div class="card preset-filled-surface-100-900 p-4 text-center">
 			<span class="text-l">January 2035</span>
-			<p class="text-primary-500 text-xs">millionaire date</p>
+			<p class="text-primary-500 text-xs">1 mio</p>
 		</div>
 
 		<div class="card preset-filled-surface-100-900 p-4 text-center">
