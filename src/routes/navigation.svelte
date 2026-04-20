@@ -4,7 +4,7 @@
 	const linksSidebar = {
 		public: [
 			// { label: 'Login', href: '/#', icon: LogIn },
-			{ label: 'Assets', href: '/assets', icon: DollarSign },
+			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
 			{ label: 'Movies', href: '/movies', icon: PopcornIcon },
 			{ label: 'Biking', href: '/biking', icon: BikeIcon }
 		],

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import AssetsTable from './table.svelte';
-	import AssetsChart from './chart.svelte';
-	import AddAsset from './add.svelte';
+	import PortfolioTable from './table.svelte';
+	import PortfolioChart from './chart.svelte';
+	import AddPortfolioItem from './add.svelte';
 	import { Table, ChartLine, Wallet, Target, TrendingUp } from '@lucide/svelte';
 	import type { PageData } from './$types';
 
@@ -12,13 +12,13 @@
 	let { data }: Props = $props();
 	let active = $state('table');
 
-	let assets = $derived(data.assets);
-	$inspect(assets).with(console.trace);
+	let portfolio = $derived(data.portfolio);
+	$inspect(portfolio).with(console.trace);
 </script>
 
 <svelte:head>
-	<title>assets</title>
-	<meta name="description" content="assets" />
+	<title>portfolio</title>
+	<meta name="description" content="portfolio" />
 </svelte:head>
 
 <!-- <SubHeader /> -->
@@ -85,16 +85,16 @@
 				</div>
 			</div>
 		</div>
-		<AddAsset />
+		<AddPortfolioItem />
 	</div>
 </div>
 
 <!-- Chart  -->
 {#if active == 'chart'}
-	<AssetsChart />
+	<PortfolioChart />
 {/if}
 
 <!-- Table  -->
 {#if active == 'table'}
-	<AssetsTable {assets} />
+	<PortfolioTable {portfolio} />
 {/if}

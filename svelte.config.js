@@ -15,7 +15,7 @@ const config = {
 			platformProxy: {
 				configPath: 'wrangler.jsonc',
 				environmentVariables: {
-					ASSETS_BUCKET: 'ASSETS_BUCKET'
+					PORTFOLIO_BUCKET: 'PORTFOLIO_BUCKET'
 				}
 			}
 		})

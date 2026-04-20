@@ -9,11 +9,11 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		interface Platform {
-			env: { ASSETS_BUCKET: R2Bucket; }
-			cf: CfProperties
-			ctx: ExecutionContext
+			env: { PORTFOLIO_BUCKET: R2Bucket };
+			cf: CfProperties;
+			ctx: ExecutionContext;
 		}
 	}
 }
 
-export { };
+export {};

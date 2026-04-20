@@ -19,9 +19,9 @@
 			console.log('Form result:', result);
 
 			if (result.type === 'success') {
-				message = result.data.message || 'Asset data saved successfully!';
+				message = result.data.message || 'portfolio item saved successfully!';
 			} else if (result.type === 'failure') {
-				message = result.data?.message || 'Error saving asset data. Please try again.';
+				message = result.data?.message || 'Error saving portfolio item. Please try again.';
 			} else {
 				message = 'An unexpected error occurred.';
 			}
@@ -38,7 +38,7 @@
 		<Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
 			<Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-4 space-y-4 shadow-xl {animation}">
 				<header class="flex justify-between items-center">
-					<Dialog.Title class="text-lg font-bold">Add Assets</Dialog.Title>
+					<Dialog.Title class="text-lg font-bold">Add portfolio item</Dialog.Title>
 					<Dialog.CloseTrigger class="btn-icon hover:preset-tonal">
 						<XIcon class="size-4" />
 					</Dialog.CloseTrigger>
@@ -181,7 +181,7 @@
 								{submitting ? 'Saving...' : 'Submit'}
 							</Dialog.CloseTrigger>
 							<!-- <button type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}> -->
-								<!-- {submitting ? 'Saving...' : 'Submit'} -->
+							<!-- {submitting ? 'Saving...' : 'Submit'} -->
 							<!-- </button> -->
 						</fieldset>
 					</form>

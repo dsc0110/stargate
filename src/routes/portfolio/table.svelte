@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { Pagination } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
-	let { assets } = $props();
+	let { portfolio } = $props();
 	const PAGE_SIZE = 15;
 	let page = $state(1);
 	const start = $derived((page - 1) * PAGE_SIZE);
 	const end = $derived(start + PAGE_SIZE);
-	const paginatedAssets = $derived(assets.slice(start, end));
+	const paginatedPortfolioItems = $derived(portfolio.slice(start, end));
 </script>
 
 <table class="table caption-bottom">
@@ -19,18 +19,18 @@
 		</tr>
 	</thead>
 	<tbody class="[&>tr]:hover:text-secondary-500">
-		{#each paginatedAssets as asset}
+		{#each paginatedPortfolioItems as item}
 			<tr>
-				<td>{asset.date}</td>
-				<td>{asset.accounts.dkbCash}</td>
-				<td>{asset.accounts.dkbDepot}</td>
-				<td>{asset.accounts.zkbCash}</td>
+				<td>{item.date}</td>
+				<td>{item.accounts.dkbCash}</td>
+				<td>{item.accounts.dkbDepot}</td>
+				<td>{item.accounts.zkbCash}</td>
 			</tr>
 		{/each}
 	</tbody>
 </table>
 
-<Pagination count={assets.length} pageSize={PAGE_SIZE} {page} onPageChange={(event: any) => (page = event.page)}>
+<Pagination count={portfolio.length} pageSize={PAGE_SIZE} {page} onPageChange={(event: any) => (page = event.page)}>
 	<Pagination.PrevTrigger>
 		<ArrowLeftIcon class="size-4" />
 	</Pagination.PrevTrigger>

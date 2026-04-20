@@ -34,7 +34,7 @@
 			// 	}
 			// },
 			// subtitle: {
-			// 	text: 'Assets',
+			// 	text: 'Portfolio',
 			// 	offsetX: 0,
 			// 	style: {
 			// 		fontSize: '14px'
@@ -80,9 +80,9 @@
 				}
 			}
 		};
-		chart = new ApexCharts(document.querySelector('#assets-chart'), options);
+		chart = new ApexCharts(document.querySelector('#portfolio-chart'), options);
 		chart.render();
 	});
 </script>
 
-<div id="assets-chart"></div>
+<div id="portfolio-chart"></div>
