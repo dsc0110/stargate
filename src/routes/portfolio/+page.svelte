@@ -27,22 +27,22 @@
 	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-6">
 		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
 			<div class="space-y-1">
+				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Value</p>
 				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">350.781€</h3>
-				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Current Portfolio Value</p>
 			</div>
 		</div>
 
 		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
 			<div class="space-y-1">
-				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">1M€</h3>
-				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Target by January 2035</p>
-			</div>
-		</div>
-
-		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
-			<div class="space-y-1">
+				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Year over Year</p>
 				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">+100k€</h3>
-				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">Year over Year Growth</p>
+			</div>
+		</div>
+
+		<div class="card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200">
+			<div class="space-y-1">
+				<p class="text-xs text-secondary-600 dark:text-secondary-400 font-medium">1M€ by</p>
+				<h3 class="text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100">Jan 2035</h3>
 			</div>
 		</div>
 	</div>

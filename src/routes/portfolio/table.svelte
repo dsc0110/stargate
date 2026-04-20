@@ -13,18 +13,18 @@
 	<thead>
 		<tr>
 			<th>Date</th>
-			<th>Cash DKB</th>
-			<th>Depot DKB</th>
-			<th>Cash ZKB</th>
+			<th>DKB</th>
+			<th>Depot</th>
+			<th>ZKB</th>
 		</tr>
 	</thead>
 	<tbody class="[&>tr]:hover:text-secondary-500">
 		{#each paginatedPortfolioItems as item}
 			<tr>
-				<td>{item.date}</td>
-				<td>{item.accounts.dkbCash}</td>
-				<td>{item.accounts.dkbDepot}</td>
-				<td>{item.accounts.zkbCash}</td>
+				<td class="text-xs">{item.date}</td>
+				<td class="text-xs">{item.accounts.dkbCash}</td>
+				<td class="text-xs">{item.accounts.dkbDepot}</td>
+				<td class="text-xs">{item.accounts.zkbCash}</td>
 			</tr>
 		{/each}
 	</tbody>
