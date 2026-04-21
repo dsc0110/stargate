@@ -54,30 +54,22 @@
 				<div class="flex">
 					<button
 						type="button"
-						class="btn rounded-lg px-3 py-2 transition-all duration-200"
-						class:preset-filled={active == 'chart'}
+						class="btn rounded-lg px-3 py-2 transition-all duration-200 hover:bg-primary-100 dark:hover:bg-primary-800"
 						class:text-primary-600={active == 'chart'}
-						class:bg-primary-50={active == 'chart'}
-						class:dark:bg-primary-900={active == 'chart'}
 						class:dark:text-primary-400={active == 'chart'}
-						class:text-gray-600={active != 'chart'}
-						class:hover:bg-gray-100={active != 'chart'}
-						class:dark:hover:bg-gray-800={active != 'chart'}
+						class:text-gray-500={active != 'chart'}
+						class:dark:text-gray-400={active != 'chart'}
 						onclick={() => (active = 'chart')}
 					>
 						<ChartLine class="w-4 h-4" />
 					</button>
 					<button
 						type="button"
-						class="btn rounded-lg px-3 py-2 transition-all duration-200"
-						class:preset-filled={active == 'table'}
+						class="btn rounded-lg px-3 py-2 transition-all duration-200 hover:bg-primary-100 dark:hover:bg-primary-800"
 						class:text-primary-600={active == 'table'}
-						class:bg-primary-50={active == 'table'}
-						class:dark:bg-primary-900={active == 'table'}
 						class:dark:text-primary-400={active == 'table'}
-						class:text-gray-600={active != 'table'}
-						class:hover:bg-gray-100={active != 'table'}
-						class:dark:hover:bg-gray-800={active != 'table'}
+						class:text-gray-500={active != 'table'}
+						class:dark:text-gray-400={active != 'table'}
 						onclick={() => (active = 'table')}
 					>
 						<Table class="w-4 h-4" />
@@ -85,7 +77,11 @@
 				</div>
 			</div>
 		</div>
-		<AddPortfolioItem />
+		<div class="preset-filled-surface-100-900 rounded-xl p-1 border border-gray-200 dark:border-gray-700">
+			<div class="flex">
+				<AddPortfolioItem />
+			</div>
+		</div>
 	</div>
 </div>
 

@@ -32,7 +32,7 @@
 </script>
 
 <Dialog>
-	<Dialog.Trigger class="btn preset-filled"><SquarePlus /></Dialog.Trigger>
+	<Dialog.Trigger class="btn rounded-lg px-3 py-2 transition-all duration-200 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800"><SquarePlus class="w-4 h-4" /></Dialog.Trigger>
 	<SkeletonPortal>
 		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
 		<Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
