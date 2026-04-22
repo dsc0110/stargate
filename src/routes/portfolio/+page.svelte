@@ -3,7 +3,8 @@
 	import MetricCard from './MetricCard.svelte';
 	import PortfolioChart from './chart.svelte';
 	import PortfolioTable from './table.svelte';
-	import { PORTFOLIO_CONFIG, SHARED_STYLES, getButtonClasses } from './index.js';
+	import { PORTFOLIO_CONFIG, generateMetrics } from './config.js';
+	import { SHARED_STYLES, getButtonClasses } from './index.js';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -11,19 +12,25 @@
 	}
 
 	let { data }: Props = $props();
-	let active = $state(PORTFOLIO_CONFIG.DEFAULT_TAB);
+	let active: string = $state('table');
 
-	// Use reactive state for portfolio data that can be updated
+	// Use state for portfolio data that can be updated
 	let portfolio = $state(data.portfolio);
 
-	// Update portfolio when data.portfolio changes (e.g., on navigation)
+	// Derive metrics from portfolio state automatically
+	let metrics = $derived(generateMetrics(portfolio));
+
+	// React to changes in data.portfolio only
 	$effect(() => {
 		portfolio = data.portfolio;
 	});
 
 	// Callback function to handle new portfolio data
 	function handlePortfolioAdded(newPortfolio: any[]) {
+		// Update both data and local state to trigger reactivity
+		data.portfolio = newPortfolio;
 		portfolio = newPortfolio;
+		// metrics will automatically recalculate via $derived
 	}
 
 	$inspect(portfolio).with(console.trace);
@@ -38,7 +45,7 @@
 <div id="subheader" class="mb-6">
 	<!-- Metrics Cards -->
 	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-2">
-		{#each PORTFOLIO_CONFIG.METRICS as metric}
+		{#each metrics as metric}
 			<MetricCard label={metric.label} value={metric.value} />
 		{/each}
 	</div>

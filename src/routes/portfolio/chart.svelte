@@ -2,6 +2,11 @@
 	import ApexCharts from 'apexcharts';
 	import { onMount } from 'svelte';
 
+	interface Props {
+		portfolio: any[];
+	}
+
+	let { portfolio }: Props = $props();
 	let chart;
 
 	onMount(() => {
@@ -26,20 +31,6 @@
 					colors: ['black', '#E91E63', '#9C27B0']
 				}
 			},
-			// title: {
-			// 	text: '$235,312',
-			// 	offsetX: 0,
-			// 	style: {
-			// 		fontSize: '24px'
-			// 	}
-			// },
-			// subtitle: {
-			// 	text: 'Portfolio',
-			// 	offsetX: 0,
-			// 	style: {
-			// 		fontSize: '14px'
-			// 	}
-			// },
 			series: [{ name: 'sum', data: [30, 40, 35, 50, 49, 60, 70, 91, 125] }],
 			xaxis: { categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999] },
 			tooltip: {

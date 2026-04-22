@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { Pagination } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
-	let { portfolio } = $props();
+
+	interface Props {
+		portfolio: any[];
+	}
+
+	let { portfolio }: Props = $props();
 	const PAGE_SIZE = 15;
 	let page = $state(1);
 	const start = $derived((page - 1) * PAGE_SIZE);
