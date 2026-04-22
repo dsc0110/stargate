@@ -60,15 +60,27 @@
 					maxHeight: 120,
 					formatter: function (value, timestamp, opts) {
 						// Only show label if it's the first occurrence of that year
+						if (!opts || typeof opts.dataPointIndex === 'undefined') {
+							// Fallback: extract year from value
+							try {
+								const year = new Date(value).getFullYear().toString();
+								return year;
+							} catch {
+								return value;
+							}
+						}
+
 						const currentIndex = opts.dataPointIndex;
 						const currentYear = new Date(value).getFullYear().toString();
 
 						// Check if this is the first occurrence of this year
 						for (let i = 0; i < currentIndex; i++) {
 							const prevDate = dates[i];
-							const prevYear = new Date(prevDate).getFullYear().toString();
-							if (prevYear === currentYear) {
-								return ''; // Hide if we've already shown this year
+							if (prevDate) {
+								const prevYear = new Date(prevDate).getFullYear().toString();
+								if (prevYear === currentYear) {
+									return ''; // Hide if we've already shown this year
+								}
 							}
 						}
 
@@ -97,8 +109,19 @@
 				x: {
 					show: true,
 					formatter: function (value, opts) {
-						// Show the exact date in tooltip
-						return value; // value is already the date since categories are dates
+						// Show the exact date in tooltip with proper formatting
+						if (opts && typeof opts.dataPointIndex !== 'undefined') {
+							const actualDate = dates[opts.dataPointIndex];
+							if (actualDate) {
+								const date = new Date(actualDate);
+								return date.toLocaleDateString('en-US', {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric'
+								});
+							}
+						}
+						return value;
 					}
 				},
 				z: {
