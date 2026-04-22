@@ -1,6 +1,7 @@
 <script lang="ts">
 	import ApexCharts from 'apexcharts';
 	import { onMount } from 'svelte';
+	import { calculatePortfolioTotal } from './utils.js';
 
 	interface Props {
 		portfolio: any[];
@@ -8,6 +9,25 @@
 
 	let { portfolio }: Props = $props();
 	let chart;
+
+	// Process portfolio data for chart
+	let chartData = $derived(
+		portfolio
+			.map((entry) => ({
+				date: entry.date,
+				total: calculatePortfolioTotal(entry)
+			}))
+			.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+	);
+
+	let dates = $derived(chartData.map((item) => item.date));
+	let totals = $derived(chartData.map((item) => item.total));
+
+	// Extract unique years for x-axis labels
+	let years = $derived([...new Set(chartData.map((item) => new Date(item.date).getFullYear().toString()))].sort());
+
+	// Create year-based categories for chart
+	let yearCategories = $derived(chartData.map((item) => new Date(item.date).getFullYear().toString()));
 
 	onMount(() => {
 		const options = {
@@ -31,8 +51,31 @@
 					colors: ['black', '#E91E63', '#9C27B0']
 				}
 			},
-			series: [{ name: 'sum', data: [30, 40, 35, 50, 49, 60, 70, 91, 125] }],
-			xaxis: { categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999] },
+			series: [{ name: 'Portfolio Total', data: totals }],
+			xaxis: {
+				categories: dates,
+				labels: {
+					show: true,
+					rotateAlways: false,
+					maxHeight: 120,
+					formatter: function (value, timestamp, opts) {
+						// Only show label if it's the first occurrence of that year
+						const currentIndex = opts.dataPointIndex;
+						const currentYear = new Date(value).getFullYear().toString();
+
+						// Check if this is the first occurrence of this year
+						for (let i = 0; i < currentIndex; i++) {
+							const prevDate = dates[i];
+							const prevYear = new Date(prevDate).getFullYear().toString();
+							if (prevYear === currentYear) {
+								return ''; // Hide if we've already shown this year
+							}
+						}
+
+						return currentYear; // Show the year
+					}
+				}
+			},
 			tooltip: {
 				enabled: true,
 				enabledOnSeries: undefined,
@@ -53,8 +96,10 @@
 				},
 				x: {
 					show: true,
-					format: 'dd MMM',
-					formatter: undefined
+					formatter: function (value, opts) {
+						// Show the exact date in tooltip
+						return value; // value is already the date since categories are dates
+					}
 				},
 				z: {
 					formatter: undefined,
@@ -73,6 +118,16 @@
 		};
 		chart = new ApexCharts(document.querySelector('#portfolio-chart'), options);
 		chart.render();
+	});
+
+	// Update chart when portfolio data changes
+	$effect(() => {
+		if (chart && dates.length > 0) {
+			chart.updateOptions({
+				series: [{ name: 'Portfolio Total', data: totals }],
+				xaxis: { categories: dates }
+			});
+		}
 	});
 </script>
 
