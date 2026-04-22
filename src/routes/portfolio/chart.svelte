@@ -55,37 +55,12 @@
 			xaxis: {
 				categories: dates,
 				labels: {
-					show: true,
-					rotateAlways: false,
-					maxHeight: 120,
-					formatter: function (value, timestamp, opts) {
-						// Only show label if it's the first occurrence of that year
-						if (!opts || typeof opts.dataPointIndex === 'undefined') {
-							// Fallback: extract year from value
-							try {
-								const year = new Date(value).getFullYear().toString();
-								return year;
-							} catch {
-								return value;
-							}
-						}
-
-						const currentIndex = opts.dataPointIndex;
-						const currentYear = new Date(value).getFullYear().toString();
-
-						// Check if this is the first occurrence of this year
-						for (let i = 0; i < currentIndex; i++) {
-							const prevDate = dates[i];
-							if (prevDate) {
-								const prevYear = new Date(prevDate).getFullYear().toString();
-								if (prevYear === currentYear) {
-									return ''; // Hide if we've already shown this year
-								}
-							}
-						}
-
-						return currentYear; // Show the year
-					}
+					show: false
+				}
+			},
+			yaxis: {
+				labels: {
+					show: false
 				}
 			},
 			tooltip: {
