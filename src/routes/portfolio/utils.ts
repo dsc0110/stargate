@@ -59,26 +59,23 @@ export function calculateYearOverYear(portfolio: any[]): string {
 	const latestTotal = calculatePortfolioTotal(latest);
 	const latestDate = parsePortfolioDate(latest.date);
 
-	// Find the first existing record that is more than 1 year old
+	// Find entry closest to being 1 year older than the newest
 	const oneYearAgo = new Date(latestDate);
 	oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-	let baseEntry = null;
+	let baseEntry = portfolio[portfolio.length - 1]; // Default to oldest
+	let closestDiff = Infinity;
 
-	// Search from oldest to newest for first entry more than 1 year old
-	for (let i = portfolio.length - 1; i >= 0; i--) {
-		const entry = portfolio[i];
+	// Find the entry closest to exactly 1 year before the latest date
+	for (const entry of portfolio) {
 		const entryDate = parsePortfolioDate(entry.date);
+		const timeDiff = Math.abs(entryDate.getTime() - oneYearAgo.getTime());
 
-		if (entryDate < oneYearAgo) {
+		// Only consider entries that are older than or equal to 1 year ago
+		if (entryDate <= oneYearAgo && timeDiff < closestDiff) {
+			closestDiff = timeDiff;
 			baseEntry = entry;
-			break;
 		}
-	}
-
-	// If no entry found that's more than 1 year old, use the oldest available
-	if (!baseEntry) {
-		baseEntry = portfolio[portfolio.length - 1];
 	}
 
 	const oldTotal = calculatePortfolioTotal(baseEntry);
@@ -103,26 +100,23 @@ export function calculateMillionForecast(portfolio: any[]): string {
 
 	const latestDate = parsePortfolioDate(latest.date);
 
-	// Find the first existing record that is more than 1 year old
+	// Find entry closest to being 1 year older than the newest
 	const oneYearAgo = new Date(latestDate);
 	oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 
-	let baseEntry = null;
+	let baseEntry = portfolio[portfolio.length - 1]; // Default to oldest
+	let closestDiff = Infinity;
 
-	// Search from oldest to newest for first entry more than 1 year old
-	for (let i = portfolio.length - 1; i >= 0; i--) {
-		const entry = portfolio[i];
+	// Find the entry closest to exactly 1 year before the latest date
+	for (const entry of portfolio) {
 		const entryDate = parsePortfolioDate(entry.date);
+		const timeDiff = Math.abs(entryDate.getTime() - oneYearAgo.getTime());
 
-		if (entryDate < oneYearAgo) {
+		// Only consider entries that are older than or equal to 1 year ago
+		if (entryDate <= oneYearAgo && timeDiff < closestDiff) {
+			closestDiff = timeDiff;
 			baseEntry = entry;
-			break;
 		}
-	}
-
-	// If no entry found that's more than 1 year old, use the oldest available
-	if (!baseEntry) {
-		baseEntry = portfolio[portfolio.length - 1];
 	}
 
 	const oldTotal = calculatePortfolioTotal(baseEntry);
