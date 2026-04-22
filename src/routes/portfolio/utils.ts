@@ -140,13 +140,16 @@ export function calculateMillionForecast(portfolio: any[]): string {
 	// If no growth or negative growth
 	if (annualGrowth <= 0) return 'No growth';
 
-	// Calculate years needed
-	const remaining = target - latestTotal;
-	const yearsNeeded = remaining / annualGrowth;
+	// Calculate average monthly growth from year-over-year growth
+	const monthlyGrowth = annualGrowth / 12;
 
-	// Calculate target date
+	// Calculate how many months needed to reach target using monthly growth
+	const remaining = target - latestTotal;
+	const monthsNeeded = Math.ceil(remaining / monthlyGrowth);
+
+	// Calculate target date by adding months
 	const targetDate = new Date(latestDate);
-	targetDate.setFullYear(targetDate.getFullYear() + Math.ceil(yearsNeeded));
+	targetDate.setMonth(targetDate.getMonth() + monthsNeeded);
 
 	const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
