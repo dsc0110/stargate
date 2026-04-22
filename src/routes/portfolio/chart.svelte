@@ -23,12 +23,6 @@
 	let dates = $derived(chartData.map((item) => item.date));
 	let totals = $derived(chartData.map((item) => item.total));
 
-	// Extract unique years for x-axis labels
-	let years = $derived([...new Set(chartData.map((item) => new Date(item.date).getFullYear().toString()))].sort());
-
-	// Create year-based categories for chart
-	let yearCategories = $derived(chartData.map((item) => new Date(item.date).getFullYear().toString()));
-
 	onMount(() => {
 		const options = {
 			chart: {

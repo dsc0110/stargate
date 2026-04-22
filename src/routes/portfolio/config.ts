@@ -1,5 +1,5 @@
 // Shared configuration for the portfolio component
-import { Table, ChartLine } from '@lucide/svelte';
+import { Table, ChartLine, ChartPie } from '@lucide/svelte';
 import { calculateCurrentValue, calculateYearOverYear, calculateMillionForecast } from './utils.js';
 
 export const PORTFOLIO_CONFIG = {
@@ -24,8 +24,9 @@ export const PORTFOLIO_CONFIG = {
 
 	// Tab configuration (no component references needed in runes mode)
 	TABS: [
+		{ id: 'table', icon: Table },
 		{ id: 'chart', icon: ChartLine },
-		{ id: 'table', icon: Table }
+		{ id: 'pie', icon: ChartPie }
 	]
 };
 
