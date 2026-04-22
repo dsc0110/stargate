@@ -26,15 +26,30 @@ export function calculatePortfolioTotal(entry: any): number {
  * Parse portfolio date string to Date object
  */
 function parsePortfolioDate(dateString: string): Date {
-	// Convert DD.MM.YY to MM/DD/YYYY format for Date parsing
-	const parts = dateString.split('.');
-	if (parts.length !== 3) return new Date();
+	// Handle ISO format (YYYY-MM-DD)
+	if (dateString.includes('-') && dateString.length >= 10) {
+		return new Date(dateString);
+	}
 
-	const day = parseInt(parts[0]);
-	const month = parseInt(parts[1]);
-	const year = parseInt(parts[2]) + 2000; // Assuming YY format is 20YY
+	// Handle DD.MM.YYYY format (4-digit year)
+	if (dateString.includes('.')) {
+		const parts = dateString.split('.');
+		if (parts.length !== 3) return new Date();
 
-	return new Date(year, month - 1, day);
+		const day = parseInt(parts[0]);
+		const month = parseInt(parts[1]);
+		let year = parseInt(parts[2]);
+
+		// If 2-digit year, convert to 20YY
+		if (year < 100) {
+			year += 2000;
+		}
+
+		return new Date(year, month - 1, day);
+	}
+
+	// Fallback: try to parse as-is
+	return new Date(dateString);
 }
 
 /**
