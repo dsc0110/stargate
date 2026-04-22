@@ -13,7 +13,19 @@
 	let { data }: Props = $props();
 	let active = $state(PORTFOLIO_CONFIG.DEFAULT_TAB);
 
-	let portfolio = $derived(data.portfolio);
+	// Use reactive state for portfolio data that can be updated
+	let portfolio = $state(data.portfolio);
+
+	// Update portfolio when data.portfolio changes (e.g., on navigation)
+	$effect(() => {
+		portfolio = data.portfolio;
+	});
+
+	// Callback function to handle new portfolio data
+	function handlePortfolioAdded(newPortfolio: any[]) {
+		portfolio = newPortfolio;
+	}
+
 	$inspect(portfolio).with(console.trace);
 </script>
 
@@ -46,7 +58,7 @@
 		</div>
 		<div class={SHARED_STYLES.container}>
 			<div class="flex">
-				<AddPortfolioItem />
+				<AddPortfolioItem onPortfolioAdded={handlePortfolioAdded} />
 			</div>
 		</div>
 	</div>

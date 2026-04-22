@@ -3,27 +3,102 @@
 	import { enhance } from '$app/forms';
 	import { XIcon, SquarePlus } from '@lucide/svelte';
 
-	// The following animation is optional.
-	// This may also be included inline.
+	// Props
+	interface Props {
+		onPortfolioAdded?: (portfolio: any[]) => void;
+	}
+
+	let { onPortfolioAdded }: Props = $props();
+
+	// Animation configuration
 	const animation = 'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
-	//let value = $state([parseDate('2025-10-15')]);
-	let value = $state([parseDate(new Date().toISOString().split('T')[0])]);
-	let submitting = $state(false);
-	let message = $state('');
 
 	// Style constants
 	const buttonStyle = 'btn rounded-lg px-3 py-2 transition-all duration-200 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800';
 	const iconStyle = 'w-4 h-4';
 
-	const handleSubmit = () => {
-		submitting = true;
-		message = '';
+	// Dialog state
+	let isDialogOpen = $state(false);
 
+	// Form state
+	let value = $state([parseDate(new Date().toISOString().split('T')[0])]);
+	let submitting = $state(false);
+	let message = $state('');
+	let formData = $state({
+		dkbAll: '',
+		dkbDepot: '',
+		zkbAll: ''
+	});
+	let formErrors = $state({
+		dkbAll: '',
+		dkbDepot: '',
+		zkbAll: ''
+	});
+
+	// Validation functions
+	function validateCurrencyField(value: string, fieldName: string): string {
+		if (!value || value.trim() === '') {
+			return `${fieldName} is required`;
+		}
+		const numValue = parseFloat(value);
+		if (isNaN(numValue) || numValue <= 0) {
+			return `Please enter a valid positive amount for ${fieldName}`;
+		}
+		return '';
+	}
+
+	function validateForm(): boolean {
+		formErrors.dkbAll = validateCurrencyField(formData.dkbAll, 'DKB All');
+		formErrors.dkbDepot = validateCurrencyField(formData.dkbDepot, 'DKB Depot');
+		formErrors.zkbAll = validateCurrencyField(formData.zkbAll, 'ZKB All');
+
+		// Cross-field validation
+		if (formData.dkbAll && formData.dkbDepot) {
+			const dkbAll = parseFloat(formData.dkbAll);
+			const dkbDepot = parseFloat(formData.dkbDepot);
+			if (dkbDepot > dkbAll) {
+				formErrors.dkbDepot = 'Depot amount cannot exceed total DKB amount';
+			}
+		}
+
+		return !formErrors.dkbAll && !formErrors.dkbDepot && !formErrors.zkbAll;
+	}
+
+	function resetForm() {
+		formData = { dkbAll: '', dkbDepot: '', zkbAll: '' };
+		formErrors = { dkbAll: '', dkbDepot: '', zkbAll: '' };
+		message = '';
+		value = [parseDate(new Date().toISOString().split('T')[0])];
+	}
+
+	function handleInput(field: keyof typeof formData) {
+		return (event: Event) => {
+			const target = event.target as HTMLInputElement;
+			formData[field] = target.value;
+			// Clear error when user starts typing
+			if (formErrors[field]) {
+				formErrors[field] = '';
+			}
+		};
+	}
+
+	const handleSubmit = () => {
 		return async ({ result }: { result: any }) => {
 			console.log('Form result:', result);
 
 			if (result.type === 'success') {
-				message = result.data.message || 'portfolio item saved successfully!';
+				message = result.data?.message || 'portfolio item saved successfully!';
+
+				// Update parent component with new portfolio data
+				if (result.data?.portfolio && onPortfolioAdded) {
+					onPortfolioAdded(result.data.portfolio);
+				}
+
+				// Close dialog and reset form after short delay
+				setTimeout(() => {
+					resetForm();
+					isDialogOpen = false;
+				}, 1000);
 			} else if (result.type === 'failure') {
 				message = result.data?.message || 'Error saving portfolio item. Please try again.';
 			} else {
@@ -33,9 +108,19 @@
 			submitting = false;
 		};
 	};
+
+	function onSubmit(event: Event) {
+		if (!validateForm()) {
+			event.preventDefault();
+			return false;
+		}
+		submitting = true;
+		message = '';
+		return true;
+	}
 </script>
 
-<Dialog>
+<Dialog open={isDialogOpen} onOpenChange={(details) => (isDialogOpen = details.open)}>
 	<Dialog.Trigger class={buttonStyle}><SquarePlus class={iconStyle} /></Dialog.Trigger>
 	<SkeletonPortal>
 		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
@@ -48,7 +133,7 @@
 					</Dialog.CloseTrigger>
 				</header>
 				<Dialog.Description>
-					<form method="POST" class="w-full space-y-4 p-4" use:enhance={handleSubmit}>
+					<form method="POST" class="w-full space-y-4 p-4" use:enhance={handleSubmit} onsubmit={onSubmit}>
 						<div class="input-group grid-cols-[auto_1fr_auto]">
 							<div class="ig-cell preset-tonal">Date</div>
 							<DatePicker locale="de-DE" {value} onValueChange={(e: any) => (value = e.value)}>
@@ -57,8 +142,8 @@
 									<DatePicker.Trigger />
 								</DatePicker.Control>
 								<SkeletonPortal>
-									<DatePicker.Positioner>
-										<DatePicker.Content>
+									<DatePicker.Positioner class="!z-[9999]">
+										<DatePicker.Content class="!z-[9999]">
 											<DatePicker.View view="day">
 												<DatePicker.Context>
 													{#snippet children(datePicker: any)}
@@ -154,21 +239,36 @@
 						<input type="hidden" name="date" value={value.at(0)?.toString()} />
 
 						<!-- DKB -->
-						<div class="input-group grid-cols-[auto_1fr_auto]">
-							<div class="ig-cell preset-tonal">EUR</div>
-							<input class="ig-input" type="number" step="0.01" name="dkbAll" placeholder="DKB All" required />
+						<div class="space-y-1">
+							<div class="input-group grid-cols-[auto_1fr_auto]" class:border-error-500={formErrors.dkbAll}>
+								<div class="ig-cell preset-tonal">EUR</div>
+								<input class="ig-input" class:border-error-500={formErrors.dkbAll} type="number" step="0.01" name="dkbAll" placeholder="DKB All" bind:value={formData.dkbAll} oninput={handleInput('dkbAll')} required />
+							</div>
+							{#if formErrors.dkbAll}
+								<div class="text-error-500 text-sm">{formErrors.dkbAll}</div>
+							{/if}
 						</div>
 
 						<!-- Depot -->
-						<div class="input-group grid-cols-[auto_1fr_auto]">
-							<div class="ig-cell preset-tonal">EUR</div>
-							<input class="ig-input" type="number" step="0.01" name="dkbDepot" placeholder="DKB Depot" required />
+						<div class="space-y-1">
+							<div class="input-group grid-cols-[auto_1fr_auto]" class:border-error-500={formErrors.dkbDepot}>
+								<div class="ig-cell preset-tonal">EUR</div>
+								<input class="ig-input" class:border-error-500={formErrors.dkbDepot} type="number" step="0.01" name="dkbDepot" placeholder="DKB Depot" bind:value={formData.dkbDepot} oninput={handleInput('dkbDepot')} required />
+							</div>
+							{#if formErrors.dkbDepot}
+								<div class="text-error-500 text-sm">{formErrors.dkbDepot}</div>
+							{/if}
 						</div>
 
 						<!-- ZKB -->
-						<div class="input-group grid-cols-[auto_1fr_auto]">
-							<div class="ig-cell preset-tonal">CHF</div>
-							<input class="ig-input" type="number" step="0.01" name="zkbAll" placeholder="ZKB All" required />
+						<div class="space-y-1">
+							<div class="input-group grid-cols-[auto_1fr_auto]" class:border-error-500={formErrors.zkbAll}>
+								<div class="ig-cell preset-tonal">CHF</div>
+								<input class="ig-input" class:border-error-500={formErrors.zkbAll} type="number" step="0.01" name="zkbAll" placeholder="ZKB All" bind:value={formData.zkbAll} oninput={handleInput('zkbAll')} required />
+							</div>
+							{#if formErrors.zkbAll}
+								<div class="text-error-500 text-sm">{formErrors.zkbAll}</div>
+							{/if}
 						</div>
 
 						{#if message}
@@ -179,14 +279,11 @@
 							</div>
 						{/if}
 
-						<fieldset class="flex justify-end">
-							<Dialog.CloseTrigger class="btn preset-tonal">Cancel</Dialog.CloseTrigger>
-							<Dialog.CloseTrigger type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}>
+						<fieldset class="flex justify-end gap-2">
+							<Dialog.CloseTrigger class="btn preset-tonal" on:click={resetForm} disabled={submitting}>Cancel</Dialog.CloseTrigger>
+							<button type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}>
 								{submitting ? 'Saving...' : 'Submit'}
-							</Dialog.CloseTrigger>
-							<!-- <button type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}> -->
-							<!-- {submitting ? 'Saving...' : 'Submit'} -->
-							<!-- </button> -->
+							</button>
 						</fieldset>
 					</form>
 				</Dialog.Description>
@@ -194,3 +291,13 @@
 		</Dialog.Positioner>
 	</SkeletonPortal>
 </Dialog>
+
+<style>
+	.border-error-500 {
+		border-color: rgb(var(--color-error-500)) !important;
+	}
+
+	.text-error-500 {
+		color: rgb(var(--color-error-500));
+	}
+</style>
