@@ -8,7 +8,7 @@
 	}
 
 	let { portfolio }: Props = $props();
-	let chart;
+	let chart: ApexCharts | undefined;
 
 	// Process portfolio data for chart
 	let chartData = $derived(
@@ -83,7 +83,7 @@
 				},
 				x: {
 					show: true,
-					formatter: function (value, opts) {
+					formatter: function (value: any, opts: any) {
 						// Show the exact date in tooltip with proper formatting
 						if (opts && typeof opts.dataPointIndex !== 'undefined') {
 							const actualDate = dates[opts.dataPointIndex];

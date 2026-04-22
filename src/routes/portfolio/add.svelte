@@ -14,8 +14,8 @@
 	const animation = 'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
 
 	// Style constants
-	const buttonStyle = 'btn rounded-lg px-3 py-2 transition-all duration-200 text-primary-600 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-800';
-	const iconStyle = 'w-4 h-4';
+	const buttonStyle = 'btn rounded-lg px-2 py-2 transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-transparent';
+	const iconStyle = 'w-6 h-6';
 
 	// Dialog state
 	let isDialogOpen = $state(false);

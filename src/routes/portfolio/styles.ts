@@ -3,17 +3,19 @@
 export const SHARED_STYLES = {
 	// Container styles
 	container: 'preset-filled-surface-100-900 rounded-xl p-1 border border-gray-200 dark:border-gray-700',
+	controlsContainer: 'preset-filled-surface-100-900 rounded-xl p-1 border border-primary-300 dark:border-primary-600 bg-primary-200 dark:bg-primary-900/50',
 
 	// Button styles
-	buttonBase: 'btn rounded-lg px-3 py-2 transition-all duration-200 hover:bg-primary-100 dark:hover:bg-primary-800',
+	buttonBase: 'btn rounded-lg px-2 py-2 transition-all duration-200 hover:bg-transparent',
 	buttonActive: 'text-primary-600 dark:text-primary-400',
 	buttonInactive: 'text-gray-500 dark:text-gray-400',
+	buttonGrey: 'btn rounded-lg px-2 py-2 transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-transparent',
 
 	// Icon styles
-	icon: 'w-4 h-4',
+	icon: 'w-6 h-6',
 
 	// Card styles
-	metricCard: 'card preset-filled-surface-50-900 p-2 md:p-4 hover:shadow-lg transition-shadow duration-200',
+	metricCard: 'p-2 md:p-4 rounded-xl backdrop-blur-md bg-white/20 dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-200 hover:shadow-xl hover:bg-white/30 dark:hover:bg-white/15',
 	metricContent: 'space-y-1',
 	metricLabel: 'text-xs text-secondary-600 dark:text-secondary-400 font-medium',
 	metricValue: 'text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100'

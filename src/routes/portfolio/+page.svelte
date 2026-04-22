@@ -42,7 +42,7 @@
 </svelte:head>
 
 <!-- <SubHeader /> -->
-<div id="subheader" class="mb-6">
+<div id="subheader" class="mb-6 lg:max-w-4xl lg:mx-auto">
 	<!-- Metrics Cards -->
 	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-2">
 		{#each metrics as metric}
@@ -51,20 +51,16 @@
 	</div>
 
 	<!-- Controls Section -->
-	<div class="flex justify-between items-center gap-4">
-		<div class="flex items-center space-x-4">
-			<div class={SHARED_STYLES.container}>
-				<div class="flex">
-					{#each PORTFOLIO_CONFIG.TABS as tab}
-						<button type="button" class={getButtonClasses(active === tab.id)} onclick={() => (active = tab.id)}>
-							<tab.icon class={SHARED_STYLES.icon} />
-						</button>
-					{/each}
-				</div>
+	<div class={SHARED_STYLES.controlsContainer}>
+		<div class="flex justify-between items-center">
+			<div class="flex items-center">
+				{#each PORTFOLIO_CONFIG.TABS as tab}
+					<button type="button" class={getButtonClasses(active === tab.id)} onclick={() => (active = tab.id)}>
+						<tab.icon class={SHARED_STYLES.icon} />
+					</button>
+				{/each}
 			</div>
-		</div>
-		<div class={SHARED_STYLES.container}>
-			<div class="flex">
+			<div>
 				<AddPortfolioItem onPortfolioAdded={handlePortfolioAdded} />
 			</div>
 		</div>
@@ -72,8 +68,10 @@
 </div>
 
 <!-- Dynamic Component Rendering -->
-{#if active === 'chart'}
-	<PortfolioChart {portfolio} />
-{:else}
-	<PortfolioTable {portfolio} />
-{/if}
+<div class="lg:max-w-4xl lg:mx-auto">
+	{#if active === 'chart'}
+		<PortfolioChart {portfolio} />
+	{:else}
+		<PortfolioTable {portfolio} />
+	{/if}
+</div>

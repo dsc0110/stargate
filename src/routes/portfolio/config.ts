@@ -6,12 +6,21 @@ export const PORTFOLIO_CONFIG = {
 	// Default active tab
 	DEFAULT_TAB: 'table',
 
+	// Metric labels configuration
+	METRIC_LABELS: {
+		VALUE: 'Value',
+		YEAR_OVER_YEAR: 'YoY',
+		MILLION_FORECAST: '1M€ by'
+	},
+
 	// Static metrics for fallback
-	DEFAULT_METRICS: [
-		{ label: 'Value', value: '0€' },
-		{ label: 'Year over Year', value: '+0€' },
-		{ label: '1M€ by', value: 'Unknown' }
-	],
+	get DEFAULT_METRICS() {
+		return [
+			{ label: this.METRIC_LABELS.VALUE, value: '0€' },
+			{ label: this.METRIC_LABELS.YEAR_OVER_YEAR, value: '+0€' },
+			{ label: this.METRIC_LABELS.MILLION_FORECAST, value: 'Unknown' }
+		];
+	},
 
 	// Tab configuration (no component references needed in runes mode)
 	TABS: [
@@ -26,9 +35,9 @@ export const PORTFOLIO_CONFIG = {
 export function generateMetrics(portfolio: any[]) {
 	try {
 		return [
-			{ label: 'Value', value: calculateCurrentValue(portfolio) },
-			{ label: 'Year over Year', value: calculateYearOverYear(portfolio) },
-			{ label: '1M€ by', value: calculateMillionForecast(portfolio) }
+			{ label: PORTFOLIO_CONFIG.METRIC_LABELS.VALUE, value: calculateCurrentValue(portfolio) },
+			{ label: PORTFOLIO_CONFIG.METRIC_LABELS.YEAR_OVER_YEAR, value: calculateYearOverYear(portfolio) },
+			{ label: PORTFOLIO_CONFIG.METRIC_LABELS.MILLION_FORECAST, value: calculateMillionForecast(portfolio) }
 		];
 	} catch (error) {
 		console.error('Error calculating metrics:', error);

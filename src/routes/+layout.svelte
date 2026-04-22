@@ -47,10 +47,10 @@
 			<!-- logo and path -->
 			<div class="flex lg:flex-1 headertext">
 				<a href="/" class="text-primary-600 hover:text-primary-500">
-					<span>/dsc</span>
+					<span>/</span>
 				</a>
 				{#key page.url.pathname}
-					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? '' : page.url.pathname}</span>
+					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? '' : page.url.pathname.slice(1)}</span>
 				{/key}
 			</div>
 
@@ -73,8 +73,11 @@
 						<div class="flex items-center justify-between">
 							<div class="flex lg:flex-1 headertext">
 								<a href="/" class="text-primary-600 hover:text-primary-500" onclick={closeMobileMenu}>
-									<span>/dsc</span>
+									<span>/</span>
 								</a>
+								{#if page.url.pathname !== '/'}
+									<span>{page.url.pathname.slice(1)}</span>
+								{/if}
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class="-m-2.5 rounded-md p-2.5">
 								<span class="sr-only">Close menu</span>
