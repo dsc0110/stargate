@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { LogIn, BikeIcon, DollarSign, PopcornIcon, SailboatIcon } from '@lucide/svelte';
+	import { House, LogIn, BikeIcon, DollarSign, PopcornIcon, SailboatIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [
+			{ label: 'Home', href: '/', icon: House },
 			// { label: 'Login', href: '/#', icon: LogIn },
 			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
 			{ label: 'Movies', href: '/movies', icon: PopcornIcon },

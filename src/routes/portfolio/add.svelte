@@ -120,7 +120,7 @@
 	}
 </script>
 
-<Dialog open={isDialogOpen} onOpenChange={(details) => (isDialogOpen = details.open)}>
+<Dialog open={isDialogOpen} onOpenChange={(details: { open: boolean }) => (isDialogOpen = details.open)}>
 	<Dialog.Trigger class={buttonStyle}><SquarePlus class={iconStyle} /></Dialog.Trigger>
 	<SkeletonPortal>
 		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />

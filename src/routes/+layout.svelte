@@ -50,7 +50,7 @@
 					<span>/</span>
 				</a>
 				{#key page.url.pathname}
-					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? '' : page.url.pathname.slice(1)}</span>
+					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? 'home' : page.url.pathname.slice(1)}</span>
 				{/key}
 			</div>
 
@@ -69,7 +69,7 @@
 		<el-dialog>
 			<dialog id="mobile-menu" class="backdrop:bg-transparent">
 				<div tabindex="-1" class="fixed inset-0 focus:outline-none">
-					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:max-w-sm sm:ring-1 sm:ring-gray-100/10">
+					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex lg:flex-1 headertext">
 								<a href="/" class="text-primary-600 hover:text-primary-500" onclick={closeMobileMenu}>
@@ -77,6 +77,8 @@
 								</a>
 								{#if page.url.pathname !== '/'}
 									<span>{page.url.pathname.slice(1)}</span>
+								{:else}
+									<span>home</span>
 								{/if}
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class="-m-2.5 rounded-md p-2.5">
