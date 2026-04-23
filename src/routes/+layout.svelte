@@ -1,6 +1,5 @@
 <script lang="ts">
 	import './layout.css';
-	import { blur, crossfade, draw, fade, fly, scale, slide } from 'svelte/transition';
 	import favicon from '$lib/images/favicon.svg';
 	import Navigation from './navigation.svelte';
 	import { Menu, SunMoon, Github } from '@lucide/svelte';

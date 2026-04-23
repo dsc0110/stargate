@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { House, LogIn, BikeIcon, DollarSign, PopcornIcon, SailboatIcon } from '@lucide/svelte';
+	import { House, BikeIcon, DollarSign, PopcornIcon, SailboatIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [

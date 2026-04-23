@@ -2,7 +2,7 @@
 	import AddPortfolioItem from './add.svelte';
 	import MetricCard from './metric-card.svelte';
 	import PortfolioChart from './line-chart.svelte';
-	import PortfolioPie from './pie-chart.svelte';
+	import PortfolioDonut from './donut-chart.svelte';
 	import PortfolioTable from './table.svelte';
 	import { PORTFOLIO_CONFIG, generateMetrics } from './config.js';
 	import { SHARED_STYLES, getButtonClasses } from './index.js';
@@ -73,7 +73,7 @@
 	{#if active === 'chart'}
 		<PortfolioChart {portfolio} />
 	{:else if active === 'pie'}
-		<PortfolioPie {portfolio} />
+		<PortfolioDonut {portfolio} />
 	{:else}
 		<PortfolioTable {portfolio} />
 	{/if}

@@ -39,28 +39,36 @@
 
 		const options = {
 			chart: {
-				type: 'pie',
+				type: 'donut',
 				height: 350,
 				background: 'transparent'
 			},
+			plotOptions: {
+				pie: {
+					donut: {
+						size: '70%'
+					}
+				}
+			},
 			series: [data.cash, data.depot],
 			labels: ['Cash', 'Depot'],
-			colors: ['var(--color-secondary-200)', 'var(--color-secondary-700)'],
+			colors: ['var(--color-primary-500)', 'var(--color-secondary-500)'],
 			legend: {
 				position: 'bottom',
 				labels: {
-					colors: ['#374151']
+					colors: ['var(--color-primary-500)', 'var(--color-secondary-500)']
 				}
 			},
 			dataLabels: {
 				enabled: true,
 				formatter: function (val: number, opts: any) {
 					const value = opts.w.config.series[opts.seriesIndex];
-					return `${val.toFixed(1)}%\n€${value.toLocaleString()}`;
+					return `${val.toFixed(1)}%`;
 				},
 				style: {
 					fontSize: '12px',
-					fontWeight: 'bold'
+					fontWeight: 'bold',
+					colors: ['white']
 				}
 			},
 			tooltip: {
@@ -82,7 +90,15 @@
 						}
 					}
 				}
-			]
+			],
+			fill: {
+				type: 'pattern',
+				opacity: 1,
+				pattern: {
+					enabled: true,
+					style: ['slantedLines', 'slantedLines']
+				}
+			}
 		};
 
 		chart = new ApexCharts(chartElement, options);
@@ -102,9 +118,6 @@
 	{#if latestEntry()}
 		<div class="w-full max-w-md">
 			<div bind:this={chartElement} class="w-full"></div>
-			<div class="mt-4 text-center text-sm text-gray-600 dark:text-gray-400">
-				{latestEntry().date}
-			</div>
 		</div>
 	{:else}
 		<div class="text-center text-gray-500 dark:text-gray-400">
