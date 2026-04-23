@@ -23,6 +23,19 @@
 	let dates = $derived(chartData.map((item) => item.date));
 	let totals = $derived(chartData.map((item) => item.total));
 
+	// Create filtered categories for x-axis labels (show first label of each year)
+	let filteredDates = $derived.by(() => {
+		const seenYears = new Set();
+		return dates.map((date) => {
+			const year = new Date(date).getFullYear();
+			if (!seenYears.has(year)) {
+				seenYears.add(year);
+				return date;
+			}
+			return '';
+		});
+	});
+
 	onMount(() => {
 		const options = {
 			chart: {
@@ -47,9 +60,14 @@
 			},
 			series: [{ name: 'Portfolio Total', data: totals }],
 			xaxis: {
-				categories: dates,
+				categories: filteredDates,
 				labels: {
-					show: false
+					show: true,
+					formatter: function (value: any) {
+						if (value === '') return '';
+						const date = new Date(value);
+						return date.getFullYear().toString();
+					}
 				},
 				crosshairs: {
 					show: false
@@ -60,7 +78,20 @@
 			},
 			yaxis: {
 				labels: {
-					show: false
+					show: true,
+					offsetX: -10,
+					style: {
+						colors: ['#999'],
+						fontSize: '11px'
+					},
+					formatter: function (value: any) {
+						// Format y-axis values with currency
+						return (
+							value.toLocaleString('de-DE', {
+								maximumFractionDigits: 0
+							}) + '€'
+						);
+					}
 				}
 			},
 			tooltip: {
@@ -118,7 +149,7 @@
 					show: true
 				},
 				fixed: {
-					enabled: false,
+					enabled: true,
 					position: 'topRight',
 					offsetX: 0,
 					offsetY: 0
@@ -134,7 +165,17 @@
 		if (chart && dates.length > 0) {
 			chart.updateOptions({
 				series: [{ name: 'Portfolio Total', data: totals }],
-				xaxis: { categories: dates }
+				xaxis: {
+					categories: filteredDates,
+					labels: {
+						show: true,
+						formatter: function (value: any) {
+							if (value === '') return '';
+							const date = new Date(value);
+							return date.getFullYear().toString();
+						}
+					}
+				}
 			});
 		}
 	});
