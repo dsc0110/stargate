@@ -43,9 +43,9 @@
 </svelte:head>
 
 <!-- <SubHeader /> -->
-<div id="subheader" class="mb-6 lg:max-w-4xl lg:mx-auto">
+<div id="subheader" class="mb-4 lg:max-w-4xl lg:mx-auto">
 	<!-- Metrics Cards -->
-	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-2">
+	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
 		{#each metrics as metric}
 			<MetricCard label={metric.label} value={metric.value} />
 		{/each}

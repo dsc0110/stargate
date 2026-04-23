@@ -43,7 +43,7 @@
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
-		<nav aria-label="Global" class="flex items-center justify-between p-2">
+		<nav aria-label="Global" class="flex items-center justify-between p-4 pb-2">
 			<!-- logo and path -->
 			<div class="flex lg:flex-1 headertext">
 				<a href="/" class="text-primary-600 hover:text-primary-500">
@@ -75,7 +75,7 @@
 		<el-dialog>
 			<dialog id="mobile-menu" class="backdrop:bg-transparent">
 				<div tabindex="-1" class="fixed inset-0 focus:outline-none">
-					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-2 sm:ring-1 sm:ring-gray-100/10">
+					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex lg:flex-1 headertext">
 								<a href="/" class="text-primary-600 hover:text-primary-500" onclick={closeMobileMenu}>
@@ -108,7 +108,7 @@
 	</header>
 
 	<div class="grid grid-cols-6 gap-4">
-		<main class="col-span-6 lg:col-span-5 col-start-1 p-2 space-y-4">
+		<main class="col-span-6 lg:col-span-5 col-start-1 p-4 pt-2">
 			{@render children()}
 		</main>
 		<aside class="p-4 hidden lg:block">
