@@ -21,6 +21,16 @@
 		}
 		return items;
 	});
+
+	function formatDate(dateString: string): string {
+		// Parse DD.MM.YY format manually
+		const [day, month, year] = dateString.split('.');
+		const fullYear = parseInt(year) < 50 ? `20${year}` : `19${year}`;
+		const date = new Date(parseInt(fullYear), parseInt(month) - 1, parseInt(day));
+
+		const monthName = date.toLocaleString('en', { month: 'short' });
+		return `${parseInt(day)}. ${monthName}. ${year}`;
+	}
 </script>
 
 <div class="flex flex-col">
@@ -38,7 +48,7 @@
 				{#each displayItems as item}
 					<tr>
 						{#if item}
-							<td class="text-xs">{item.date}</td>
+							<td class="text-xs">{formatDate(item.date)}</td>
 							<td class="text-xs">{item.accounts.dkbCash}</td>
 							<td class="text-xs">{item.accounts.dkbDepot}</td>
 							<td class="text-xs">{item.accounts.zkbCash}</td>
