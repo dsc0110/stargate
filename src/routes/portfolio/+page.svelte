@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AddPortfolioItem from './add.svelte';
+	import AddPortfolioItem from './add-portfolio-item.svelte';
 	import MetricCard from './metric-card.svelte';
 	import PortfolioChart from './line-chart.svelte';
 	import PortfolioDonut from './donut-chart.svelte';
