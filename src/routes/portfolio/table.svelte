@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Pagination } from '@skeletonlabs/skeleton-svelte';
-	import { ArrowLeftIcon, ArrowRightIcon } from '@lucide/svelte';
+	import { ArrowLeft, ArrowRight } from '@lucide/svelte';
 
 	interface Props {
 		portfolio: any[];
@@ -66,7 +66,7 @@
 	<div class="mt-4">
 		<Pagination count={portfolio.length} pageSize={PAGE_SIZE} {page} onPageChange={(event: any) => (page = event.page)}>
 			<Pagination.PrevTrigger>
-				<ArrowLeftIcon class="size-4" />
+				<ArrowLeft class="size-4" />
 			</Pagination.PrevTrigger>
 			<Pagination.Context>
 				{#snippet children(pagination: any)}
@@ -82,7 +82,7 @@
 				{/snippet}
 			</Pagination.Context>
 			<Pagination.NextTrigger>
-				<ArrowRightIcon class="size-4" />
+				<ArrowRight class="size-4" />
 			</Pagination.NextTrigger>
 		</Pagination>
 	</div>
