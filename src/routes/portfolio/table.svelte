@@ -23,13 +23,12 @@
 	});
 
 	function formatDate(dateString: string): string {
-		// Parse DD.MM.YY format manually
-		const [day, month, year] = dateString.split('.');
-		const fullYear = parseInt(year) < 50 ? `20${year}` : `19${year}`;
-		const date = new Date(parseInt(fullYear), parseInt(month) - 1, parseInt(day));
-
+		// Parse YYYY-MM-DD ISO format
+		const date = new Date(dateString);
+		const day = date.getDate();
 		const monthName = date.toLocaleString('en', { month: 'short' });
-		return `${parseInt(day)}. ${monthName}. ${year}`;
+		const year = date.getFullYear().toString().slice(-2);
+		return `${day}. ${monthName}. ${year}`;
 	}
 </script>
 
