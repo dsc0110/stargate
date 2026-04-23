@@ -8,7 +8,7 @@
 
 	let { portfolio }: Props = $props();
 	let chart: ApexCharts | undefined;
-	let chartElement: HTMLDivElement;
+	let chartElement = $state<HTMLDivElement>();
 
 	// Calculate current values (latest entry)
 	let latestEntry = $derived(() => {

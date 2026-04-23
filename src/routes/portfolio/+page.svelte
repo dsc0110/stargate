@@ -1,8 +1,8 @@
 <script lang="ts">
 	import AddPortfolioItem from './add.svelte';
-	import MetricCard from './MetricCard.svelte';
-	import PortfolioChart from './chart.svelte';
-	import PortfolioPie from './pie.svelte';
+	import MetricCard from './metric-card.svelte';
+	import PortfolioChart from './line-chart.svelte';
+	import PortfolioPie from './pie-chart.svelte';
 	import PortfolioTable from './table.svelte';
 	import { PORTFOLIO_CONFIG, generateMetrics } from './config.js';
 	import { SHARED_STYLES, getButtonClasses } from './index.js';

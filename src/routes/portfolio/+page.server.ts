@@ -1,6 +1,6 @@
 import { fail, json } from '@sveltejs/kit';
 import { testPortfolio as testPortfolio } from '$lib/portfolio.js';
-import { ConversionHelper } from './ConversionHelper';
+import { ConversionHelper } from './conversion-helper';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {

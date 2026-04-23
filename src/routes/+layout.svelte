@@ -38,6 +38,7 @@
 </script>
 
 <svelte:head>
+	<title>{page.url.pathname === '/' ? 'home' : page.url.pathname.slice(1)}</title>
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
