@@ -50,6 +50,12 @@
 				categories: dates,
 				labels: {
 					show: false
+				},
+				crosshairs: {
+					show: false
+				},
+				tooltip: {
+					enabled: false
 				}
 			},
 			yaxis: {
@@ -83,7 +89,7 @@
 							const actualDate = dates[opts.dataPointIndex];
 							if (actualDate) {
 								const date = new Date(actualDate);
-								return date.toLocaleDateString('en-US', {
+								return date.toLocaleDateString('de-DE', {
 									year: 'numeric',
 									month: 'short',
 									day: 'numeric'
@@ -91,6 +97,17 @@
 							}
 						}
 						return value;
+					}
+				},
+				y: {
+					formatter: function (value: any) {
+						// Format portfolio total with currency and decimal separators
+						return (
+							value.toLocaleString('de-DE', {
+								minimumFractionDigits: 0,
+								maximumFractionDigits: 0
+							}) + '€'
+						);
 					}
 				},
 				z: {
