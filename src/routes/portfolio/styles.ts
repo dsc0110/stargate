@@ -3,7 +3,7 @@
 export const SHARED_STYLES = {
 	// Container styles
 	container: 'preset-filled-surface-100-900 rounded-xl p-1 border border-gray-200 dark:border-gray-700',
-	controlsContainer: 'preset-filled-surface-100-900 rounded-xl p-1 border border-orange-400/50 dark:border-primary-600 backdrop-blur-lg bg-orange-400/20 dark:bg-primary-900/50 shadow-lg shadow-orange-200/30 dark:shadow-none',
+	controlsContainer: 'p-2 md:p-4 rounded-xl backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-200 hover:shadow-xl hover:bg-black/15 dark:hover:bg-white/15',
 
 	// Button styles
 	buttonBase: 'btn rounded-lg px-2 py-2 transition-all duration-200 hover:bg-transparent',
