@@ -43,7 +43,7 @@
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
-		<nav aria-label="Global" class="flex items-center justify-between p-4">
+		<nav aria-label="Global" class="flex items-center justify-between p-2">
 			<!-- logo and path -->
 			<div class="flex lg:flex-1 headertext">
 				<a href="/" class="text-primary-600 hover:text-primary-500">
@@ -57,8 +57,8 @@
 			<!-- header icons -->
 			<div class="flex gap-x-4">
 				<button type="button" class="text-sm/6 font-semibold" aria-label="Toggle Theme" onclick={toggleTheme}><SunMoon /></button>
-				<a href="https://github.com/dsc0110" class="text-sm/6 font-semibold">
-					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<a href="https://github.com/dsc0110" class="text-sm/6 font-semibold" aria-label="Visit GitHub profile">
+					<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 						<path
 							d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
 						></path>
@@ -75,7 +75,7 @@
 		<el-dialog>
 			<dialog id="mobile-menu" class="backdrop:bg-transparent">
 				<div tabindex="-1" class="fixed inset-0 focus:outline-none">
-					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
+					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-2 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex lg:flex-1 headertext">
 								<a href="/" class="text-primary-600 hover:text-primary-500" onclick={closeMobileMenu}>
@@ -108,7 +108,7 @@
 	</header>
 
 	<div class="grid grid-cols-6 gap-4">
-		<main class="col-span-6 lg:col-span-5 col-start-1 p-4 space-y-4">
+		<main class="col-span-6 lg:col-span-5 col-start-1 p-2 space-y-4">
 			{@render children()}
 		</main>
 		<aside class="p-4 hidden lg:block">
