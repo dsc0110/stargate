@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { House, BikeIcon, DollarSign, PopcornIcon, SailboatIcon } from '@lucide/svelte';
+	import { House, BikeIcon, DollarSign, ScaleIcon, SailboatIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [
 			{ label: 'Home', href: '/', icon: House },
 			// { label: 'Login', href: '/#', icon: LogIn },
 			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
-			{ label: 'Movies', href: '/movies', icon: PopcornIcon },
+			{ label: 'Scale', href: '/scale', icon: ScaleIcon },
 			{ label: 'Biking', href: '/biking', icon: BikeIcon }
 		],
 		private: [{ label: 'Sailing', href: '/sailing', icon: SailboatIcon }]

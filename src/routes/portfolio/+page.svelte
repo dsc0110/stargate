@@ -3,7 +3,7 @@
 	import MetricCard from './metric-card.svelte';
 	import PortfolioChart from './line-chart.svelte';
 	import PortfolioDonut from './donut-chart.svelte';
-	import PortfolioTable from './table.svelte';
+	import PortfolioTable from './portfolio-table.svelte';
 	import { PORTFOLIO_CONFIG, generateMetrics } from './config.js';
 	import { SHARED_STYLES, getButtonClasses } from './index.js';
 	import type { PageData } from './$types';
