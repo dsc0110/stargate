@@ -1,4 +1,4 @@
-// Shared style constants for portfolio components
+// Shared styles for components across the application
 
 export const SHARED_STYLES = {
 	// Container styles
@@ -20,3 +20,10 @@ export const SHARED_STYLES = {
 	metricLabel: 'text-xs text-secondary-600 dark:text-secondary-400 font-medium',
 	metricValue: 'text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100'
 } as const;
+
+/**
+ * Get button classes based on active state
+ */
+export function getButtonClasses(isActive: boolean): string {
+	return `${SHARED_STYLES.buttonBase} ${isActive ? SHARED_STYLES.buttonActive : SHARED_STYLES.buttonInactive}`;
+}
