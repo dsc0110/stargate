@@ -1,5 +1,5 @@
 import { fail, json } from '@sveltejs/kit';
-import { ConversionHelper } from './conversion-helper';
+import { ConversionHelper } from '../scale/utils.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
