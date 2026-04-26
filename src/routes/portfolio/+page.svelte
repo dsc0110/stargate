@@ -16,7 +16,7 @@
 	let active: string = $state('table');
 
 	// Use state for portfolio data that can be updated
-	let portfolio = $state(data.portfolio);
+	let portfolio = $state<any[]>([]);
 
 	// Derive metrics from portfolio state automatically
 	let metrics = $derived(generateMetrics(portfolio));
