@@ -1,5 +1,6 @@
 <script lang="ts">
 	import ScaleTable from './scale-table.svelte';
+	import ScaleChart from './scale-chart.svelte';
 	import AddScaleResult from './add-scale-result.svelte';
 	import { ChartLine, Table } from '@lucide/svelte';
 	import { SHARED_STYLES, getButtonClasses } from '$lib/shared-styles';
@@ -60,8 +61,7 @@
 <!-- Dynamic Component Rendering -->
 <div class="lg:max-w-4xl lg:mx-auto">
 	{#if active === 'chart'}
-		<!-- Chart component will go here -->
-		<div class="p-4 text-center text-gray-500">Chart view coming soon</div>
+		<ScaleChart {scaleResults} bodySizeCm={data.bodySizeCm} />
 	{:else}
 		<ScaleTable {scaleResults} bodySizeCm={data.bodySizeCm} />
 	{/if}

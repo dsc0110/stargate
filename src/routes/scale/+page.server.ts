@@ -87,11 +87,9 @@ export const actions: Actions = {
 			console.log('Scale result saved successfully:', scaleResultItem);
 
 			return {
-				status: 'success',
-				data: {
-					message: 'Scale result saved successfully!',
-					scaleResults: scaleResults
-				}
+				success: true,
+				scaleResults: scaleResults,
+				message: 'Scale result saved successfully!'
 			};
 		} catch (error) {
 			console.error('Error saving scale result:', error);
