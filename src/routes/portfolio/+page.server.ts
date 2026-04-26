@@ -1,29 +1,25 @@
 import { fail, json } from '@sveltejs/kit';
-import { testPortfolio as testPortfolio } from '$lib/portfolio.js';
 import { ConversionHelper } from './conversion-helper';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
 		if (platform?.env.STARGATE_BUCKET === undefined) {
-			// return test data sorted newest-first
-			const portfolio = Array.isArray(testPortfolio) ? [...testPortfolio].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : testPortfolio;
-			return { portfolio };
+			return { portfolio: [] };
 		}
 
 		const object = await platform?.env.STARGATE_BUCKET.get('portfolio/portfolio.json');
 		if (object === null) {
-			const portfolio = Array.isArray(testPortfolio) ? [...testPortfolio].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : testPortfolio;
-			return { portfolio };
+			return { portfolio: [] };
 		}
 
 		const parsed = JSON.parse(await object.text());
-		const portfolio = Array.isArray(parsed) ? parsed.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : parsed;
+		const portfolio = Array.isArray(parsed) ? parsed.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
 
 		return { portfolio };
 	} catch (error) {
 		console.error('Error getting portfolio data:', error);
-		return { portfolio: testPortfolio };
+		return { portfolio: [] };
 	}
 };
 
