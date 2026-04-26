@@ -5,13 +5,13 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
-		if (platform?.env.PORTFOLIO_BUCKET === undefined) {
+		if (platform?.env.STARGATE_BUCKET === undefined) {
 			// return test data sorted newest-first
 			const portfolio = Array.isArray(testPortfolio) ? [...testPortfolio].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : testPortfolio;
 			return { portfolio };
 		}
 
-		const object = await platform?.env.PORTFOLIO_BUCKET.get('portfolio.json');
+		const object = await platform?.env.STARGATE_BUCKET.get('portfolio/portfolio.json');
 		if (object === null) {
 			const portfolio = Array.isArray(testPortfolio) ? [...testPortfolio].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : testPortfolio;
 			return { portfolio };
@@ -31,7 +31,7 @@ export const actions: Actions = {
 	default: async ({ request, platform }) => {
 		console.log('Form action triggered');
 
-		if (platform?.env.PORTFOLIO_BUCKET === undefined) {
+		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return fail(500, { message: 'R2 bucket not available' });
 		}
 
@@ -61,7 +61,7 @@ export const actions: Actions = {
 			};
 
 			// Get portfolio.json from R2 to append new record
-			const existingPortfolio = await platform?.env.PORTFOLIO_BUCKET.get('portfolio.json');
+			const existingPortfolio = await platform?.env.STARGATE_BUCKET.get('portfolio/portfolio.json');
 			let portfolio = [];
 
 			if (existingPortfolio) {
@@ -76,7 +76,7 @@ export const actions: Actions = {
 			const filename = `portfolio.json`;
 
 			// Store in R2 bucket
-			await platform.env.PORTFOLIO_BUCKET.put(filename, JSON.stringify(portfolio), {
+			await platform.env.STARGATE_BUCKET.put('portfolio/portfolio.json', JSON.stringify(portfolio), {
 				httpMetadata: {
 					contentType: 'application/json'
 				}

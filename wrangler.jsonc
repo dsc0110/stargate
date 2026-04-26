@@ -18,8 +18,8 @@
 	},
 	"r2_buckets": [
 		{
-			"binding": "PORTFOLIO_BUCKET",
-			"bucket_name": "portfolio-bucket"
+			"binding": "STARGATE_BUCKET",
+			"bucket_name": "stargate-bucket"
 		}
 	]
 	/**
