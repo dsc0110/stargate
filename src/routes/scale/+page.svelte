@@ -15,8 +15,8 @@
 
 	// Configuration for scale tabs
 	const SCALE_TABS = [
-		{ id: 'chart', icon: ChartLine },
-		{ id: 'table', icon: Table }
+		{ id: 'table', icon: Table },
+		{ id: 'chart', icon: ChartLine }
 	];
 
 	// Use state for scale results data that can be updated

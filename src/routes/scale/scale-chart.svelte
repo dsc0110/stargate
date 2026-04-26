@@ -52,12 +52,24 @@
 		const options = {
 			chart: {
 				type: 'line' as const,
-				height: 400,
 				toolbar: {
-					show: false
+					show: false,
+					tools: {
+						download: false,
+						selection: false,
+						zoom: false,
+						zoomin: false,
+						zoomout: false,
+						pan: false
+					}
 				}
 			},
-			colors: ['var(--color-primary-500)'],
+			colors: ['var(--color-secondary-500)'],
+			dataLabels: {
+				style: {
+					colors: ['black']
+				}
+			},
 			series: [{ name: 'Weight (kg)', data: weights }],
 			xaxis: {
 				categories: filteredDates,
@@ -77,13 +89,13 @@
 				}
 			},
 			yaxis: {
-				// Weight axis only
-				title: {
-					text: 'Weight (kg)',
-					style: { color: 'var(--color-primary-500)' }
-				},
 				labels: {
-					style: { colors: ['var(--color-primary-500)'] },
+					show: true,
+					offsetX: -10,
+					style: {
+						colors: ['#999'],
+						fontSize: '11px'
+					},
 					formatter: function (value: number) {
 						return value.toFixed(1) + ' kg';
 					}
@@ -91,9 +103,51 @@
 			},
 			tooltip: {
 				enabled: true,
-				shared: false,
+				enabledOnSeries: undefined,
+				shared: true,
+				followCursor: false,
 				intersect: false,
+				inverseOrder: false,
+				hideEmptySeries: true,
+				fillSeriesColor: false,
 				theme: 'dark',
+				style: {
+					fontSize: '12px',
+					fontFamily: undefined
+				},
+				onDatasetHover: {
+					highlightDataSeries: false
+				},
+				x: {
+					show: true,
+					formatter: function (value: any, opts: any) {
+						// Show the exact date in tooltip with proper formatting
+						if (opts && typeof opts.dataPointIndex !== 'undefined') {
+							const actualDate = dates[opts.dataPointIndex];
+							if (actualDate) {
+								const date = new Date(actualDate);
+								return date.toLocaleDateString('de-DE', {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric'
+								});
+							}
+						}
+						return value;
+					}
+				},
+				y: {
+					formatter: function (value: any) {
+						return value.toFixed(1) + ' kg';
+					}
+				},
+				z: {
+					formatter: undefined,
+					title: 'Size: '
+				},
+				marker: {
+					show: true
+				},
 				fixed: {
 					enabled: true,
 					position: 'topRight',
@@ -132,23 +186,6 @@
 						</div>
 					</div>`;
 				}
-			},
-			stroke: {
-				curve: 'smooth' as const,
-				width: 3
-			},
-			markers: {
-				size: 4,
-				strokeWidth: 2,
-				fillOpacity: 1,
-				strokeOpacity: 1
-			},
-			grid: {
-				borderColor: '#374151',
-				strokeDashArray: 3
-			},
-			legend: {
-				show: false
 			}
 		};
 
@@ -167,7 +204,15 @@
 				chart.updateOptions({
 					series: [{ name: 'Weight (kg)', data: weights }],
 					xaxis: {
-						categories: filteredDates
+						categories: filteredDates,
+						labels: {
+							show: true,
+							formatter: function (value: any) {
+								if (value === '') return '';
+								const date = new Date(value);
+								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
+							}
+						}
 					}
 				});
 			}
