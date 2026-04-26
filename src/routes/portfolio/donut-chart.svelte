@@ -35,11 +35,13 @@
 	});
 
 	function initChart() {
+		if (!chartElement) return;
+
 		const data = pieData();
 
 		const options = {
 			chart: {
-				type: 'donut',
+				type: 'donut' as const,
 				height: 350,
 				background: 'transparent'
 			},
@@ -54,7 +56,7 @@
 			labels: ['Cash', 'Depot'],
 			colors: ['var(--color-primary-500)', 'var(--color-secondary-500)'],
 			legend: {
-				position: 'bottom',
+				position: 'bottom' as const,
 				labels: {
 					colors: ['var(--color-primary-500)', 'var(--color-secondary-500)']
 				}
@@ -86,13 +88,13 @@
 							height: 300
 						},
 						legend: {
-							position: 'bottom'
+							position: 'bottom' as const
 						}
 					}
 				}
 			],
 			fill: {
-				type: 'pattern',
+				type: 'pattern' as const,
 				opacity: 1,
 				pattern: {
 					enabled: true,
