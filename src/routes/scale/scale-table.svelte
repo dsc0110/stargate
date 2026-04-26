@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { Pagination } from '@skeletonlabs/skeleton-svelte';
 	import { ArrowLeft, ArrowRight } from '@lucide/svelte';
+	import { calculateBMI } from './utils.js';
 
 	interface Props {
 		scaleResults: any[];
+		bodySizeCm: number;
 	}
 
-	let { scaleResults }: Props = $props();
+	let { scaleResults, bodySizeCm }: Props = $props();
 	const PAGE_SIZE = 15;
 	let page = $state(1);
 	const start = $derived((page - 1) * PAGE_SIZE);
@@ -38,9 +40,9 @@
 			<thead>
 				<tr>
 					<th>Date</th>
-					<th>Weight</th>
+					<th>Weight (kg)</th>
+					<th>Body Fat (%)</th>
 					<th>BMI</th>
-					<th>Bodyfat</th>
 				</tr>
 			</thead>
 			<tbody class="[&>tr]:hover:text-secondary-500">
@@ -48,9 +50,9 @@
 					<tr>
 						{#if item}
 							<td class="text-xs">{formatDate(item.date)}</td>
-							<td class="text-xs">{item.accounts.weight}</td>
-							<td class="text-xs">{item.accounts.bmi}</td>
-							<td class="text-xs">{item.accounts.bodyFat}</td>
+							<td class="text-xs">{item.weight}</td>
+							<td class="text-xs">{item.bodyFat}</td>
+							<td class="text-xs">{bodySizeCm > 0 ? calculateBMI(item.weight, bodySizeCm) : '-'}</td>
 						{:else}
 							<td class="text-xs">&nbsp;</td>
 							<td class="text-xs">&nbsp;</td>

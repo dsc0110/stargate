@@ -1,9 +1,15 @@
 <script lang="ts">
 	import ScaleTable from './scale-table.svelte';
-	import { ChartLine, Table, SquarePlus } from '@lucide/svelte';
+	import AddScaleResult from './add-scale-result.svelte';
+	import { ChartLine, Table } from '@lucide/svelte';
 	import { SHARED_STYLES, getButtonClasses } from '$lib/shared-styles';
+	import type { PageData } from './$types';
 
-	let scaleResults = $state<any[]>([]);
+	interface Props {
+		data: PageData;
+	}
+
+	let { data }: Props = $props();
 	let active: string = $state('table');
 
 	// Configuration for scale tabs
@@ -11,6 +17,21 @@
 		{ id: 'chart', icon: ChartLine },
 		{ id: 'table', icon: Table }
 	];
+
+	// Use state for scale results data that can be updated
+	let scaleResults = $state<any[]>([]);
+
+	// React to changes in data.scaleResults only
+	$effect(() => {
+		scaleResults = data.scaleResults;
+	});
+
+	// Callback function to handle new scale data
+	function handleScaleResultAdded(newScaleResults: any[]) {
+		// Update both data and local state to trigger reactivity
+		data.scaleResults = newScaleResults;
+		scaleResults = newScaleResults;
+	}
 </script>
 
 <svelte:head>
@@ -30,10 +51,7 @@
 				{/each}
 			</div>
 			<div>
-				<!-- Add Scale Result button will go here -->
-				<button type="button" class={SHARED_STYLES.buttonGrey}>
-					<SquarePlus class={SHARED_STYLES.icon} />
-				</button>
+				<AddScaleResult onScaleResultAdded={handleScaleResultAdded} />
 			</div>
 		</div>
 	</div>
@@ -45,6 +63,6 @@
 		<!-- Chart component will go here -->
 		<div class="p-4 text-center text-gray-500">Chart view coming soon</div>
 	{:else}
-		<ScaleTable {scaleResults} />
+		<ScaleTable {scaleResults} bodySizeCm={data.bodySizeCm} />
 	{/if}
 </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { SHARED_STYLES, type PortfolioMetric } from './index.js';
+	import { SHARED_STYLES } from '$lib/shared-styles';
+	import type { PortfolioMetric } from './index.js';
 
 	interface Props extends PortfolioMetric {}
 
