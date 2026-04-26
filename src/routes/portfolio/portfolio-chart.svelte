@@ -39,7 +39,7 @@
 	onMount(() => {
 		const options = {
 			chart: {
-				type: 'line',
+				type: 'line' as const,
 				toolbar: {
 					show: false,
 					tools: {
@@ -156,8 +156,11 @@
 				}
 			}
 		};
-		chart = new ApexCharts(document.querySelector('#portfolio-chart'), options);
-		chart.render();
+		const chartElement = document.querySelector('#portfolio-chart') as HTMLElement;
+		if (chartElement) {
+			chart = new ApexCharts(chartElement, options);
+			chart.render();
+		}
 	});
 
 	// Update chart when portfolio data changes

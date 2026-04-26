@@ -94,6 +94,12 @@
 				shared: false,
 				intersect: false,
 				theme: 'dark',
+				fixed: {
+					enabled: true,
+					position: 'topRight',
+					offsetX: 0,
+					offsetY: 0
+				},
 				custom: function ({ series, seriesIndex, dataPointIndex, w }: any) {
 					const date = new Date(dates[dataPointIndex]).toLocaleDateString('de-DE', {
 						year: 'numeric',
