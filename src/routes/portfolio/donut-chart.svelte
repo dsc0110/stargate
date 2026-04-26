@@ -103,7 +103,7 @@
 			}
 		};
 
-		chart = new ApexCharts(chartElement, options);
+		chart = new ApexCharts(chartElement!, options);
 		chart.render();
 	}
 
