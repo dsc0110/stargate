@@ -1,15 +1,17 @@
 <script lang="ts">
-	import { House, BikeIcon, DollarSign, ScaleIcon, SailboatIcon } from '@lucide/svelte';
+	import { House, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [
 			{ label: 'Home', href: '/', icon: House },
-			// { label: 'Login', href: '/#', icon: LogIn },
+			{ label: 'Feed', href: '/feed', icon: RssIcon },
+			{ label: 'DJ Horn', href: '/djhorn', icon: BoomBoxIcon }
+		],
+		private: [
 			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
 			{ label: 'Scale', href: '/scale', icon: ScaleIcon },
-			{ label: 'Biking', href: '/biking', icon: BikeIcon }
-		],
-		private: [{ label: 'Sailing', href: '/sailing', icon: SailboatIcon }]
+			{ label: 'Study', href: '/study', icon: GraduationCapIcon }
+		]
 	};
 
 	function closeMobileMenu() {

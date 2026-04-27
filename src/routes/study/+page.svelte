@@ -1,6 +1,6 @@
 <svelte:head>
-	<title>sailing</title>
-	<meta name="description" content="sailing" />
+	<title>study</title>
+	<meta name="description" content="study" />
 </svelte:head>
 
 <article class="h-[512px] p-4">
