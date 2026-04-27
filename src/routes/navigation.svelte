@@ -4,8 +4,7 @@
 	const linksSidebar = {
 		public: [
 			{ label: 'Home', href: '/', icon: House },
-			{ label: 'Feed', href: '/feed', icon: RssIcon },
-			{ label: 'DJ Horn', href: '/djhorn', icon: BoomBoxIcon }
+			{ label: 'Feed', href: '/feed', icon: RssIcon }
 		],
 		private: [
 			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
