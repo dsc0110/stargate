@@ -40,6 +40,7 @@
 		const options = {
 			chart: {
 				type: 'line' as const,
+				height: 400,
 				toolbar: {
 					show: false,
 					tools: {

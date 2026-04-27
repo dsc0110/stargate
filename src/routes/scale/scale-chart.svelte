@@ -29,13 +29,13 @@
 	let bodyFats = $derived(chartData.map((item) => item.bodyFat));
 	let bmis = $derived(chartData.map((item) => item.bmi));
 
-	// Create filtered categories for x-axis labels (show first label of each month)
+	// Create filtered categories for x-axis labels (show first label of each year)
 	let filteredDates = $derived.by(() => {
-		const seenMonths = new Set();
+		const seenYears = new Set();
 		return dates.map((date) => {
-			const monthYear = new Date(date).toISOString().slice(0, 7); // YYYY-MM
-			if (!seenMonths.has(monthYear)) {
-				seenMonths.add(monthYear);
+			const year = new Date(date).getFullYear();
+			if (!seenYears.has(year)) {
+				seenYears.add(year);
 				return date;
 			}
 			return '';
@@ -52,6 +52,7 @@
 		const options = {
 			chart: {
 				type: 'line' as const,
+				height: 400,
 				toolbar: {
 					show: false,
 					tools: {
@@ -78,7 +79,7 @@
 					formatter: function (value: any) {
 						if (value === '') return '';
 						const date = new Date(value);
-						return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
+						return date.getFullYear().toString();
 					}
 				},
 				crosshairs: {
