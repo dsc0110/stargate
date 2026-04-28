@@ -154,38 +154,6 @@
 					position: 'topRight',
 					offsetX: 0,
 					offsetY: 0
-				},
-				custom: function ({ series, seriesIndex, dataPointIndex, w }: any) {
-					const date = new Date(dates[dataPointIndex]).toLocaleDateString('de-DE', {
-						year: 'numeric',
-						month: 'short',
-						day: 'numeric'
-					});
-
-					const weight = weights[dataPointIndex];
-					const bodyFat = bodyFats[dataPointIndex];
-					const bmi = bmis[dataPointIndex];
-
-					return `<div class="p-3 bg-gray-800 rounded shadow-lg border border-gray-600">
-						<div class="font-semibold text-white mb-2">${date}</div>
-						<div class="space-y-1">
-							<div class="flex items-center text-sm">
-								<span class="w-3 h-3 bg-blue-500 rounded-full mr-2"></span>
-								<span class="text-gray-300">Weight: </span>
-								<span class="text-white font-medium">${weight.toFixed(1)} kg</span>
-							</div>
-							<div class="flex items-center text-sm">
-								<span class="w-3 h-3 bg-orange-500 rounded-full mr-2"></span>
-								<span class="text-gray-300">Body Fat: </span>
-								<span class="text-white font-medium">${bodyFat.toFixed(1)}%</span>
-							</div>
-							<div class="flex items-center text-sm">
-								<span class="w-3 h-3 bg-purple-500 rounded-full mr-2"></span>
-								<span class="text-gray-300">BMI: </span>
-								<span class="text-white font-medium">${bmi.toFixed(1)}</span>
-							</div>
-						</div>
-					</div>`;
 				}
 			}
 		};

@@ -43,7 +43,7 @@
 </svelte:head>
 
 <!-- <SubHeader /> -->
-<div id="subheader" class="mb-4 lg:max-w-4xl lg:mx-auto">
+<div id="subheader">
 	<!-- Metrics Cards -->
 	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
 		{#each metrics as metric}
@@ -69,7 +69,7 @@
 </div>
 
 <!-- Dynamic Component Rendering -->
-<div class="lg:max-w-4xl lg:mx-auto">
+<div>
 	{#if active === 'chart'}
 		<PortfolioChart {portfolio} />
 	{:else if active === 'pie'}
