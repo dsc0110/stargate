@@ -2,6 +2,8 @@
 	import ScaleTable from './scale-table.svelte';
 	import ScaleChart from './scale-chart.svelte';
 	import AddScaleResult from './add-scale-result.svelte';
+	import MetricCard from '$lib/metric-card.svelte';
+	import { generateScaleMetrics } from './config.js';
 	import { ChartLine, Table, Weight, Activity, Percent } from '@lucide/svelte';
 	import { SHARED_STYLES, getButtonClasses } from '$lib/shared-styles';
 	import type { PageData } from './$types';
@@ -30,6 +32,9 @@
 	// Use state for scale results data that can be updated
 	let scaleResults = $state<any[]>([]);
 
+	// Derive metrics from scale results state automatically
+	let metrics = $derived(generateScaleMetrics(scaleResults, data.bodySizeCm));
+
 	// React to changes in data.scaleResults only
 	$effect(() => {
 		scaleResults = data.scaleResults;
@@ -40,6 +45,7 @@
 		// Update both data and local state to trigger reactivity
 		data.scaleResults = newScaleResults;
 		scaleResults = newScaleResults;
+		// metrics will automatically recalculate via $derived
 	}
 </script>
 
@@ -49,6 +55,13 @@
 </svelte:head>
 
 <div id="subheader">
+	<!-- Metrics Cards -->
+	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
+		{#each metrics as metric}
+			<MetricCard label={metric.label} value={metric.value} />
+		{/each}
+	</div>
+
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
 		<div class="flex justify-between items-center">

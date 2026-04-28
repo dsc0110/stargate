@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { SHARED_STYLES } from '$lib/shared-styles';
-	import type { PortfolioMetric } from './index.js';
 
-	interface Props extends PortfolioMetric {}
+	interface Props {
+		label: string;
+		value: string;
+	}
 
 	let { label, value }: Props = $props();
 </script>

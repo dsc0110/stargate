@@ -1,6 +1,6 @@
 <script lang="ts">
 	import AddPortfolioItem from './add-portfolio-item.svelte';
-	import MetricCard from './metric-card.svelte';
+	import MetricCard from '$lib/metric-card.svelte';
 	import PortfolioChart from './portfolio-chart.svelte';
 	import PortfolioDonut from './donut-chart.svelte';
 	import PortfolioTable from './portfolio-table.svelte';
