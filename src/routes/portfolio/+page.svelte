@@ -13,7 +13,7 @@
 	}
 
 	let { data }: Props = $props();
-	let active: string = $state('table');
+	let active: string = $state('chart');
 
 	// Use state for portfolio data that can be updated
 	let portfolio = $state<any[]>([]);

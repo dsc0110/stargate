@@ -6,9 +6,10 @@
 	interface Props {
 		scaleResults: any[];
 		bodySizeCm: number;
+		metric: string;
 	}
 
-	let { scaleResults, bodySizeCm }: Props = $props();
+	let { scaleResults, bodySizeCm, metric }: Props = $props();
 	let chart: ApexCharts | undefined;
 	let chartElement = $state<HTMLDivElement>();
 
@@ -24,10 +25,44 @@
 			.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
 
+	// Metric configuration
+	const METRIC_CONFIG = {
+		weight: {
+			name: 'Weight (kg)',
+			unit: ' kg',
+			decimals: 1
+		},
+		bmi: {
+			name: 'BMI',
+			unit: '',
+			decimals: 1
+		},
+		bodyFat: {
+			name: 'Body Fat (%)',
+			unit: '%',
+			decimals: 1
+		}
+	};
+
 	let dates = $derived(chartData.map((item) => item.date));
 	let weights = $derived(chartData.map((item) => item.weight));
 	let bodyFats = $derived(chartData.map((item) => item.bodyFat));
 	let bmis = $derived(chartData.map((item) => item.bmi));
+
+	// Get current metric configuration
+	let currentMetricConfig = $derived(METRIC_CONFIG[metric as keyof typeof METRIC_CONFIG] || METRIC_CONFIG.weight);
+
+	// Get series data based on selected metric
+	let seriesData = $derived.by(() => {
+		switch (metric) {
+			case 'bmi':
+				return bmis;
+			case 'bodyFat':
+				return bodyFats;
+			default:
+				return weights;
+		}
+	});
 
 	// Create filtered categories for x-axis labels (show first label of each year)
 	let filteredDates = $derived.by(() => {
@@ -71,7 +106,7 @@
 					colors: ['black']
 				}
 			},
-			series: [{ name: 'Weight (kg)', data: weights }],
+			series: [{ name: currentMetricConfig.name, data: seriesData }],
 			xaxis: {
 				categories: filteredDates,
 				labels: {
@@ -98,7 +133,7 @@
 						fontSize: '11px'
 					},
 					formatter: function (value: number) {
-						return value.toFixed(1) + ' kg';
+						return value.toFixed(currentMetricConfig.decimals) + currentMetricConfig.unit;
 					}
 				}
 			},
@@ -139,7 +174,7 @@
 				},
 				y: {
 					formatter: function (value: any) {
-						return value.toFixed(1) + ' kg';
+						return value.toFixed(currentMetricConfig.decimals) + currentMetricConfig.unit;
 					}
 				},
 				z: {
@@ -162,24 +197,43 @@
 		chart.render();
 	}
 
-	// Initialize or update chart when data changes
+	// Initialize or update chart when data or metric changes
 	$effect(() => {
 		if (chartElement && chartData.length > 0) {
+			// Access reactive values to ensure this effect runs when they change
+			const currentData = seriesData;
+			const currentConfig = currentMetricConfig;
+			const currentFiltered = filteredDates;
+
 			if (!chart) {
 				// Initialize chart if it doesn't exist yet
 				initChart();
 			} else {
 				// Update existing chart with new data
 				chart.updateOptions({
-					series: [{ name: 'Weight (kg)', data: weights }],
+					series: [{ name: currentConfig.name, data: currentData }],
 					xaxis: {
-						categories: filteredDates,
+						categories: currentFiltered,
 						labels: {
 							show: true,
 							formatter: function (value: any) {
 								if (value === '') return '';
 								const date = new Date(value);
 								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
+							}
+						}
+					},
+					yaxis: {
+						labels: {
+							formatter: function (value: number) {
+								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
+							}
+						}
+					},
+					tooltip: {
+						y: {
+							formatter: function (value: any) {
+								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
 							}
 						}
 					}

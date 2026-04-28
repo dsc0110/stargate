@@ -9,6 +9,7 @@
 
 	let { portfolio }: Props = $props();
 	let chart: ApexCharts | undefined;
+	let chartElement = $state<HTMLDivElement>();
 
 	// Process portfolio data for chart
 	let chartData = $derived(
@@ -37,6 +38,12 @@
 	});
 
 	onMount(() => {
+		// Chart will be initialized by the effect below when data is available
+	});
+
+	function initChart() {
+		if (!chartElement) return;
+
 		const options = {
 			chart: {
 				type: 'line' as const,
@@ -157,32 +164,56 @@
 				}
 			}
 		};
-		const chartElement = document.querySelector('#portfolio-chart') as HTMLElement;
-		if (chartElement) {
-			chart = new ApexCharts(chartElement, options);
-			chart.render();
+
+		chart = new ApexCharts(chartElement, options);
+		chart.render();
+	}
+
+	// Initialize or update chart when data changes
+	$effect(() => {
+		if (chartElement && chartData.length > 0) {
+			if (!chart) {
+				// Initialize chart if it doesn't exist yet
+				initChart();
+			} else {
+				// Update existing chart with new data
+				chart.updateOptions({
+					series: [{ name: 'Portfolio Total', data: totals }],
+					xaxis: {
+						categories: filteredDates,
+						labels: {
+							show: true,
+							formatter: function (value: any) {
+								if (value === '') return '';
+								const date = new Date(value);
+								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
+							}
+						}
+					}
+				});
+			}
 		}
 	});
 
-	// Update chart when portfolio data changes
+	// Cleanup
 	$effect(() => {
-		if (chart && dates.length > 0) {
-			chart.updateOptions({
-				series: [{ name: 'Portfolio Total', data: totals }],
-				xaxis: {
-					categories: filteredDates,
-					labels: {
-						show: true,
-						formatter: function (value: any) {
-							if (value === '') return '';
-							const date = new Date(value);
-							return date.getFullYear().toString();
-						}
-					}
-				}
-			});
-		}
+		return () => {
+			if (chart) {
+				chart.destroy();
+			}
+		};
 	});
 </script>
 
-<div id="portfolio-chart"></div>
+<div class="w-full h-full flex flex-col items-center justify-center">
+	{#if chartData.length > 0}
+		<div class="w-full">
+			<div bind:this={chartElement} class="w-full"></div>
+		</div>
+	{:else}
+		<div class="text-center text-gray-500 dark:text-gray-400">
+			<p>No portfolio data available for chart</p>
+			<p class="text-sm mt-2">Add some portfolio entries to see the trends</p>
+		</div>
+	{/if}
+</div>
