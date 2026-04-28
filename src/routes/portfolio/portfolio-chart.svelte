@@ -60,10 +60,15 @@
 					}
 				}
 			},
+			legend: {
+				labels: {
+					colors: ['var(--color-tertiary-500)']
+				}
+			},
 			colors: ['var(--color-secondary-500)', 'var(--color-primary-500), var(--color-tertiary-500)'],
 			dataLabels: {
 				style: {
-					colors: ['black', '#E91E63', '#9C27B0']
+					colors: ['var(--color-tertiary-500)']
 				}
 			},
 			series: [{ name: 'Portfolio Total', data: totals }],
@@ -71,6 +76,9 @@
 				categories: filteredDates,
 				labels: {
 					show: true,
+					style: {
+						colors: ['var(--color-surface-600)']
+					},
 					formatter: function (value: any) {
 						if (value === '') return '';
 						const date = new Date(value);
@@ -89,7 +97,7 @@
 					show: true,
 					offsetX: -10,
 					style: {
-						colors: ['#999'],
+						colors: ['var(--color-surface-500)'],
 						fontSize: '11px'
 					},
 					formatter: function (value: any) {
@@ -179,14 +187,36 @@
 				// Update existing chart with new data
 				chart.updateOptions({
 					series: [{ name: 'Portfolio Total', data: totals }],
+					legend: {
+						labels: {
+							colors: ['var(--color-tertiary-500)']
+						}
+					},
 					xaxis: {
 						categories: filteredDates,
 						labels: {
 							show: true,
+							style: {
+								colors: ['var(--color-surface-600)']
+							},
 							formatter: function (value: any) {
 								if (value === '') return '';
 								const date = new Date(value);
 								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
+							}
+						}
+					},
+					yaxis: {
+						labels: {
+							style: {
+								colors: ['var(--color-surface-500)']
+							},
+							formatter: function (value: any) {
+								return (
+									value.toLocaleString('de-DE', {
+										maximumFractionDigits: 0
+									}) + '€'
+								);
 							}
 						}
 					}

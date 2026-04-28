@@ -100,6 +100,11 @@
 					}
 				}
 			},
+			legend: {
+				labels: {
+					colors: ['var(--color-tertiary-500)']
+				}
+			},
 			colors: ['var(--color-secondary-500)'],
 			dataLabels: {
 				style: {
@@ -111,6 +116,9 @@
 				categories: filteredDates,
 				labels: {
 					show: true,
+					style: {
+						colors: ['var(--color-surface-600)']
+					},
 					formatter: function (value: any) {
 						if (value === '') return '';
 						const date = new Date(value);
@@ -129,7 +137,7 @@
 					show: true,
 					offsetX: -10,
 					style: {
-						colors: ['#999'],
+						colors: ['var(--color-surface-500)'],
 						fontSize: '11px'
 					},
 					formatter: function (value: number) {
@@ -212,10 +220,18 @@
 				// Update existing chart with new data
 				chart.updateOptions({
 					series: [{ name: currentConfig.name, data: currentData }],
+					legend: {
+						labels: {
+							colors: ['var(--color-tertiary-500)']
+						}
+					},
 					xaxis: {
 						categories: currentFiltered,
 						labels: {
 							show: true,
+							style: {
+								colors: ['var(--color-surface-600)']
+							},
 							formatter: function (value: any) {
 								if (value === '') return '';
 								const date = new Date(value);
@@ -225,6 +241,9 @@
 					},
 					yaxis: {
 						labels: {
+							style: {
+								colors: ['var(--color-surface-500)']
+							},
 							formatter: function (value: number) {
 								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
 							}
