@@ -4,6 +4,19 @@ import type { MultipleFeedResponse } from './types';
 export const load: PageServerLoad = async ({ fetch, url }) => {
 	try {
 		const selectedFeeds = url.searchParams.get('feeds') || '';
+		const selectedFeedsArray = selectedFeeds.split(',').filter(Boolean);
+
+		// Define available feeds (should match server-side list)
+		const availableFeeds = ['Reddit', 'BBC News'];
+
+		// If no feeds selected, return early without making API call
+		if (selectedFeedsArray.length === 0) {
+			return {
+				feeds: [],
+				availableFeeds,
+				selectedFeeds: []
+			};
+		}
 
 		const response = await fetch(`/feed?feeds=${encodeURIComponent(selectedFeeds)}`, {
 			method: 'GET'
@@ -14,14 +27,14 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		if (data.success) {
 			return {
 				feeds: data.feeds,
-				availableFeeds: data.availableFeeds || [],
-				selectedFeeds: selectedFeeds.split(',').filter(Boolean)
+				availableFeeds: data.availableFeeds || availableFeeds,
+				selectedFeeds: selectedFeedsArray
 			};
 		} else {
 			return {
 				error: data.error || 'Failed to load feeds',
-				availableFeeds: data.availableFeeds || [],
-				selectedFeeds: []
+				availableFeeds: data.availableFeeds || availableFeeds,
+				selectedFeeds: selectedFeedsArray
 			};
 		}
 	} catch (error) {

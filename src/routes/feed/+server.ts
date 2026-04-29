@@ -55,40 +55,47 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		// Get selected feeds from query params
 		const selectedFeeds = url.searchParams.get('feeds');
-		let feedsToFetch = availableFeeds;
+		let feedsToFetch = [];
 
-		if (selectedFeeds) {
-			const selectedNames = selectedFeeds.split(',').map((name) => name.trim());
+		if (selectedFeeds && selectedFeeds.trim() !== '') {
+			const selectedNames = selectedFeeds
+				.split(',')
+				.map((name) => name.trim())
+				.filter(Boolean);
 			feedsToFetch = availableFeeds.filter((feed) => selectedNames.includes(feed.name));
 		}
 
-		// Fetch selected feeds concurrently
-		const feedPromises = feedsToFetch.map(async ({ name, url }) => {
-			try {
-				const feed = await parseRSSFeed(url);
-				return {
-					name,
-					success: true,
-					title: feed.title,
-					description: feed.description,
-					items: feed.items.map((item: any) => ({
-						title: item.title,
-						link: item.link,
-						pubDate: item.pubDate,
-						contentSnippet: item.contentSnippet
-					}))
-				};
-			} catch (error) {
-				console.error(`Error parsing ${name} feed:`, error);
-				return {
-					name,
-					success: false,
-					error: error instanceof Error ? error.message : 'Unknown error occurred'
-				};
-			}
-		});
+		// Only fetch if there are feeds to fetch
+		let results = [];
+		if (feedsToFetch.length > 0) {
+			// Fetch selected feeds concurrently
+			const feedPromises = feedsToFetch.map(async ({ name, url }) => {
+				try {
+					const feed = await parseRSSFeed(url);
+					return {
+						name,
+						success: true,
+						title: feed.title,
+						description: feed.description,
+						items: feed.items.map((item: any) => ({
+							title: item.title,
+							link: item.link,
+							pubDate: item.pubDate,
+							contentSnippet: item.contentSnippet
+						}))
+					};
+				} catch (error) {
+					console.error(`Error parsing ${name} feed:`, error);
+					return {
+						name,
+						success: false,
+						error: error instanceof Error ? error.message : 'Unknown error occurred'
+					};
+				}
+			});
 
-		const results = await Promise.all(feedPromises);
+			results = await Promise.all(feedPromises);
+		}
 
 		// Return processed feed data with available feeds list
 		return json({
