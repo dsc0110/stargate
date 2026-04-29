@@ -6,18 +6,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const selectedCategories = url.searchParams.get('categories') || '';
 		const selectedCategoriesArray = selectedCategories.split(',').filter(Boolean);
 
-		// Define available categories (should match server-side list)
-		const availableCategories = ['News', 'Social', 'Tech'];
-
-		// If no categories selected, return early without making API call
-		if (selectedCategoriesArray.length === 0) {
-			return {
-				feeds: [],
-				availableCategories,
-				selectedCategories: []
-			};
-		}
-
+		// Always make API call to get available categories, even if no categories selected
 		const response = await fetch(`/feed?categories=${encodeURIComponent(selectedCategories)}`, {
 			method: 'GET'
 		});
@@ -26,14 +15,14 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 
 		if (data.success) {
 			return {
-				feeds: data.feeds,
-				availableCategories: data.availableCategories || availableCategories,
+				feeds: data.feeds || [],
+				availableCategories: data.availableCategories || [],
 				selectedCategories: selectedCategoriesArray
 			};
 		} else {
 			return {
 				error: data.error || 'Failed to load feeds',
-				availableCategories: data.availableCategories || availableCategories,
+				availableCategories: data.availableCategories || [],
 				selectedCategories: selectedCategoriesArray
 			};
 		}
@@ -41,7 +30,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		console.error('Error loading feeds:', error);
 		return {
 			error: 'Failed to load feed data',
-			availableCategories: ['News', 'Social', 'Tech'],
+			availableCategories: [],
 			selectedCategories: []
 		};
 	}

@@ -98,9 +98,7 @@
 			{/each}
 		</div>
 	{:else if !selectedCategory}
-		<div class="text-center py-16">
-			<p class="text-gray-500">Select a category to view feeds</p>
-		</div>
+		<!-- Show nothing when no category selected -->
 	{:else}
 		<div class="flex items-center justify-center h-64">
 			<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
