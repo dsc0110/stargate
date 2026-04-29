@@ -46,21 +46,35 @@ async function parseRSSFeed(url: string): Promise<any> {
 	}
 }
 
-export const GET: RequestHandler = async ({ url }) => {
+export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
-		// Define available feed URLs with categories
-		const availableFeeds: FeedConfig[] = [
-			{ name: 'Tagesschau', url: 'https://www.tagesschau.de/infoservices/alle-meldungen-100~rss2.xml', category: 'News' },
-			{ name: 'SRF', url: 'https://www.srf.ch/news/bnf/rss/19032223', category: 'News' },
-			{ name: 'BBC', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'News' },
-			{ name: 'Hacker News', url: 'https://hnrss.org/frontpage', category: 'Tech' },
-			{ name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Tech' },
-			{ name: 'Cloudflare', url: 'https://developers.cloudflare.com/changelog/rss/index.xml', category: 'Blogs' },
-			{ name: 'GitHub Blog', url: 'https://github.blog/feed/', category: 'Blogs' },
-			{ name: 'Init 7', url: 'https://blog.init7.net/en/feed/', category: 'Blogs' },
-			{ name: 'Transfermarkt', url: 'https://www.transfermarkt.de/rss/news', category: 'Sport' },
-			{ name: 'Sportschau', url: 'https://www.sportschau.de/fussball/index~rss2.xml', category: 'Sport' }
-		];
+		// Get feed configuration from environment variable
+		const feedConfigStr = platform?.env?.FEED_CONFIG || process.env.FEED_CONFIG;
+
+		if (!feedConfigStr) {
+			return json(
+				{
+					success: false,
+					error: 'FEED_CONFIG environment variable not found. Run with: wrangler pages dev'
+				},
+				{ status: 500 }
+			);
+		}
+
+		let availableFeeds: FeedConfig[] = [];
+
+		try {
+			availableFeeds = JSON.parse(feedConfigStr);
+		} catch (error) {
+			console.error('Failed to parse FEED_CONFIG:', error);
+			return json(
+				{
+					success: false,
+					error: 'Invalid feed configuration format'
+				},
+				{ status: 500 }
+			);
+		}
 
 		// Get unique categories
 		const availableCategories = [...new Set(availableFeeds.map((f) => f.category))];

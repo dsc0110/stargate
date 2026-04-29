@@ -81,46 +81,43 @@
 			{/each}
 		</div>
 	{:else if data.feeds && selectedCategory}
-		<div class="space-y-4">
-			{#each data.feeds as feed}
-				{#if feed.success && feed.items}
-					{#each feed.items.slice(0, 5) as item}
-						<div
-							class="border border-gray-200 dark:border-gray-700 rounded-lg p-2 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
-							onclick={() => window.open(item.link, '_blank')}
-							onkeydown={(e) => {
-								if (e.key === 'Enter' || e.key === ' ') {
-									e.preventDefault();
-									window.open(item.link, '_blank');
-								}
-							}}
-							tabindex="0"
-							role="button"
-							aria-label="Open {item.title} in new tab"
-						>
-							<div class="py-2">
-								<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-									{item.title}
-								</h3>
-								<div class="mt-1">
-									<span class="text-xs text-secondary-600 dark:text-secondary-400">
-										{feed.name}{#if item.pubDate}, {new Date(item.pubDate).toLocaleDateString('en-US', {
-												month: 'short',
-												day: 'numeric'
-											})}{/if}
-									</span>
-								</div>
-							</div>
+		{#each data.feeds as feed}
+			{#if feed.success && feed.items}
+				{#each feed.items.slice(0, 5) as item}
+					<div
+						id="feeditem"
+						class="border border-gray-200 dark:border-gray-700 rounded-lg p-2 mb-2 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
+						onclick={() => window.open(item.link, '_blank')}
+						onkeydown={(e) => {
+							if (e.key === 'Enter' || e.key === ' ') {
+								e.preventDefault();
+								window.open(item.link, '_blank');
+							}
+						}}
+						tabindex="0"
+						role="button"
+						aria-label="Open {item.title} in new tab"
+					>
+						<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+							{item.title}
+						</h3>
+						<div class="mt-1">
+							<span class="text-xs text-secondary-600 dark:text-secondary-400">
+								{feed.name}{#if item.pubDate}, {new Date(item.pubDate).toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric'
+									})}{/if}
+							</span>
 						</div>
-					{/each}
-				{:else}
-					<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-						<strong>Error loading {feed.name}:</strong>
-						{feed.error || 'Unknown error'}
 					</div>
-				{/if}
-			{/each}
-		</div>
+				{/each}
+			{:else}
+				<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+					<strong>Error loading {feed.name}:</strong>
+					{feed.error || 'Unknown error'}
+				</div>
+			{/if}
+		{/each}
 	{:else if !selectedCategory}
 		<!-- Show nothing when no category selected -->
 	{/if}
