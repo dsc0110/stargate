@@ -50,13 +50,16 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		// Define available feed URLs with categories
 		const availableFeeds: FeedConfig[] = [
-			{ name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml', category: 'News' },
-			{ name: 'CNN', url: 'http://rss.cnn.com/rss/edition.rss', category: 'News' },
+			{ name: 'Tagesschau', url: 'https://www.tagesschau.de/infoservices/alle-meldungen-100~rss2.xml', category: 'News' },
+			{ name: 'SRF', url: 'https://www.srf.ch/news/bnf/rss/19032223', category: 'News' },
+			{ name: 'BBC', url: 'https://feeds.bbci.co.uk/news/world/rss.xml', category: 'News' },
 			{ name: 'Hacker News', url: 'https://hnrss.org/frontpage', category: 'Tech' },
 			{ name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Tech' },
 			{ name: 'Cloudflare', url: 'https://developers.cloudflare.com/changelog/rss/index.xml', category: 'Blogs' },
 			{ name: 'GitHub Blog', url: 'https://github.blog/feed/', category: 'Blogs' },
-			{ name: 'Reddit', url: 'https://www.reddit.com/.rss', category: 'Social' }
+			{ name: 'Init 7', url: 'https://blog.init7.net/en/feed/', category: 'Blogs' },
+			{ name: 'Transfermarkt', url: 'https://www.transfermarkt.de/rss/news', category: 'Sport' },
+			{ name: 'Sportschau', url: 'https://www.sportschau.de/fussball/index~rss2.xml', category: 'Sport' }
 		];
 
 		// Get unique categories

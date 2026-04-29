@@ -4,13 +4,25 @@
 	import { page } from '$app/state';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 
-	export let data: PageData;
+	let { data }: { data: PageData } = $props();
 
-	let selectedCategory = data.selectedCategories?.[0] || '';
+	let selectedCategory = $state('');
+	let loading = $state(false);
+
+	// Update selectedCategory when data changes
+	$effect(() => {
+		selectedCategory = data.selectedCategories?.[0] || '';
+		loading = false;
+	});
 
 	function handleCategoryToggle(categoryName: string) {
 		// If clicking the same category, deselect it; otherwise select the new one
 		selectedCategory = selectedCategory === categoryName ? '' : categoryName;
+
+		// Show loading immediately
+		if (selectedCategory) {
+			loading = true;
+		}
 
 		// Auto-apply selection
 		const url = new URL(page.url);
@@ -38,7 +50,7 @@
 				<div class="flex items-center gap-2">
 					{#each data.availableCategories as categoryName}
 						<button
-							on:click={() => handleCategoryToggle(categoryName)}
+							onclick={() => handleCategoryToggle(categoryName)}
 							class="chip {selectedCategory === categoryName ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500 hover:bg-primary-50'} border px-3 py-1 rounded-full text-sm transition-colors"
 						>
 							{categoryName}
@@ -56,6 +68,18 @@
 			<strong>Error:</strong>
 			{data.error}
 		</div>
+	{:else if loading}
+		<!-- Loading placeholders -->
+		<div class="space-y-4">
+			{#each Array(5) as _}
+				<div class="placeholder animate-pulse border border-gray-200 dark:border-gray-700 rounded-lg p-2">
+					<div class="py-2">
+						<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
+						<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+					</div>
+				</div>
+			{/each}
+		</div>
 	{:else if data.feeds && selectedCategory}
 		<div class="space-y-4">
 			{#each data.feeds as feed}
@@ -63,8 +87,8 @@
 					{#each feed.items.slice(0, 5) as item}
 						<div
 							class="border border-gray-200 dark:border-gray-700 rounded-lg p-2 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
-							on:click={() => window.open(item.link, '_blank')}
-							on:keydown={(e) => {
+							onclick={() => window.open(item.link, '_blank')}
+							onkeydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
 									e.preventDefault();
 									window.open(item.link, '_blank');
@@ -99,10 +123,5 @@
 		</div>
 	{:else if !selectedCategory}
 		<!-- Show nothing when no category selected -->
-	{:else}
-		<div class="flex items-center justify-center h-64">
-			<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-			<span class="ml-3 text-gray-600">Loading feeds...</span>
-		</div>
 	{/if}
 </div>
