@@ -20,14 +20,14 @@ export interface FeedData {
 export interface MultipleFeedResponse {
 	success: boolean;
 	feeds?: FeedData[];
-	availableFeeds?: string[];
+	availableCategories?: string[];
 	error?: string;
 }
 
 export interface PageData {
 	feeds?: FeedData[];
-	availableFeeds?: string[];
-	selectedFeeds?: string[];
+	availableCategories?: string[];
+	selectedCategories?: string[];
 	error?: string;
 }
 

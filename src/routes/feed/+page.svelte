@@ -6,24 +6,24 @@
 
 	export let data: PageData;
 
-	let selectedFeeds = new Set(data.selectedFeeds || []);
+	let selectedCategories = new Set(data.selectedCategories || []);
 
-	function handleFeedToggle(feedName: string) {
-		if (selectedFeeds.has(feedName)) {
-			selectedFeeds.delete(feedName);
+	function handleCategoryToggle(categoryName: string) {
+		if (selectedCategories.has(categoryName)) {
+			selectedCategories.delete(categoryName);
 		} else {
-			selectedFeeds.add(feedName);
+			selectedCategories.add(categoryName);
 		}
-		selectedFeeds = selectedFeeds; // Trigger reactivity
+		selectedCategories = selectedCategories; // Trigger reactivity
 
 		// Auto-apply selection
-		const feedsParam = Array.from(selectedFeeds).join(',');
+		const categoriesParam = Array.from(selectedCategories).join(',');
 		const url = new URL(page.url);
 
-		if (feedsParam) {
-			url.searchParams.set('feeds', feedsParam);
+		if (categoriesParam) {
+			url.searchParams.set('categories', categoriesParam);
 		} else {
-			url.searchParams.delete('feeds');
+			url.searchParams.delete('categories');
 		}
 
 		goto(url.toString());
@@ -37,17 +37,17 @@
 
 <div id="subheader">
 	<!-- Controls Section -->
-	{#if data.availableFeeds && data.availableFeeds.length > 0}
+	{#if data.availableCategories && data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex justify-between items-center">
 				<div class="flex items-center gap-2">
-					<span class="text-sm font-medium text-gray-800 dark:text-gray-200">Select Feeds:</span>
-					{#each data.availableFeeds as feedName}
+					<span class="text-sm font-medium text-gray-800 dark:text-gray-200">Select Categories:</span>
+					{#each data.availableCategories as categoryName}
 						<button
-							on:click={() => handleFeedToggle(feedName)}
-							class="chip {selectedFeeds.has(feedName) ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500 hover:bg-primary-50'} border px-3 py-1 rounded-full text-sm transition-colors"
+							on:click={() => handleCategoryToggle(categoryName)}
+							class="chip {selectedCategories.has(categoryName) ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500 hover:bg-primary-50'} border px-3 py-1 rounded-full text-sm transition-colors"
 						>
-							{feedName}
+							{categoryName}
 						</button>
 					{/each}
 				</div>
@@ -62,7 +62,7 @@
 			<strong>Error:</strong>
 			{data.error}
 		</div>
-	{:else if data.feeds && selectedFeeds.size > 0}
+	{:else if data.feeds && selectedCategories.size > 0}
 		<div class="space-y-4">
 			{#each data.feeds as feed}
 				{#if feed.success && feed.items}
@@ -106,7 +106,11 @@
 				{/if}
 			{/each}
 		</div>
-	{:else if selectedFeeds.size === 0}{:else}
+	{:else if selectedCategories.size === 0}
+		<div class="text-center py-16">
+			<p class="text-gray-500">Select categories to view feeds</p>
+		</div>
+	{:else}
 		<div class="flex items-center justify-center h-64">
 			<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
 			<span class="ml-3 text-gray-600">Loading feeds...</span>

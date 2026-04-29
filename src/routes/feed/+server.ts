@@ -47,22 +47,28 @@ async function parseRSSFeed(url: string): Promise<any> {
 
 export const GET: RequestHandler = async ({ url }) => {
 	try {
-		// Define available feed URLs
+		// Define available feed URLs with categories
 		const availableFeeds = [
-			{ name: 'Reddit', url: 'https://www.reddit.com/.rss' },
-			{ name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' }
+			{ name: 'Reddit', url: 'https://www.reddit.com/.rss', category: 'Social' },
+			{ name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml', category: 'News' },
+			{ name: 'Hacker News', url: 'https://hnrss.org/frontpage', category: 'Tech' },
+			{ name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Tech' },
+			{ name: 'CNN', url: 'http://rss.cnn.com/rss/edition.rss', category: 'News' }
 		];
 
-		// Get selected feeds from query params
-		const selectedFeeds = url.searchParams.get('feeds');
+		// Get unique categories
+		const availableCategories = [...new Set(availableFeeds.map((f) => f.category))];
+
+		// Get selected categories from query params
+		const selectedCategories = url.searchParams.get('categories');
 		let feedsToFetch = [];
 
-		if (selectedFeeds && selectedFeeds.trim() !== '') {
-			const selectedNames = selectedFeeds
+		if (selectedCategories && selectedCategories.trim() !== '') {
+			const selectedCategoryNames = selectedCategories
 				.split(',')
 				.map((name) => name.trim())
 				.filter(Boolean);
-			feedsToFetch = availableFeeds.filter((feed) => selectedNames.includes(feed.name));
+			feedsToFetch = availableFeeds.filter((feed) => selectedCategoryNames.includes(feed.category));
 		}
 
 		// Only fetch if there are feeds to fetch
@@ -97,11 +103,11 @@ export const GET: RequestHandler = async ({ url }) => {
 			results = await Promise.all(feedPromises);
 		}
 
-		// Return processed feed data with available feeds list
+		// Return processed feed data with available categories list
 		return json({
 			success: true,
 			feeds: results,
-			availableFeeds: availableFeeds.map((f) => f.name)
+			availableCategories: availableCategories
 		});
 	} catch (error) {
 		console.error('RSS parsing error:', error);

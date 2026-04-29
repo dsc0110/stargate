@@ -3,22 +3,22 @@ import type { MultipleFeedResponse } from './types';
 
 export const load: PageServerLoad = async ({ fetch, url }) => {
 	try {
-		const selectedFeeds = url.searchParams.get('feeds') || '';
-		const selectedFeedsArray = selectedFeeds.split(',').filter(Boolean);
+		const selectedCategories = url.searchParams.get('categories') || '';
+		const selectedCategoriesArray = selectedCategories.split(',').filter(Boolean);
 
-		// Define available feeds (should match server-side list)
-		const availableFeeds = ['Reddit', 'BBC News'];
+		// Define available categories (should match server-side list)
+		const availableCategories = ['News', 'Social', 'Tech'];
 
-		// If no feeds selected, return early without making API call
-		if (selectedFeedsArray.length === 0) {
+		// If no categories selected, return early without making API call
+		if (selectedCategoriesArray.length === 0) {
 			return {
 				feeds: [],
-				availableFeeds,
-				selectedFeeds: []
+				availableCategories,
+				selectedCategories: []
 			};
 		}
 
-		const response = await fetch(`/feed?feeds=${encodeURIComponent(selectedFeeds)}`, {
+		const response = await fetch(`/feed?categories=${encodeURIComponent(selectedCategories)}`, {
 			method: 'GET'
 		});
 
@@ -27,22 +27,22 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		if (data.success) {
 			return {
 				feeds: data.feeds,
-				availableFeeds: data.availableFeeds || availableFeeds,
-				selectedFeeds: selectedFeedsArray
+				availableCategories: data.availableCategories || availableCategories,
+				selectedCategories: selectedCategoriesArray
 			};
 		} else {
 			return {
 				error: data.error || 'Failed to load feeds',
-				availableFeeds: data.availableFeeds || availableFeeds,
-				selectedFeeds: selectedFeedsArray
+				availableCategories: data.availableCategories || availableCategories,
+				selectedCategories: selectedCategoriesArray
 			};
 		}
 	} catch (error) {
 		console.error('Error loading feeds:', error);
 		return {
 			error: 'Failed to load feed data',
-			availableFeeds: ['Reddit', 'BBC News'],
-			selectedFeeds: []
+			availableCategories: ['News', 'Social', 'Tech'],
+			selectedCategories: []
 		};
 	}
 };
