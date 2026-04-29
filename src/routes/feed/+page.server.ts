@@ -1,9 +1,11 @@
 import type { PageServerLoad } from './$types';
 import type { MultipleFeedResponse } from './types';
 
-export const load: PageServerLoad = async ({ fetch }) => {
+export const load: PageServerLoad = async ({ fetch, url }) => {
 	try {
-		const response = await fetch('/feed', {
+		const selectedFeeds = url.searchParams.get('feeds') || '';
+
+		const response = await fetch(`/feed?feeds=${encodeURIComponent(selectedFeeds)}`, {
 			method: 'GET'
 		});
 
@@ -11,17 +13,23 @@ export const load: PageServerLoad = async ({ fetch }) => {
 
 		if (data.success) {
 			return {
-				feeds: data.feeds
+				feeds: data.feeds,
+				availableFeeds: data.availableFeeds || [],
+				selectedFeeds: selectedFeeds.split(',').filter(Boolean)
 			};
 		} else {
 			return {
-				error: data.error || 'Failed to load feeds'
+				error: data.error || 'Failed to load feeds',
+				availableFeeds: data.availableFeeds || [],
+				selectedFeeds: []
 			};
 		}
 	} catch (error) {
 		console.error('Error loading feeds:', error);
 		return {
-			error: 'Failed to load feed data'
+			error: 'Failed to load feed data',
+			availableFeeds: ['Reddit', 'BBC News'],
+			selectedFeeds: []
 		};
 	}
 };

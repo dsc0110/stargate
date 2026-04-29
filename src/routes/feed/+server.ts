@@ -45,16 +45,25 @@ async function parseRSSFeed(url: string): Promise<any> {
 	}
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ url }) => {
 	try {
-		// Define feed URLs
-		const feeds = [
+		// Define available feed URLs
+		const availableFeeds = [
 			{ name: 'Reddit', url: 'https://www.reddit.com/.rss' },
 			{ name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml' }
 		];
 
-		// Fetch all feeds concurrently
-		const feedPromises = feeds.map(async ({ name, url }) => {
+		// Get selected feeds from query params
+		const selectedFeeds = url.searchParams.get('feeds');
+		let feedsToFetch = availableFeeds;
+
+		if (selectedFeeds) {
+			const selectedNames = selectedFeeds.split(',').map((name) => name.trim());
+			feedsToFetch = availableFeeds.filter((feed) => selectedNames.includes(feed.name));
+		}
+
+		// Fetch selected feeds concurrently
+		const feedPromises = feedsToFetch.map(async ({ name, url }) => {
 			try {
 				const feed = await parseRSSFeed(url);
 				return {
@@ -81,10 +90,11 @@ export const GET: RequestHandler = async () => {
 
 		const results = await Promise.all(feedPromises);
 
-		// Return processed feed data
+		// Return processed feed data with available feeds list
 		return json({
 			success: true,
-			feeds: results
+			feeds: results,
+			availableFeeds: availableFeeds.map((f) => f.name)
 		});
 	} catch (error) {
 		console.error('RSS parsing error:', error);
