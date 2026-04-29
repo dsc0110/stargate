@@ -1,6 +1,12 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
 
+export interface FeedConfig {
+	name: string;
+	url: string;
+	category: string;
+}
+
 export interface FeedItem {
 	title: string;
 	link: string;

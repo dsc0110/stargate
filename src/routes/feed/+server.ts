@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import Parser from 'rss-parser';
+import type { FeedData, FeedConfig } from './types';
 
 // Custom parser with proper headers to avoid 403 errors
 const requestHeaders = {
@@ -48,12 +49,14 @@ async function parseRSSFeed(url: string): Promise<any> {
 export const GET: RequestHandler = async ({ url }) => {
 	try {
 		// Define available feed URLs with categories
-		const availableFeeds = [
-			{ name: 'Reddit', url: 'https://www.reddit.com/.rss', category: 'Social' },
+		const availableFeeds: FeedConfig[] = [
 			{ name: 'BBC News', url: 'https://feeds.bbci.co.uk/news/rss.xml', category: 'News' },
+			{ name: 'CNN', url: 'http://rss.cnn.com/rss/edition.rss', category: 'News' },
 			{ name: 'Hacker News', url: 'https://hnrss.org/frontpage', category: 'Tech' },
 			{ name: 'TechCrunch', url: 'https://techcrunch.com/feed/', category: 'Tech' },
-			{ name: 'CNN', url: 'http://rss.cnn.com/rss/edition.rss', category: 'News' }
+			{ name: 'Cloudflare', url: 'https://developers.cloudflare.com/changelog/rss/index.xml', category: 'Blogs' },
+			{ name: 'GitHub Blog', url: 'https://github.blog/feed/', category: 'Blogs' },
+			{ name: 'Reddit', url: 'https://www.reddit.com/.rss', category: 'Social' }
 		];
 
 		// Get unique categories
@@ -61,7 +64,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 		// Get selected categories from query params
 		const selectedCategories = url.searchParams.get('categories');
-		let feedsToFetch = [];
+		let feedsToFetch: FeedConfig[] = [];
 
 		if (selectedCategories && selectedCategories.trim() !== '') {
 			const selectedCategoryNames = selectedCategories
@@ -72,7 +75,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		}
 
 		// Only fetch if there are feeds to fetch
-		let results = [];
+		let results: FeedData[] = [];
 		if (feedsToFetch.length > 0) {
 			// Fetch selected feeds concurrently
 			const feedPromises = feedsToFetch.map(async ({ name, url }) => {

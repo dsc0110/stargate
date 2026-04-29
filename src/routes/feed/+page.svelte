@@ -6,22 +6,17 @@
 
 	export let data: PageData;
 
-	let selectedCategories = new Set(data.selectedCategories || []);
+	let selectedCategory = data.selectedCategories?.[0] || '';
 
 	function handleCategoryToggle(categoryName: string) {
-		if (selectedCategories.has(categoryName)) {
-			selectedCategories.delete(categoryName);
-		} else {
-			selectedCategories.add(categoryName);
-		}
-		selectedCategories = selectedCategories; // Trigger reactivity
+		// If clicking the same category, deselect it; otherwise select the new one
+		selectedCategory = selectedCategory === categoryName ? '' : categoryName;
 
 		// Auto-apply selection
-		const categoriesParam = Array.from(selectedCategories).join(',');
 		const url = new URL(page.url);
 
-		if (categoriesParam) {
-			url.searchParams.set('categories', categoriesParam);
+		if (selectedCategory) {
+			url.searchParams.set('categories', selectedCategory);
 		} else {
 			url.searchParams.delete('categories');
 		}
@@ -31,8 +26,8 @@
 </script>
 
 <svelte:head>
-	<title>RSS Feed</title>
-	<meta name="description" content="RSS feed display" />
+	<title>feed</title>
+	<meta name="description" content="feed" />
 </svelte:head>
 
 <div id="subheader">
@@ -41,11 +36,10 @@
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex justify-between items-center">
 				<div class="flex items-center gap-2">
-					<span class="text-sm font-medium text-gray-800 dark:text-gray-200">Select Categories:</span>
 					{#each data.availableCategories as categoryName}
 						<button
 							on:click={() => handleCategoryToggle(categoryName)}
-							class="chip {selectedCategories.has(categoryName) ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500 hover:bg-primary-50'} border px-3 py-1 rounded-full text-sm transition-colors"
+							class="chip {selectedCategory === categoryName ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500 hover:bg-primary-50'} border px-3 py-1 rounded-full text-sm transition-colors"
 						>
 							{categoryName}
 						</button>
@@ -56,19 +50,19 @@
 	{/if}
 </div>
 
-<article class="min-h-[512px] p-4">
+<div id="feeditems" class="py-4">
 	{#if data.error}
 		<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
 			<strong>Error:</strong>
 			{data.error}
 		</div>
-	{:else if data.feeds && selectedCategories.size > 0}
+	{:else if data.feeds && selectedCategory}
 		<div class="space-y-4">
 			{#each data.feeds as feed}
 				{#if feed.success && feed.items}
 					{#each feed.items.slice(0, 5) as item}
 						<div
-							class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
+							class="border border-gray-200 dark:border-gray-700 rounded-lg p-2 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
 							on:click={() => window.open(item.link, '_blank')}
 							on:keydown={(e) => {
 								if (e.key === 'Enter' || e.key === ' ') {
@@ -84,16 +78,13 @@
 								<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
 									{item.title}
 								</h3>
-								<div class="flex items-center gap-2 mt-2">
-									<span class="text-xs bg-transparent text-secondary-600 dark:text-secondary-400 border border-secondary-300 dark:border-secondary-600 px-2 py-1 rounded-full">{feed.name}</span>
-									{#if item.pubDate}
-										<span class="text-xs bg-transparent text-secondary-600 dark:text-secondary-400 border border-secondary-300 dark:border-secondary-600 px-2 py-1 rounded-full">
-											{new Date(item.pubDate).toLocaleDateString('en-US', {
+								<div class="mt-1">
+									<span class="text-xs text-secondary-600 dark:text-secondary-400">
+										{feed.name}{#if item.pubDate}, {new Date(item.pubDate).toLocaleDateString('en-US', {
 												month: 'short',
 												day: 'numeric'
-											})}
-										</span>
-									{/if}
+											})}{/if}
+									</span>
 								</div>
 							</div>
 						</div>
@@ -106,9 +97,9 @@
 				{/if}
 			{/each}
 		</div>
-	{:else if selectedCategories.size === 0}
+	{:else if !selectedCategory}
 		<div class="text-center py-16">
-			<p class="text-gray-500">Select categories to view feeds</p>
+			<p class="text-gray-500">Select a category to view feeds</p>
 		</div>
 	{:else}
 		<div class="flex items-center justify-center h-64">
@@ -116,4 +107,4 @@
 			<span class="ml-3 text-gray-600">Loading feeds...</span>
 		</div>
 	{/if}
-</article>
+</div>
