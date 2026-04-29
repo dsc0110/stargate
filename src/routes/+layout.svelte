@@ -1,8 +1,8 @@
 <script lang="ts">
 	import './layout.css';
-	import favicon from '$lib/images/favicon.svg';
 	import Navigation from './navigation.svelte';
-	import { Menu, SunMoon } from '@lucide/svelte';
+	import SlashIcon from '$lib/SlashIcon.svelte';
+	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
 	let { children } = $props();
 
@@ -38,17 +38,26 @@
 
 <svelte:head>
 	<title>{page.url.pathname === '/' ? 'home' : page.url.pathname.slice(1)}</title>
-	<link rel="icon" href={favicon} />
 </svelte:head>
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
 		<nav aria-label="Global" class="flex items-center justify-between p-4 pb-2">
 			<!-- logo and path -->
-			<div class="flex lg:flex-1 headertext">
-				<a href="/" class="text-primary-600 hover:text-primary-500">
-					<span>/</span>
-				</a>
+			<div class="flex items-center gap-2 lg:flex-1 headertext">
+				{#if page.url.pathname === '/'}
+					<SlashIcon class="size-6 text-primary-600" />
+				{:else if page.url.pathname === '/feed'}
+					<RssIcon class="size-6 text-primary-600" />
+				{:else if page.url.pathname === '/portfolio'}
+					<DollarSign class="size-6 text-primary-600" />
+				{:else if page.url.pathname === '/scale'}
+					<ScaleIcon class="size-6 text-primary-600" />
+				{:else if page.url.pathname === '/study'}
+					<GraduationCapIcon class="size-6 text-primary-600" />
+				{:else}
+					<SlashIcon class="size-6 text-primary-600" />
+				{/if}
 				{#key page.url.pathname}
 					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? 'home' : page.url.pathname.slice(1)}</span>
 				{/key}
@@ -77,10 +86,20 @@
 				<div tabindex="-1" class="fixed inset-0 focus:outline-none">
 					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
-							<div class="flex lg:flex-1 headertext">
-								<a href="/" class="text-primary-600 hover:text-primary-500" onclick={closeMobileMenu}>
-									<span>/</span>
-								</a>
+							<div class="flex items-center gap-2 lg:flex-1 headertext">
+								{#if page.url.pathname === '/'}
+									<SlashIcon class="size-6 text-primary-600" />
+								{:else if page.url.pathname === '/feed'}
+									<RssIcon class="size-6 text-primary-600" />
+								{:else if page.url.pathname === '/portfolio'}
+									<DollarSign class="size-6 text-primary-600" />
+								{:else if page.url.pathname === '/scale'}
+									<ScaleIcon class="size-6 text-primary-600" />
+								{:else if page.url.pathname === '/study'}
+									<GraduationCapIcon class="size-6 text-primary-600" />
+								{:else}
+									<SlashIcon class="size-6 text-primary-600" />
+								{/if}
 								{#if page.url.pathname !== '/'}
 									<span>{page.url.pathname.slice(1)}</span>
 								{:else}

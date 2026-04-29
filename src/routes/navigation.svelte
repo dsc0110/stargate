@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { House, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
+	import SlashIcon from '$lib/SlashIcon.svelte';
+	import { RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [
-			{ label: 'Home', href: '/', icon: House },
+			{ label: 'Home', href: '/', icon: SlashIcon },
 			{ label: 'Feed', href: '/feed', icon: RssIcon }
 		],
 		private: [

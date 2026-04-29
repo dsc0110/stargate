@@ -276,10 +276,5 @@
 		<div class="w-full">
 			<div bind:this={chartElement} class="w-full"></div>
 		</div>
-	{:else}
-		<div class="text-center text-gray-500 dark:text-gray-400">
-			<p>No scale data available for chart</p>
-			<p class="text-sm mt-2">Add some scale results to see the trends</p>
-		</div>
 	{/if}
 </div>
