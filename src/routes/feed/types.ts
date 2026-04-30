@@ -28,6 +28,10 @@ export interface MultipleFeedResponse {
 	feeds?: FeedData[];
 	availableCategories?: string[];
 	error?: string;
+	cacheInfo?: {
+		timestamp: number;
+		cacheDuration: number;
+	};
 }
 
 export interface PageData {
@@ -35,6 +39,10 @@ export interface PageData {
 	availableCategories?: string[];
 	selectedCategories?: string[];
 	error?: string;
+	cacheInfo?: {
+		timestamp: number;
+		cacheDuration: number;
+	};
 }
 
 export interface PageServerLoad {

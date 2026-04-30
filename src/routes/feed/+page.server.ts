@@ -17,13 +17,15 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 			return {
 				feeds: data.feeds || [],
 				availableCategories: data.availableCategories || [],
-				selectedCategories: selectedCategoriesArray
+				selectedCategories: selectedCategoriesArray,
+				cacheInfo: data.cacheInfo
 			};
 		} else {
 			return {
 				error: data.error || 'Failed to load feeds',
 				availableCategories: data.availableCategories || [],
-				selectedCategories: selectedCategoriesArray
+				selectedCategories: selectedCategoriesArray,
+				cacheInfo: data.cacheInfo
 			};
 		}
 	} catch (error) {

@@ -3,38 +3,85 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { SHARED_STYLES } from '$lib/shared-styles';
+	import { browser } from '$app/environment';
+	import { FEED_CONFIG } from './config';
 
 	let { data }: { data: PageData } = $props();
 
 	let selectedCategory = $state('');
 	let loading = $state(false);
+	let lastFetchTime = $state(0);
+
+	// Client-side cache to avoid redundant requests
+	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
 
 	// Update selectedCategory when data changes
 	$effect(() => {
 		selectedCategory = data.selectedCategories?.[0] || '';
 		loading = false;
+		lastFetchTime = Date.now();
 	});
+
+	// Debounced category change to prevent rapid requests
+	let categoryChangeTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	function handleCategoryToggle(categoryName: string) {
 		// If clicking the same category, deselect it; otherwise select the new one
-		selectedCategory = selectedCategory === categoryName ? '' : categoryName;
+		const newCategory = selectedCategory === categoryName ? '' : categoryName;
+		selectedCategory = newCategory;
 
-		// Show loading immediately
-		if (selectedCategory) {
+		// Clear any pending category change
+		if (categoryChangeTimeout) {
+			clearTimeout(categoryChangeTimeout);
+		}
+
+		// Check client cache first
+		const cacheKey = newCategory || 'none';
+		const cached = clientCache.get(cacheKey);
+		if (cached && Date.now() < cached.expires) {
+			console.log('Using client cache for category:', cacheKey);
+			data = cached.data;
+			return;
+		}
+
+		// Show loading immediately for non-cached requests
+		if (newCategory) {
 			loading = true;
 		}
 
-		// Auto-apply selection
-		const url = new URL(page.url);
+		// Debounce the actual navigation to prevent rapid requests
+		categoryChangeTimeout = setTimeout(() => {
+			const url = new URL(page.url);
 
-		if (selectedCategory) {
-			url.searchParams.set('categories', selectedCategory);
-		} else {
-			url.searchParams.delete('categories');
-		}
+			if (newCategory) {
+				url.searchParams.set('categories', newCategory);
+			} else {
+				url.searchParams.delete('categories');
+			}
 
-		goto(url.toString());
+			goto(url.toString());
+		}, FEED_CONFIG.CATEGORY_CHANGE_DEBOUNCE);
 	}
+
+	// Cache successful data loads
+	$effect(() => {
+		if (data && !data.error && browser) {
+			const cacheKey = selectedCategory || 'none';
+			const timestamp = Date.now();
+			clientCache.set(cacheKey, {
+				data: { ...data },
+				timestamp,
+				expires: timestamp + FEED_CONFIG.CLIENT_CACHE_DURATION
+			});
+
+			// Cleanup old cache entries
+			for (const [key, entry] of clientCache.entries()) {
+				if (timestamp > entry.expires + FEED_CONFIG.CLIENT_CACHE_DURATION) {
+					clientCache.delete(key);
+				}
+			}
+		}
+	});
 </script>
 
 <svelte:head>
@@ -57,6 +104,14 @@
 						</button>
 					{/each}
 				</div>
+
+				<!-- Cache status indicator -->
+				{#if data.cacheInfo && selectedCategory}
+					<div class="flex items-center gap-2 text-xs text-gray-500">
+						<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+						<span>Cached data</span>
+					</div>
+				{/if}
 			</div>
 		</div>
 	{/if}
@@ -71,7 +126,7 @@
 	{:else if loading}
 		<!-- Loading placeholders -->
 		<div class="space-y-4">
-			{#each Array(5) as _}
+			{#each Array(FEED_CONFIG.LOADING_PLACEHOLDER_COUNT) as _}
 				<div class="placeholder animate-pulse border border-gray-200 dark:border-gray-700 rounded-lg p-2">
 					<div class="py-2">
 						<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
