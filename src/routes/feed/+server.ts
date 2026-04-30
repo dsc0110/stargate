@@ -132,9 +132,9 @@ async function parseRSSFeed(url: string): Promise<any> {
 export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
 		// Get feed configuration from environment variable
-		const feedConfigStr = platform?.env?.FEED_CONFIG || process.env.FEED_CONFIG;
+		const feedConfig = platform?.env?.FEED_CONFIG || (process.env.FEED_CONFIG ? JSON.parse(process.env.FEED_CONFIG) : null);
 
-		if (!feedConfigStr) {
+		if (!feedConfig) {
 			return json(
 				{
 					success: false,
@@ -147,7 +147,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		let availableFeeds: FeedConfig[] = [];
 
 		try {
-			availableFeeds = JSON.parse(feedConfigStr);
+			availableFeeds = Array.isArray(feedConfig) ? feedConfig : JSON.parse(feedConfig);
 		} catch (error) {
 			console.error('Failed to parse FEED_CONFIG:', error);
 			return json(

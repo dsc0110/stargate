@@ -10,7 +10,7 @@ declare namespace Cloudflare {
 		ASSETS: Fetcher;
 		BODY_SIZE_CM: string;
 		BIRTH_DATE: string;
-		FEED_CONFIG: string;
+		FEED_CONFIG: Array<{ name: string; url: string; category: string }>;
 	}
 }
 interface Env extends Cloudflare.Env {}
