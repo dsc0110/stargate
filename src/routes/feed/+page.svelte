@@ -10,7 +10,6 @@
 
 	let selectedCategory = $state('');
 	let loading = $state(false);
-	let lastFetchTime = $state(0);
 
 	// Client-side cache to avoid redundant requests
 	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
@@ -19,7 +18,6 @@
 	$effect(() => {
 		selectedCategory = data.selectedCategories?.[0] || '';
 		loading = false;
-		lastFetchTime = Date.now();
 	});
 
 	// Debounced category change to prevent rapid requests
