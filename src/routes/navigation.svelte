@@ -1,6 +1,6 @@
 <script lang="ts">
 	import SlashIcon from '$lib/slash-icon.svelte';
-	import { Newspaper, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
+	import { Newspaper, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [

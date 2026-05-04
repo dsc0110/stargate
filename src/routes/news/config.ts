@@ -9,7 +9,7 @@ export const FEED_CONFIG = {
 
 	// Request settings
 	REQUEST_TIMEOUT: 10000, // 10 second timeout
-	MAX_ITEMS_PER_FEED: 5, // Limit items to reduce response size
+	MAX_ITEMS_PER_FEED: 20, // Limit items to reduce response size
 	BATCH_SIZE: 3, // Process feeds in batches of 3
 	BATCH_DELAY: 100, // Small delay between batches (milliseconds)
 

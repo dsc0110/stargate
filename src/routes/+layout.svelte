@@ -3,7 +3,7 @@
 	import Navigation from './navigation.svelte';
 	import SlashIcon from '$lib/slash-icon.svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
-	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
+	import { Menu, SunMoon, Newspaper, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
 	let { children } = $props();
 
@@ -48,8 +48,8 @@
 			<div class="flex items-center gap-2 lg:flex-1 headertext">
 				{#if page.url.pathname === '/'}
 					<SlashIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/feed'}
-					<RssIcon class={SHARED_STYLES.navIcon} />
+				{:else if page.url.pathname === '/news'}
+					<Newspaper class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/portfolio'}
 					<DollarSign class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/scale'}
@@ -90,7 +90,7 @@
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
 								{#if page.url.pathname === '/'}
 									<SlashIcon class={SHARED_STYLES.navIcon} />
-								{:else if page.url.pathname === '/feed'}
+								{:else if page.url.pathname === '/news'}
 									<RssIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/portfolio'}
 									<DollarSign class={SHARED_STYLES.navIcon} />
