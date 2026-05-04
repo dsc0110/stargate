@@ -1,7 +1,8 @@
 <script lang="ts">
 	import './layout.css';
 	import Navigation from './navigation.svelte';
-	import SlashIcon from '$lib/SlashIcon.svelte';
+	import SlashIcon from '$lib/slash-icon.svelte';
+	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
 	let { children } = $props();
@@ -46,17 +47,17 @@
 			<!-- logo and path -->
 			<div class="flex items-center gap-2 lg:flex-1 headertext">
 				{#if page.url.pathname === '/'}
-					<SlashIcon class="size-6 text-primary-600" />
+					<SlashIcon class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/feed'}
-					<RssIcon class="size-6 text-primary-600" />
+					<RssIcon class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/portfolio'}
-					<DollarSign class="size-6 text-primary-600" />
+					<DollarSign class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/scale'}
-					<ScaleIcon class="size-6 text-primary-600" />
+					<ScaleIcon class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/study'}
-					<GraduationCapIcon class="size-6 text-primary-600" />
+					<GraduationCapIcon class={SHARED_STYLES.navIcon} />
 				{:else}
-					<SlashIcon class="size-6 text-primary-600" />
+					<SlashIcon class={SHARED_STYLES.navIcon} />
 				{/if}
 				{#key page.url.pathname}
 					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? 'home' : page.url.pathname.slice(1)}</span>
@@ -88,17 +89,17 @@
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
 								{#if page.url.pathname === '/'}
-									<SlashIcon class="size-6 text-primary-600" />
+									<SlashIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/feed'}
-									<RssIcon class="size-6 text-primary-600" />
+									<RssIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/portfolio'}
-									<DollarSign class="size-6 text-primary-600" />
+									<DollarSign class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/scale'}
-									<ScaleIcon class="size-6 text-primary-600" />
+									<ScaleIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/study'}
-									<GraduationCapIcon class="size-6 text-primary-600" />
+									<GraduationCapIcon class={SHARED_STYLES.navIcon} />
 								{:else}
-									<SlashIcon class="size-6 text-primary-600" />
+									<SlashIcon class={SHARED_STYLES.navIcon} />
 								{/if}
 								{#if page.url.pathname !== '/'}
 									<span>{page.url.pathname.slice(1)}</span>

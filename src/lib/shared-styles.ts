@@ -13,6 +13,7 @@ export const SHARED_STYLES = {
 
 	// Icon styles
 	icon: 'w-6 h-6',
+	navIcon: 'size-6 text-tertiary-600',
 
 	// Card styles
 	metricCard: 'p-2 md:p-4 rounded-xl backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-200 hover:shadow-xl hover:bg-black/15 dark:hover:bg-white/15',

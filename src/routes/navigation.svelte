@@ -1,5 +1,5 @@
 <script lang="ts">
-	import SlashIcon from '$lib/SlashIcon.svelte';
+	import SlashIcon from '$lib/slash-icon.svelte';
 	import { RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
