@@ -96,7 +96,7 @@
 					{#each data.availableCategories as categoryName}
 						<button
 							onclick={() => handleCategoryToggle(categoryName)}
-							class="chip {selectedCategory === categoryName ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500 hover:bg-primary-50'} border px-3 py-1 rounded-full text-sm transition-colors"
+							class="chip {selectedCategory === categoryName ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500'} border px-3 py-1 rounded-full text-sm transition-colors"
 						>
 							{categoryName}
 						</button>
@@ -107,7 +107,6 @@
 				{#if data.cacheInfo && selectedCategory}
 					<div class="flex items-center gap-2 text-xs text-gray-500">
 						<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-						<span>Cached data</span>
 					</div>
 				{/if}
 			</div>
@@ -139,7 +138,7 @@
 				{#each feed.items.slice(0, 5) as item}
 					<div
 						id="feeditem"
-						class="border border-gray-200 dark:border-gray-700 rounded-lg p-2 mb-2 hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
+						class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-2 hover:shadow-md hover:bg-gray-50/800 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
 						onclick={() => window.open(item.link, '_blank')}
 						onkeydown={(e) => {
 							if (e.key === 'Enter' || e.key === ' ') {
@@ -151,16 +150,23 @@
 						role="button"
 						aria-label="Open {item.title} in new tab"
 					>
-						<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-							{item.title}
-						</h3>
-						<div class="mt-1">
-							<span class="text-xs text-secondary-600 dark:text-secondary-400">
-								{feed.name}{#if item.pubDate}, {new Date(item.pubDate).toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric'
-									})}{/if}
-							</span>
+						<div class="flex items-start justify-between gap-3">
+							<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-relaxed flex-1 min-w-0">
+								{item.title}
+							</h3>
+							<div class="flex flex-col sm:flex-row gap-1 sm:gap-2 flex-shrink-0">
+								<span class={`${SHARED_STYLES.badge} ${SHARED_STYLES.badgeSource}`}>
+									{feed.name}
+								</span>
+								{#if item.pubDate}
+									<span class={`${SHARED_STYLES.badge} ${SHARED_STYLES.badgeDate}`}>
+										{new Date(item.pubDate).toLocaleDateString('en-US', {
+											month: 'short',
+											day: 'numeric'
+										})}
+									</span>
+								{/if}
+							</div>
 						</div>
 					</div>
 				{/each}
