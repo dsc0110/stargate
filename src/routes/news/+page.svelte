@@ -83,8 +83,8 @@
 </script>
 
 <svelte:head>
-	<title>feed</title>
-	<meta name="description" content="feed" />
+	<title>news</title>
+	<meta name="description" content="news" />
 </svelte:head>
 
 <div id="subheader">

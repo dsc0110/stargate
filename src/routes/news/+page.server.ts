@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const selectedCategoriesArray = selectedCategories.split(',').filter(Boolean);
 
 		// Always make API call to get available categories, even if no categories selected
-		const response = await fetch(`/feed?categories=${encodeURIComponent(selectedCategories)}`, {
+		const response = await fetch(`/news?categories=${encodeURIComponent(selectedCategories)}`, {
 			method: 'GET'
 		});
 

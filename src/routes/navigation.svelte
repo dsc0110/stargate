@@ -1,16 +1,17 @@
 <script lang="ts">
 	import SlashIcon from '$lib/slash-icon.svelte';
-	import { RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
+	import { Newspaper, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
 
 	const linksSidebar = {
 		public: [
-			{ label: 'Home', href: '/', icon: SlashIcon },
-			{ label: 'Feed', href: '/feed', icon: RssIcon }
+			{ label: 'home', href: '/', icon: SlashIcon },
+			{ label: 'news', href: '/news', icon: Newspaper }
+			// { label: 'blogs', href: '/blogs', icon: RssIcon }
 		],
 		private: [
-			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
-			{ label: 'Scale', href: '/scale', icon: ScaleIcon },
-			{ label: 'Study', href: '/study', icon: GraduationCapIcon }
+			{ label: 'portfolio', href: '/portfolio', icon: DollarSign },
+			{ label: 'scale', href: '/scale', icon: ScaleIcon },
+			{ label: 'study', href: '/study', icon: GraduationCapIcon }
 		]
 	};
 
