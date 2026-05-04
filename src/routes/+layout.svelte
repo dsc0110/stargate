@@ -91,7 +91,7 @@
 								{#if page.url.pathname === '/'}
 									<SlashIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/news'}
-									<RssIcon class={SHARED_STYLES.navIcon} />
+									<Newspaper class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/portfolio'}
 									<DollarSign class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/scale'}

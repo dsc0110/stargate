@@ -12,17 +12,33 @@
 	let loading = $state(false);
 	let loadingMore = $state(false);
 	let additionalPages = $state(0); // Track how many additional pages loaded
+	let hasAutoSelected = $state(false); // Track if we've already auto-selected
 
 	// Client-side cache to avoid redundant requests
 	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
 
 	// Update selectedCategory when data changes
 	$effect(() => {
-		selectedCategory = data.selectedCategories?.[0] || '';
+		const newSelectedCategory = data.selectedCategories?.[0] || '';
+		selectedCategory = newSelectedCategory;
 		loading = false;
 		// Reset pagination state when category changes
 		additionalPages = 0;
 		console.log('Category changed to:', selectedCategory, 'Reset additionalPages to 0');
+
+		// Reset auto-select flag if user manually selected a category
+		if (newSelectedCategory) {
+			hasAutoSelected = true;
+		}
+	});
+
+	// Auto-select first category on initial load
+	$effect(() => {
+		if (browser && !hasAutoSelected && !selectedCategory && data.availableCategories && data.availableCategories.length > 0) {
+			console.log('Auto-selecting first category:', data.availableCategories[0]);
+			hasAutoSelected = true;
+			handleCategoryToggle(data.availableCategories[0]);
+		}
 	});
 
 	// Debounced category change to prevent rapid requests
