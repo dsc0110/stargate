@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { SHARED_STYLES } from '$lib/shared-styles';
+	import { SHARED_STYLES, getChipClasses } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import { FEED_CONFIG } from './config';
 
@@ -189,10 +189,7 @@
 			<div class="flex justify-between items-center">
 				<div class="flex items-center gap-2">
 					{#each data.availableCategories as categoryName}
-						<button
-							onclick={() => handleCategoryToggle(categoryName)}
-							class="chip {selectedCategory === categoryName ? 'bg-primary-500 text-white border-primary-500' : 'bg-transparent text-primary-500 border-primary-500'} border px-3 py-1 rounded-full text-sm transition-colors"
-						>
+						<button onclick={() => handleCategoryToggle(categoryName)} class="chip {getChipClasses(selectedCategory === categoryName)}">
 							{categoryName}
 						</button>
 					{/each}

@@ -7,11 +7,16 @@ export const SHARED_STYLES = {
 
 	// Button styles
 	buttonBase: 'btn rounded-lg px-2 py-2 transition-all duration-200 hover:bg-transparent',
-	buttonActive: 'text-primary-600 dark:text-primary-400',
+	buttonActive: 'text-primary-800 dark:text-primary-400',
 	buttonInactive: 'text-gray-500 dark:text-gray-400',
-	buttonGrey: 'btn rounded-lg px-2 py-2 transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-transparent',
+	buttonGrey: 'btn rounded-lg px-2 py-2 transition-all duration-200 text-gray-500 dark:text-gray-400 hover:bg-transparent hover:text-primary-800 dark:hover:text-primary-400',
+
+	// Chip styles for news and other control sections
+	chipBase: 'border px-3 py-1 rounded-full text-sm transition-all duration-200 hover:bg-transparent',
+	chipActive: 'text-primary-800 dark:text-primary-400 bg-transparent border-primary-800 dark:border-primary-400',
+	chipInactive: 'text-gray-500 dark:text-gray-400 bg-transparent border-gray-500 dark:border-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:border-primary-800 dark:hover:border-primary-400',
 	buttonIcon: 'rounded-lg p-2 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800',
-	buttonHeaderIcon: 'inline-flex items-center justify-center text-sm/6 font-semibold transition-colors duration-200 hover:text-primary-600 dark:hover:text-primary-400',
+	buttonHeaderIcon: 'inline-flex items-center justify-center text-sm/6 font-semibold transition-colors duration-200 hover:text-primary-800 dark:hover:text-primary-400',
 	buttonPrimary: 'btn preset-outlined-surface-300-700',
 	buttonSecondary: 'btn preset-tonal',
 	buttonIconClose: 'btn-icon hover:preset-tonal',
@@ -37,4 +42,11 @@ export const SHARED_STYLES = {
  */
 export function getButtonClasses(isActive: boolean): string {
 	return `${SHARED_STYLES.buttonBase} ${isActive ? SHARED_STYLES.buttonActive : SHARED_STYLES.buttonInactive}`;
+}
+
+/**
+ * Get chip classes based on active state
+ */
+export function getChipClasses(isActive: boolean): string {
+	return `${SHARED_STYLES.chipBase} ${isActive ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`;
 }
