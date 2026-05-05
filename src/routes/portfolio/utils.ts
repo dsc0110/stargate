@@ -167,13 +167,6 @@ export class ConversionHelper {
 }
 
 /**
- * Validate tab ID exists in configuration
- */
-export function isValidTabId(tabs: any[], tabId: string): boolean {
-	return tabs.some((tab) => tab.id === tabId);
-}
-
-/**
  * Calculate the total value of a portfolio entry
  */
 export function calculatePortfolioTotal(entry: any): number {
