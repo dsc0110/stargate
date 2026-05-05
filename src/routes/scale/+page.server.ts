@@ -6,8 +6,7 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return {
 				scaleResults: [],
-				bodySizeCm: 0,
-				birthDate: ''
+				bodySizeCm: 0
 			};
 		}
 
@@ -33,8 +32,7 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 		console.error('Error getting scale results data:', error);
 		return {
 			scaleResults: [],
-			bodySizeCm: 0,
-			birthDate: ''
+			bodySizeCm: 0
 		};
 	}
 };
