@@ -132,13 +132,13 @@ async function parseRSSFeed(url: string): Promise<any> {
 export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
 		// Get feed configuration from environment variable
-		const feedConfig = platform?.env?.FEED_CONFIG || (process.env.FEED_CONFIG ? JSON.parse(process.env.FEED_CONFIG) : null);
+		const newsFeeds = platform?.env?.NEWS_FEEDS || (process.env.NEWS_FEEDS ? JSON.parse(process.env.NEWS_FEEDS) : null);
 
-		if (!feedConfig) {
+		if (!newsFeeds) {
 			return json(
 				{
 					success: false,
-					error: 'FEED_CONFIG environment variable not found. Run with: wrangler pages dev'
+					error: 'NEWS_FEEDS environment variable not found. Run with: wrangler pages dev'
 				},
 				{ status: 500 }
 			);
@@ -147,9 +147,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		let availableFeeds: FeedConfig[] = [];
 
 		try {
-			availableFeeds = Array.isArray(feedConfig) ? feedConfig : JSON.parse(feedConfig);
+			availableFeeds = Array.isArray(newsFeeds) ? newsFeeds : JSON.parse(newsFeeds);
 		} catch (error) {
-			console.error('Failed to parse FEED_CONFIG:', error);
+			console.error('Failed to parse NEWS_FEEDS:', error);
 			return json(
 				{
 					success: false,

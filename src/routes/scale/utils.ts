@@ -34,9 +34,8 @@ export function calculateAge(birthDate: string, measureDate: string | Date): num
  */
 export function getScaleEnvironment(env: any) {
 	const bodySizeCm = parseFloat(env?.BODY_SIZE_CM || '0');
-	const birthDate = env?.BIRTH_DATE || '';
 
-	return { bodySizeCm, birthDate };
+	return { bodySizeCm };
 }
 
 // Currency conversion utilities
