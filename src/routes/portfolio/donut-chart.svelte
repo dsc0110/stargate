@@ -69,7 +69,6 @@
 				},
 				style: {
 					fontSize: '12px',
-					fontWeight: 'bold',
 					colors: ['white']
 				}
 			},
@@ -92,15 +91,7 @@
 						}
 					}
 				}
-			],
-			fill: {
-				type: 'pattern' as const,
-				opacity: 1,
-				pattern: {
-					enabled: true,
-					style: ['slantedLines', 'slantedLines']
-				}
-			}
+			]
 		};
 
 		chart = new ApexCharts(chartElement!, options);
