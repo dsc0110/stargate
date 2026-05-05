@@ -27,17 +27,6 @@ export function calculateAge(birthDate: string, measureDate: string | Date): num
 	return Math.floor((measure.getTime() - birth.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
 }
 
-/**
- * Get environment values for calculations
- * @param env Environment object from platform
- * @returns Object with parsed body size and birth date
- */
-export function getScaleEnvironment(env: any) {
-	const bodySizeCm = parseFloat(env?.BODY_SIZE_CM || '0');
-
-	return { bodySizeCm };
-}
-
 // Currency conversion utilities
 
 interface ExchangeRateData {

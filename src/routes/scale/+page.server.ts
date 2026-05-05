@@ -1,6 +1,5 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getScaleEnvironment } from './utils.js';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
@@ -12,15 +11,14 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 			};
 		}
 
-		// Get environment variables using the utility function
-		const { bodySizeCm, birthDate } = getScaleEnvironment(platform?.env);
+		// Get body size from environment variable
+		const bodySizeCm = parseFloat(platform?.env.BODY_SIZE_CM || '0');
 
 		const object = await platform?.env.STARGATE_BUCKET.get('scale/scale-results.json');
 		if (object === null) {
 			return {
 				scaleResults: [],
-				bodySizeCm,
-				birthDate
+				bodySizeCm
 			};
 		}
 
@@ -29,8 +27,7 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 
 		return {
 			scaleResults,
-			bodySizeCm,
-			birthDate
+			bodySizeCm
 		};
 	} catch (error) {
 		console.error('Error getting scale results data:', error);
