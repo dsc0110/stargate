@@ -175,13 +175,22 @@
 <div id="subheader">
 	<div class={SHARED_STYLES.controlsContainer}>
 		<div class="flex items-center gap-4 w-full">
-			<div class="relative dropdown-container">
+			<!-- Cache status indicator -->
+			{#if data.cacheInfo}
+				<div class="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0">
+					<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+				</div>
+			{/if}
+
+			<div class="relative dropdown-container ml-auto">
 				<!-- Compact dropdown button -->
-				<button class="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
-					<span>Feeds</span>
-					{#if selectedFeeds.length > 0}
-						<span class="badge preset-filled text-xs">{selectedFeeds.length}</span>
-					{/if}
+				<button class="flex items-center justify-between gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm w-48" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
+					<div class="flex items-center gap-2">
+						<span>Feeds</span>
+						{#if selectedFeeds.length > 0}
+							<span class="badge preset-filled text-xs">{selectedFeeds.length}</span>
+						{/if}
+					</div>
 					<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 					</svg>
@@ -189,7 +198,7 @@
 
 				<!-- Dropdown menu -->
 				{#if isDropdownOpen}
-					<div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50">
+					<div class="absolute top-full right-0 mt-1 w-48 backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg shadow-lg z-50">
 						<div class="p-2 max-h-64 overflow-y-auto">
 							{#each journalFeeds as feed (feed.value)}
 								<label class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
@@ -201,22 +210,6 @@
 					</div>
 				{/if}
 			</div>
-
-			<!-- Selected feeds display -->
-			<div class="flex flex-wrap gap-1 flex-1">
-				{#each selectedFeeds as item (item)}
-					<span class="badge preset-filled text-xs px-2 py-1">
-						{item}
-					</span>
-				{/each}
-			</div>
-
-			<!-- Cache status indicator -->
-			{#if data.cacheInfo}
-				<div class="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0">
-					<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-				</div>
-			{/if}
 		</div>
 	</div>
 </div>

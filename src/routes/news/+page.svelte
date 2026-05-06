@@ -13,6 +13,54 @@
 	let loadingMore = $state(false);
 	let additionalPages = $state(0); // Track how many additional pages loaded
 	let hasAutoSelected = $state(false); // Track if we've already auto-selected
+	let isDropdownOpen = $state(false);
+
+	// Available categories for dropdown
+	const availableCategories = $derived(data.availableCategories || []);
+
+	// Toggle category selection (single selection only)
+	const selectCategory = (categoryName: string) => {
+		const newCategory = selectedCategory === categoryName ? '' : categoryName;
+		selectedCategory = newCategory;
+		isDropdownOpen = false;
+
+		// Clear timeout and update URL after a delay to prevent rapid requests
+		clearTimeout(categoryChangeTimeout);
+		loading = true;
+
+		categoryChangeTimeout = setTimeout(() => {
+			console.log('Debounced category change to:', newCategory);
+
+			// Update URL with the new category parameter
+			const url = new URL(page.url);
+			if (newCategory) {
+				url.searchParams.set('categories', newCategory);
+			}
+
+			goto(url.toString());
+		}, 300);
+	};
+
+	// Close dropdown when clicking outside
+	const handleOutsideClick = (event: Event) => {
+		const target = event.target as Element;
+		if (!target.closest('.dropdown-container')) {
+			isDropdownOpen = false;
+		}
+	};
+
+	// Add/remove event listener for outside clicks
+	$effect(() => {
+		if (isDropdownOpen) {
+			document.addEventListener('click', handleOutsideClick);
+		} else {
+			document.removeEventListener('click', handleOutsideClick);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleOutsideClick);
+		};
+	});
 
 	// Client-side cache to avoid redundant requests
 	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
@@ -37,49 +85,24 @@
 		if (browser && !hasAutoSelected && !selectedCategory && data.availableCategories && data.availableCategories.length > 0) {
 			console.log('Auto-selecting first category:', data.availableCategories[0]);
 			hasAutoSelected = true;
-			handleCategoryToggle(data.availableCategories[0]);
+			handleAutoSelect(data.availableCategories[0]);
 		}
 	});
 
 	// Debounced category change to prevent rapid requests
 	let categoryChangeTimeout: ReturnType<typeof setTimeout> | undefined;
 
-	function handleCategoryToggle(categoryName: string) {
-		// If clicking the same category, deselect it; otherwise select the new one
-		const newCategory = selectedCategory === categoryName ? '' : categoryName;
-		selectedCategory = newCategory;
+	// Auto-select handler
+	function handleAutoSelect(categoryName: string) {
+		selectedCategory = categoryName;
 
-		// Clear any pending category change
-		if (categoryChangeTimeout) {
-			clearTimeout(categoryChangeTimeout);
-		}
+		// Show loading immediately
+		loading = true;
 
-		// Check client cache first
-		const cacheKey = newCategory || 'none';
-		const cached = clientCache.get(cacheKey);
-		if (cached && Date.now() < cached.expires) {
-			console.log('Using client cache for category:', cacheKey);
-			data = cached.data;
-			return;
-		}
-
-		// Show loading immediately for non-cached requests
-		if (newCategory) {
-			loading = true;
-		}
-
-		// Debounce the actual navigation to prevent rapid requests
-		categoryChangeTimeout = setTimeout(() => {
-			const url = new URL(page.url);
-
-			if (newCategory) {
-				url.searchParams.set('categories', newCategory);
-			} else {
-				url.searchParams.delete('categories');
-			}
-
-			goto(url.toString());
-		}, FEED_CONFIG.CATEGORY_CHANGE_DEBOUNCE);
+		// Update URL with new category
+		const url = new URL(page.url);
+		url.searchParams.set('categories', categoryName);
+		goto(url.toString());
 	}
 
 	// Function to load more items from all feeds
@@ -186,21 +209,41 @@
 	<!-- Controls Section -->
 	{#if data.availableCategories && data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
-			<div class="flex justify-between items-center">
-				<div class="flex items-center gap-2">
-					{#each data.availableCategories as categoryName}
-						<button onclick={() => handleCategoryToggle(categoryName)} class="chip {getChipClasses(selectedCategory === categoryName)}">
-							{categoryName}
-						</button>
-					{/each}
-				</div>
-
+			<div class="flex items-center gap-4 w-full">
 				<!-- Cache status indicator -->
 				{#if data.cacheInfo && selectedCategory}
-					<div class="flex items-center gap-2 text-xs text-gray-500">
+					<div class="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0">
 						<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
 					</div>
 				{/if}
+
+				<div class="relative dropdown-container ml-auto">
+					<!-- Compact dropdown button -->
+					<button class="flex items-center justify-between gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm w-48" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
+						<span>{selectedCategory || 'Select category...'}</span>
+						<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+						</svg>
+					</button>
+
+					<!-- Dropdown menu -->
+					{#if isDropdownOpen}
+						<div class="absolute top-full right-0 mt-1 w-48 backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg shadow-lg z-50">
+							<div class="p-2 max-h-64 overflow-y-auto">
+								{#each availableCategories as category (category)}
+									<button class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer w-full text-left text-sm" onclick={() => selectCategory(category)}>
+										<span>{category}</span>
+										{#if selectedCategory === category}
+											<svg class="w-4 h-4 ml-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+											</svg>
+										{/if}
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
 			</div>
 		</div>
 	{/if}
