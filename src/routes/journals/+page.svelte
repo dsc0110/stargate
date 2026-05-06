@@ -3,12 +3,63 @@
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import { JOURNALS_CONFIG } from './config';
+	import { Combobox, Portal, useListCollection } from '@skeletonlabs/skeleton-svelte';
 
 	let { data }: { data: PageData } = $props();
+
+	// Create journal feeds options from data
+	const journalFeeds = $derived(data.feeds ? data.feeds.filter((feed) => feed.success).map((feed) => ({ label: feed.name, value: feed.name })) : []);
+
+	let selectedFeeds: string[] = $state([]);
+	let isDropdownOpen = $state(false);
+
+	// Initialize with all feeds selected by default
+	$effect(() => {
+		if (journalFeeds.length > 0 && selectedFeeds.length === 0) {
+			selectedFeeds = journalFeeds.map((feed) => feed.value);
+		}
+	});
+
+	// Toggle feed selection
+	const toggleFeed = (feedName: string) => {
+		if (selectedFeeds.includes(feedName)) {
+			selectedFeeds = selectedFeeds.filter((name) => name !== feedName);
+		} else {
+			selectedFeeds = [...selectedFeeds, feedName];
+		}
+	};
+
+	// Close dropdown when clicking outside
+	const handleOutsideClick = (event: Event) => {
+		const target = event.target as Element;
+		if (!target.closest('.dropdown-container')) {
+			isDropdownOpen = false;
+		}
+	};
+
+	// Add/remove event listener for outside clicks
+	$effect(() => {
+		if (isDropdownOpen) {
+			document.addEventListener('click', handleOutsideClick);
+		} else {
+			document.removeEventListener('click', handleOutsideClick);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleOutsideClick);
+		};
+	});
 
 	let loading = $state(false);
 	let loadingMore = $state(false);
 	let additionalPages = $state(0); // Track how many additional pages loaded
+
+	// Filter feeds based on selection
+	const filteredFeeds = $derived(
+		selectedFeeds.length === 0
+			? data.feeds // Show all feeds if none selected
+			: data.feeds?.filter((feed) => selectedFeeds.includes(feed.name))
+	);
 
 	// Client-side cache to avoid redundant requests
 	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
@@ -26,7 +77,7 @@
 		if (loadingMore) return;
 
 		// Check if we have more items to load
-		const hasMoreItems = data.feeds && data.feeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5);
+		const hasMoreItems = filteredFeeds && filteredFeeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5);
 
 		if (!hasMoreItems) {
 			console.log('No more items to load. additionalPages:', additionalPages);
@@ -53,7 +104,7 @@
 			const documentHeight = document.documentElement.scrollHeight;
 
 			// If content doesn't fill the viewport and we have more items, load them
-			if (documentHeight <= windowHeight + 100 && data.feeds && data.feeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5)) {
+			if (documentHeight <= windowHeight + 100 && filteredFeeds && filteredFeeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5)) {
 				loadMoreItems();
 			}
 		}, 200);
@@ -122,16 +173,52 @@
 </svelte:head>
 
 <div id="subheader">
-	<!-- Cache status indicator -->
-	{#if data.cacheInfo}
-		<div class={SHARED_STYLES.controlsContainer}>
-			<div class="flex justify-end items-center">
-				<div class="flex items-center gap-2 text-xs text-gray-500">
+	<div class={SHARED_STYLES.controlsContainer}>
+		<div class="flex items-center gap-4 w-full">
+			<div class="relative dropdown-container">
+				<!-- Compact dropdown button -->
+				<button class="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-sm" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
+					<span>Feeds</span>
+					{#if selectedFeeds.length > 0}
+						<span class="badge preset-filled text-xs">{selectedFeeds.length}</span>
+					{/if}
+					<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+					</svg>
+				</button>
+
+				<!-- Dropdown menu -->
+				{#if isDropdownOpen}
+					<div class="absolute top-full left-0 mt-1 w-48 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg z-50">
+						<div class="p-2 max-h-64 overflow-y-auto">
+							{#each journalFeeds as feed (feed.value)}
+								<label class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer">
+									<input type="checkbox" checked={selectedFeeds.includes(feed.value)} onchange={() => toggleFeed(feed.value)} class="rounded" />
+									<span class="text-sm">{feed.label}</span>
+								</label>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+
+			<!-- Selected feeds display -->
+			<div class="flex flex-wrap gap-1 flex-1">
+				{#each selectedFeeds as item (item)}
+					<span class="badge preset-filled text-xs px-2 py-1">
+						{item}
+					</span>
+				{/each}
+			</div>
+
+			<!-- Cache status indicator -->
+			{#if data.cacheInfo}
+				<div class="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0">
 					<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
 				</div>
-			</div>
+			{/if}
 		</div>
-	{/if}
+	</div>
 </div>
 
 <div id="feeditems" class="py-4">
@@ -152,9 +239,9 @@
 				</div>
 			{/each}
 		</div>
-	{:else if data.feeds}
+	{:else if filteredFeeds}
 		<!-- Initial items (first 5 from each feed) -->
-		{#each data.feeds as feed}
+		{#each filteredFeeds as feed}
 			{#if feed.success && feed.items}
 				{#each feed.items.slice(0, 5) as item}
 					<div
@@ -204,7 +291,7 @@
 			{#each Array(additionalPages).fill(0) as _, pageIndex}
 				{@const startIndex = 5 + pageIndex * 5}
 				{@const endIndex = startIndex + 5}
-				{#each data.feeds as feed}
+				{#each filteredFeeds as feed}
 					{#if feed.success && feed.items && feed.items.length > startIndex}
 						{#each feed.items.slice(startIndex, endIndex) as item}
 							<div
