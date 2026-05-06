@@ -1,16 +1,43 @@
-<script>
+<script lang="ts">
 	import FeedItem from './feed-item.svelte';
+	import type { FeedData, FeedItem as RSSFeedItem } from './rss-service';
 
-	const { feeds, additionalPages = 0, loadingPlaceholderCount = 5 } = $props();
+	interface FeedItemWithSource extends RSSFeedItem {
+		feedName: string;
+	}
+
+	const { feeds }: { feeds: FeedData[] } = $props();
+
+	// Get all items sorted by date - reactive to feeds changes
+	const allItems = $derived(
+		(() => {
+			const items: FeedItemWithSource[] = [];
+
+			if (feeds && Array.isArray(feeds)) {
+				feeds.forEach((feed) => {
+					if (feed.success && feed.items && Array.isArray(feed.items)) {
+						feed.items.forEach((item: RSSFeedItem) => {
+							items.push({ ...item, feedName: feed.name });
+						});
+					}
+				});
+
+				// Sort by date (newest first)
+				items.sort((a, b) => {
+					const dateA = new Date(a.pubDate || 0);
+					const dateB = new Date(b.pubDate || 0);
+					return dateB.getTime() - dateA.getTime();
+				});
+			}
+
+			return items;
+		})()
+	);
 </script>
 
-<!-- Initial items (first 5 from each feed) -->
+<!-- Error messages for failed feeds -->
 {#each feeds as feed}
-	{#if feed.success && feed.items}
-		{#each feed.items.slice(0, 5) as item}
-			<FeedItem {item} feedName={feed.name} />
-		{/each}
-	{:else}
+	{#if !feed.success}
 		<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
 			<strong>Error loading {feed.name}:</strong>
 			{feed.error || 'Unknown error'}
@@ -18,17 +45,7 @@
 	{/if}
 {/each}
 
-<!-- Additional items (shown after clicking Load More) -->
-{#if additionalPages > 0}
-	{#each Array(additionalPages).fill(0) as _, pageIndex}
-		{@const startIndex = 5 + pageIndex * 5}
-		{@const endIndex = startIndex + 5}
-		{#each feeds as feed}
-			{#if feed.success && feed.items && feed.items.length > startIndex}
-				{#each feed.items.slice(startIndex, endIndex) as item}
-					<FeedItem {item} feedName={feed.name} />
-				{/each}
-			{/if}
-		{/each}
-	{/each}
-{/if}
+<!-- Display all items sorted by date -->
+{#each allItems as item}
+	<FeedItem {item} feedName={item.feedName} />
+{/each}

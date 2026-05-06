@@ -11,8 +11,6 @@
 
 	let selectedCategory = $state('');
 	let loading = $state(false);
-	let loadingMore = $state(false);
-	let additionalPages = $state(0); // Track how many additional pages loaded
 	let hasAutoSelected = $state(false); // Track if we've already auto-selected
 	let isDropdownOpen = $state(false);
 
@@ -71,9 +69,7 @@
 		const newSelectedCategory = data.selectedCategories?.[0] || '';
 		selectedCategory = newSelectedCategory;
 		loading = false;
-		// Reset pagination state when category changes
-		additionalPages = 0;
-		console.log('Category changed to:', selectedCategory, 'Reset additionalPages to 0');
+		console.log('Category changed to:', selectedCategory);
 
 		// Reset auto-select flag if user manually selected a category
 		if (newSelectedCategory) {
@@ -105,80 +101,6 @@
 		url.searchParams.set('categories', categoryName);
 		goto(url.toString());
 	}
-
-	// Function to load more items from all feeds
-	function loadMoreItems() {
-		if (loadingMore) return;
-
-		// Check if we have more items to load
-		const hasMoreItems = data.feeds && data.feeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5);
-
-		if (!hasMoreItems) {
-			console.log('No more items to load. additionalPages:', additionalPages);
-			return;
-		}
-
-		loadingMore = true;
-		console.log('Loading more items. Current additionalPages:', additionalPages);
-
-		// Simulate loading delay for UX
-		setTimeout(() => {
-			additionalPages += 1;
-			loadingMore = false;
-			console.log('Loaded more items. New additionalPages:', additionalPages);
-		}, 300);
-	}
-
-	// Check if we need to auto-load content to fill viewport
-	function checkAndLoadContent() {
-		if (loadingMore || !browser) return;
-
-		setTimeout(() => {
-			const windowHeight = window.innerHeight;
-			const documentHeight = document.documentElement.scrollHeight;
-
-			// If content doesn't fill the viewport and we have more items, load them
-			if (documentHeight <= windowHeight + 100 && data.feeds && data.feeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5)) {
-				loadMoreItems();
-			}
-		}, 200);
-	}
-
-	// Infinite scroll handling
-	function handleScroll() {
-		if (loadingMore || !browser) return;
-
-		const scrollTop = window.scrollY;
-		const windowHeight = window.innerHeight;
-		const documentHeight = document.documentElement.scrollHeight;
-
-		// Trigger when within 200px of the bottom
-		if (scrollTop + windowHeight >= documentHeight - 200) {
-			loadMoreItems();
-		}
-	}
-
-	// Set up scroll listener and check for auto-load
-	$effect(() => {
-		if (browser) {
-			console.log('Setting up scroll listener. Category:', selectedCategory, 'AdditionalPages:', additionalPages);
-			window.addEventListener('scroll', handleScroll);
-
-			// Delay auto-load check to ensure DOM is updated
-			setTimeout(() => {
-				checkAndLoadContent();
-			}, 100);
-
-			return () => window.removeEventListener('scroll', handleScroll);
-		}
-	});
-
-	// Also check after loading more content
-	$effect(() => {
-		if (additionalPages > 0) {
-			checkAndLoadContent();
-		}
-	});
 
 	// Cache successful data loads
 	$effect(() => {
@@ -269,17 +191,7 @@
 			{/each}
 		</div>
 	{:else if data.feeds && selectedCategory}
-		<FeedList feeds={data.feeds} {additionalPages} loadingPlaceholderCount={FEED_CONFIG.LOADING_PLACEHOLDER_COUNT} />
-
-		<!-- Loading indicator for infinite scroll -->
-		{#if loadingMore}
-			<div class="flex justify-center mt-6">
-				<div class="flex items-center gap-2 text-gray-500">
-					<div class="animate-spin w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full"></div>
-					<span>Loading more...</span>
-				</div>
-			</div>
-		{/if}
+		<FeedList feeds={data.feeds} />
 	{:else if !selectedCategory}
 		<!-- Show nothing when no category selected -->
 	{/if}

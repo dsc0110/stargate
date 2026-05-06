@@ -52,8 +52,6 @@
 	});
 
 	let loading = $state(false);
-	let loadingMore = $state(false);
-	let additionalPages = $state(0); // Track how many additional pages loaded
 
 	// Filter feeds based on selection
 	const filteredFeeds = $derived(
@@ -68,83 +66,7 @@
 	// Update loading state when data changes
 	$effect(() => {
 		loading = false;
-		// Reset pagination state when data changes
-		additionalPages = 0;
-		console.log('Data changed, reset additionalPages to 0');
-	});
-
-	// Function to load more items from all feeds
-	function loadMoreItems() {
-		if (loadingMore) return;
-
-		// Check if we have more items to load
-		const hasMoreItems = filteredFeeds && filteredFeeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5);
-
-		if (!hasMoreItems) {
-			console.log('No more items to load. additionalPages:', additionalPages);
-			return;
-		}
-
-		loadingMore = true;
-		console.log('Loading more items. Current additionalPages:', additionalPages);
-
-		// Simulate loading delay for UX
-		setTimeout(() => {
-			additionalPages += 1;
-			loadingMore = false;
-			console.log('Loaded more items. New additionalPages:', additionalPages);
-		}, 300);
-	}
-
-	// Check if we need to auto-load content to fill viewport
-	function checkAndLoadContent() {
-		if (loadingMore || !browser) return;
-
-		setTimeout(() => {
-			const windowHeight = window.innerHeight;
-			const documentHeight = document.documentElement.scrollHeight;
-
-			// If content doesn't fill the viewport and we have more items, load them
-			if (documentHeight <= windowHeight + 100 && filteredFeeds && filteredFeeds.some((feed) => feed.success && feed.items && feed.items.length > 5 + additionalPages * 5)) {
-				loadMoreItems();
-			}
-		}, 200);
-	}
-
-	// Infinite scroll handling
-	function handleScroll() {
-		if (loadingMore || !browser) return;
-
-		const scrollTop = window.scrollY;
-		const windowHeight = window.innerHeight;
-		const documentHeight = document.documentElement.scrollHeight;
-
-		// Trigger when within 200px of the bottom
-		if (scrollTop + windowHeight >= documentHeight - 200) {
-			loadMoreItems();
-		}
-	}
-
-	// Set up scroll listener and check for auto-load
-	$effect(() => {
-		if (browser) {
-			console.log('Setting up scroll listener. AdditionalPages:', additionalPages);
-			window.addEventListener('scroll', handleScroll);
-
-			// Delay auto-load check to ensure DOM is updated
-			setTimeout(() => {
-				checkAndLoadContent();
-			}, 100);
-
-			return () => window.removeEventListener('scroll', handleScroll);
-		}
-	});
-
-	// Also check after loading more content
-	$effect(() => {
-		if (additionalPages > 0) {
-			checkAndLoadContent();
-		}
+		console.log('Data changed');
 	});
 
 	// Cache successful data loads
@@ -235,16 +157,6 @@
 			{/each}
 		</div>
 	{:else if filteredFeeds}
-		<FeedList feeds={filteredFeeds} {additionalPages} loadingPlaceholderCount={JOURNALS_CONFIG.LOADING_PLACEHOLDER_COUNT} />
-
-		<!-- Loading indicator for infinite scroll -->
-		{#if loadingMore}
-			<div class="flex justify-center mt-6">
-				<div class="flex items-center gap-2 text-gray-500">
-					<div class="animate-spin w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full"></div>
-					<span>Loading more...</span>
-				</div>
-			</div>
-		{/if}
+		<FeedList feeds={filteredFeeds} />
 	{/if}
 </div>
