@@ -6,8 +6,8 @@
 	const linksSidebar = {
 		public: [
 			{ label: 'home', href: '/', icon: SlashIcon },
-			{ label: 'news', href: '/news', icon: Newspaper }
-			// { label: 'blogs', href: '/blogs', icon: RssIcon }
+			{ label: 'news', href: '/news', icon: Newspaper },
+			{ label: 'blogs', href: '/blogs', icon: RssIcon }
 		],
 		private: [
 			{ label: 'portfolio', href: '/portfolio', icon: DollarSign },

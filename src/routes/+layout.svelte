@@ -50,6 +50,8 @@
 					<SlashIcon class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/news'}
 					<Newspaper class={SHARED_STYLES.navIcon} />
+				{:else if page.url.pathname === '/blogs'}
+					<RssIcon class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/portfolio'}
 					<DollarSign class={SHARED_STYLES.navIcon} />
 				{:else if page.url.pathname === '/scale'}
@@ -92,6 +94,8 @@
 									<SlashIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/news'}
 									<Newspaper class={SHARED_STYLES.navIcon} />
+								{:else if page.url.pathname === '/blogs'}
+									<RssIcon class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/portfolio'}
 									<DollarSign class={SHARED_STYLES.navIcon} />
 								{:else if page.url.pathname === '/scale'}
