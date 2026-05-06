@@ -7,7 +7,7 @@
 		public: [
 			{ label: 'home', href: '/', icon: SlashIcon },
 			{ label: 'news', href: '/news', icon: Newspaper },
-			{ label: 'blogs', href: '/blogs', icon: RssIcon }
+			{ label: 'journals', href: '/journals', icon: RssIcon }
 		],
 		private: [
 			{ label: 'portfolio', href: '/portfolio', icon: DollarSign },
