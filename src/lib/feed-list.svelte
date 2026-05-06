@@ -124,7 +124,7 @@
 {/each}
 
 <!-- Display items sorted by date -->
-{#each displayItems as item, index (`${item.feedName}-${item.link || item.title || index}`)}
+{#each displayItems as item, index (`${index}-${item.feedName}-${item.link || item.title}`)}
 	{@const isNewlyLoaded = index >= previousItemsCount && previousItemsCount > 0}
 	{@const delay = isNewlyLoaded ? Math.min((index - previousItemsCount) * 100, 800) : Math.min(index * 100, 800)}
 	<div in:fly={{ y: 30, duration: 600, delay, easing: quintOut }} out:fade={{ duration: 200 }}>
