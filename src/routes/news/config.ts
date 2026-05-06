@@ -16,6 +16,8 @@ export const FEED_CONFIG = {
 	// UI settings
 	CATEGORY_CHANGE_DEBOUNCE: 300, // Debounce category changes (milliseconds)
 	LOADING_PLACEHOLDER_COUNT: 5, // Number of loading placeholders to show
+	INITIAL_ITEMS_LIMIT: 10, // Number of items to show initially
+	LOAD_MORE_INCREMENT: 10, // Number of additional items to load on scroll
 
 	// HTTP cache headers
 	BROWSER_CACHE_MAX_AGE: 300, // 5 minutes browser cache

@@ -51,8 +51,6 @@
 		};
 	});
 
-	let loading = $state(false);
-
 	// Filter feeds based on selection
 	const filteredFeeds = $derived(
 		selectedFeeds.length === 0
@@ -63,9 +61,8 @@
 	// Client-side cache to avoid redundant requests
 	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
 
-	// Update loading state when data changes
+	// Update state when data changes
 	$effect(() => {
-		loading = false;
 		console.log('Data changed');
 	});
 
@@ -144,19 +141,7 @@
 			<strong>Error:</strong>
 			{data.error}
 		</div>
-	{:else if loading}
-		<!-- Loading placeholders -->
-		<div class="space-y-4">
-			{#each Array(JOURNALS_CONFIG.LOADING_PLACEHOLDER_COUNT) as _}
-				<div class="placeholder animate-pulse border border-gray-200 dark:border-gray-700 rounded-lg p-2">
-					<div class="py-2">
-						<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
-						<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-					</div>
-				</div>
-			{/each}
-		</div>
 	{:else if filteredFeeds}
-		<FeedList feeds={filteredFeeds} />
+		<FeedList feeds={filteredFeeds} initialLimit={JOURNALS_CONFIG.INITIAL_ITEMS_LIMIT} loadMoreIncrement={JOURNALS_CONFIG.LOAD_MORE_INCREMENT} />
 	{/if}
 </div>

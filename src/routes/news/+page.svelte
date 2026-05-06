@@ -10,7 +10,6 @@
 	let { data }: { data: PageData } = $props();
 
 	let selectedCategory = $state('');
-	let loading = $state(false);
 	let hasAutoSelected = $state(false); // Track if we've already auto-selected
 	let isDropdownOpen = $state(false);
 
@@ -25,7 +24,6 @@
 
 		// Clear timeout and update URL after a delay to prevent rapid requests
 		clearTimeout(categoryChangeTimeout);
-		loading = true;
 
 		categoryChangeTimeout = setTimeout(() => {
 			console.log('Debounced category change to:', newCategory);
@@ -68,7 +66,6 @@
 	$effect(() => {
 		const newSelectedCategory = data.selectedCategories?.[0] || '';
 		selectedCategory = newSelectedCategory;
-		loading = false;
 		console.log('Category changed to:', selectedCategory);
 
 		// Reset auto-select flag if user manually selected a category
@@ -92,9 +89,6 @@
 	// Auto-select handler
 	function handleAutoSelect(categoryName: string) {
 		selectedCategory = categoryName;
-
-		// Show loading immediately
-		loading = true;
 
 		// Update URL with new category
 		const url = new URL(page.url);
@@ -178,20 +172,8 @@
 			<strong>Error:</strong>
 			{data.error}
 		</div>
-	{:else if loading}
-		<!-- Loading placeholders -->
-		<div class="space-y-4">
-			{#each Array(FEED_CONFIG.LOADING_PLACEHOLDER_COUNT) as _}
-				<div class="placeholder animate-pulse border border-gray-200 dark:border-gray-700 rounded-lg p-2">
-					<div class="py-2">
-						<div class="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-2"></div>
-						<div class="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-					</div>
-				</div>
-			{/each}
-		</div>
 	{:else if data.feeds && selectedCategory}
-		<FeedList feeds={data.feeds} />
+		<FeedList feeds={data.feeds} initialLimit={FEED_CONFIG.INITIAL_ITEMS_LIMIT} loadMoreIncrement={FEED_CONFIG.LOAD_MORE_INCREMENT} />
 	{:else if !selectedCategory}
 		<!-- Show nothing when no category selected -->
 	{/if}
