@@ -4,6 +4,7 @@
 	import { browser } from '$app/environment';
 	import { JOURNALS_CONFIG } from './config';
 	import { Combobox, Portal, useListCollection } from '@skeletonlabs/skeleton-svelte';
+	import FeedList from '$lib/feed-list.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -234,98 +235,7 @@
 			{/each}
 		</div>
 	{:else if filteredFeeds}
-		<!-- Initial items (first 5 from each feed) -->
-		{#each filteredFeeds as feed}
-			{#if feed.success && feed.items}
-				{#each feed.items.slice(0, 5) as item}
-					<div
-						id="feeditem"
-						class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-2 hover:shadow-md hover:bg-gray-50/800 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
-						onclick={() => window.open(item.link, '_blank')}
-						onkeydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') {
-								e.preventDefault();
-								window.open(item.link, '_blank');
-							}
-						}}
-						tabindex="0"
-						role="button"
-						aria-label="Open {item.title} in new tab"
-					>
-						<div class="flex items-start justify-between gap-3">
-							<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-relaxed flex-1 min-w-0">
-								{item.title}
-							</h3>
-							<div class="flex flex-col sm:flex-row gap-1 sm:gap-2 flex-shrink-0">
-								<span class={`${SHARED_STYLES.badge} ${SHARED_STYLES.badgeSource}`}>
-									{feed.name}
-								</span>
-								{#if item.pubDate}
-									<span class={`${SHARED_STYLES.badge} ${SHARED_STYLES.badgeDate}`}>
-										{new Date(item.pubDate).toLocaleDateString('en-US', {
-											month: 'short',
-											day: 'numeric'
-										})}
-									</span>
-								{/if}
-							</div>
-						</div>
-					</div>
-				{/each}
-			{:else}
-				<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-					<strong>Error loading {feed.name}:</strong>
-					{feed.error || 'Unknown error'}
-				</div>
-			{/if}
-		{/each}
-
-		<!-- Additional items (shown after clicking Load More) -->
-		{#if additionalPages > 0}
-			{#each Array(additionalPages).fill(0) as _, pageIndex}
-				{@const startIndex = 5 + pageIndex * 5}
-				{@const endIndex = startIndex + 5}
-				{#each filteredFeeds as feed}
-					{#if feed.success && feed.items && feed.items.length > startIndex}
-						{#each feed.items.slice(startIndex, endIndex) as item}
-							<div
-								id="feeditem"
-								class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-2 hover:shadow-md hover:bg-gray-50/800 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
-								onclick={() => window.open(item.link, '_blank')}
-								onkeydown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										window.open(item.link, '_blank');
-									}
-								}}
-								tabindex="0"
-								role="button"
-								aria-label="Open {item.title} in new tab"
-							>
-								<div class="flex items-start justify-between gap-3">
-									<h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 leading-relaxed flex-1 min-w-0">
-										{item.title}
-									</h3>
-									<div class="flex flex-col sm:flex-row gap-1 sm:gap-2 flex-shrink-0">
-										<span class={`${SHARED_STYLES.badge} ${SHARED_STYLES.badgeSource}`}>
-											{feed.name}
-										</span>
-										{#if item.pubDate}
-											<span class={`${SHARED_STYLES.badge} ${SHARED_STYLES.badgeDate}`}>
-												{new Date(item.pubDate).toLocaleDateString('en-US', {
-													month: 'short',
-													day: 'numeric'
-												})}
-											</span>
-										{/if}
-									</div>
-								</div>
-							</div>
-						{/each}
-					{/if}
-				{/each}
-			{/each}
-		{/if}
+		<FeedList feeds={filteredFeeds} {additionalPages} loadingPlaceholderCount={JOURNALS_CONFIG.LOADING_PLACEHOLDER_COUNT} />
 
 		<!-- Loading indicator for infinite scroll -->
 		{#if loadingMore}
