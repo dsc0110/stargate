@@ -17,6 +17,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 			return {
 				feeds: data.feeds || [],
 				availableCategories: data.availableCategories || [],
+				categoryFeeds: data.categoryFeeds || {},
 				selectedCategories: selectedCategoriesArray,
 				cacheInfo: data.cacheInfo
 			};
@@ -24,6 +25,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 			return {
 				error: data.error || 'Failed to load feeds',
 				availableCategories: data.availableCategories || [],
+				categoryFeeds: data.categoryFeeds || {},
 				selectedCategories: selectedCategoriesArray,
 				cacheInfo: data.cacheInfo
 			};

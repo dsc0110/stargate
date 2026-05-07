@@ -41,6 +41,17 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		// Get unique categories
 		const availableCategories = [...new Set(availableFeeds.map((f) => f.category))];
 
+		// Build category to feeds mapping
+		const categoryFeeds: Record<string, string[]> = {};
+		availableFeeds.forEach((feed) => {
+			if (!categoryFeeds[feed.category]) {
+				categoryFeeds[feed.category] = [];
+			}
+			if (!categoryFeeds[feed.category].includes(feed.name)) {
+				categoryFeeds[feed.category].push(feed.name);
+			}
+		});
+
 		// Get selected categories from query params
 		const selectedCategories = url.searchParams.get('categories');
 		let categoryFilter: string[] | undefined;
@@ -61,6 +72,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				success: true,
 				feeds: results,
 				availableCategories: availableCategories,
+				categoryFeeds: categoryFeeds,
 				cacheInfo: {
 					timestamp: Date.now(),
 					cacheDuration: config.CACHE_DURATION

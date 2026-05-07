@@ -6,7 +6,7 @@
 
 <div
 	id="feeditem"
-	class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 mb-2 hover:shadow-md hover:bg-gray-50/800 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
+	class="border border-gray-400 dark:border-gray-700 rounded-lg p-3 mb-2 hover:shadow-md hover:bg-gray-50/800 dark:hover:bg-gray-800/50 transition-shadow cursor-pointer"
 	onclick={() => window.open(item.link, '_blank')}
 	onkeydown={(e) => {
 		if (e.key === 'Enter' || e.key === ' ') {

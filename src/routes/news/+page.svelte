@@ -10,16 +10,24 @@
 	let { data }: { data: PageData } = $props();
 
 	let selectedCategory = $state('');
+	let selectedSource = $state(''); // Track selected feed source
 	let hasAutoSelected = $state(false); // Track if we've already auto-selected
 	let isDropdownOpen = $state(false);
 
 	// Available categories for dropdown
 	const availableCategories = $derived(data.availableCategories || []);
 
+	// Get feed sources for selected category
+	const selectedFeedSources = $derived(selectedCategory ? data.categoryFeeds?.[selectedCategory] || [] : []);
+
+	// Filter feeds based on selected source
+	const filteredFeeds = $derived(selectedSource && data.feeds ? data.feeds.filter((feed) => feed.name === selectedSource) : data.feeds || []);
+
 	// Toggle category selection (single selection only)
 	const selectCategory = (categoryName: string) => {
 		const newCategory = selectedCategory === categoryName ? '' : categoryName;
 		selectedCategory = newCategory;
+		selectedSource = ''; // Reset source filter when changing category
 		isDropdownOpen = false;
 
 		// Clear timeout and update URL after a delay to prevent rapid requests
@@ -36,6 +44,11 @@
 
 			goto(url.toString());
 		}, 300);
+	};
+
+	// Toggle source selection
+	const selectSource = (sourceName: string) => {
+		selectedSource = selectedSource === sourceName ? '' : sourceName;
 	};
 
 	// Close dropdown when clicking outside
@@ -58,9 +71,6 @@
 			document.removeEventListener('click', handleOutsideClick);
 		};
 	});
-
-	// Client-side cache to avoid redundant requests
-	const clientCache = new Map<string, { data: PageData; timestamp: number; expires: number }>();
 
 	// Update selectedCategory when data changes
 	$effect(() => {
@@ -95,26 +105,6 @@
 		url.searchParams.set('categories', categoryName);
 		goto(url.toString());
 	}
-
-	// Cache successful data loads
-	$effect(() => {
-		if (data && !data.error && browser) {
-			const cacheKey = selectedCategory || 'none';
-			const timestamp = Date.now();
-			clientCache.set(cacheKey, {
-				data: { ...data },
-				timestamp,
-				expires: timestamp + FEED_CONFIG.CLIENT_CACHE_DURATION
-			});
-
-			// Cleanup old cache entries
-			for (const [key, entry] of clientCache.entries()) {
-				if (timestamp > entry.expires + FEED_CONFIG.CLIENT_CACHE_DURATION) {
-					clientCache.delete(key);
-				}
-			}
-		}
-	});
 </script>
 
 <svelte:head>
@@ -129,7 +119,7 @@
 			<div class="flex items-center gap-4 w-full">
 				<div class="relative dropdown-container">
 					<!-- Compact dropdown button -->
-					<button class="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
+					<button class="flex items-center gap-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
 						<span>{selectedCategory || 'Select category...'}</span>
 						<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -155,10 +145,14 @@
 					{/if}
 				</div>
 
-				<!-- Cache status indicator -->
-				{#if data.cacheInfo && selectedCategory}
-					<div class="flex items-center gap-2 text-xs text-gray-500 flex-shrink-0 ml-auto">
-						<span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+				<!-- Feed sources chips -->
+				{#if selectedFeedSources.length > 0}
+					<div class="flex flex-wrap gap-2 items-center max-w-xl">
+						{#each selectedFeedSources as source (source)}
+							<button class={`${SHARED_STYLES.chipBase} ${selectedSource === source ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} onclick={() => selectSource(source)}>
+								{source}
+							</button>
+						{/each}
 					</div>
 				{/if}
 			</div>
@@ -173,7 +167,7 @@
 			{data.error}
 		</div>
 	{:else if data.feeds && selectedCategory}
-		<FeedList feeds={data.feeds} initialLimit={FEED_CONFIG.INITIAL_ITEMS_LIMIT} loadMoreIncrement={FEED_CONFIG.LOAD_MORE_INCREMENT} />
+		<FeedList feeds={filteredFeeds} initialLimit={FEED_CONFIG.INITIAL_ITEMS_LIMIT} loadMoreIncrement={FEED_CONFIG.LOAD_MORE_INCREMENT} />
 	{:else if !selectedCategory}
 		<!-- Show nothing when no category selected -->
 	{/if}

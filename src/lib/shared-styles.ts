@@ -3,7 +3,7 @@
 export const SHARED_STYLES = {
 	// Container styles
 	container: 'preset-filled-surface-100-900 rounded-xl p-1 border border-gray-200 dark:border-gray-700',
-	controlsContainer: 'p-2 md:p-4 rounded-xl bg-transparent transition-all duration-200',
+	controlsContainer: 'bg-transparent transition-all duration-200',
 
 	// Button styles
 	buttonBase: 'btn rounded-lg px-2 py-2 transition-all duration-200 hover:bg-transparent',
@@ -12,7 +12,7 @@ export const SHARED_STYLES = {
 	buttonGrey: 'btn rounded-lg px-2 py-2 transition-all duration-200 text-gray-500 dark:text-gray-400 hover:bg-transparent hover:text-primary-800 dark:hover:text-primary-400',
 
 	// Chip styles for news and other control sections
-	chipBase: 'border px-3 py-1 rounded-full text-sm transition-all duration-200 hover:bg-transparent',
+	chipBase: 'border px-1.5 py-0 rounded-full text-xs transition-all duration-200 hover:bg-transparent',
 	chipActive: 'text-primary-800 dark:text-primary-400 bg-transparent border-primary-800 dark:border-primary-400',
 	chipInactive: 'text-gray-500 dark:text-gray-400 bg-transparent border-gray-500 dark:border-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:border-primary-800 dark:hover:border-primary-400',
 	buttonIcon: 'rounded-lg p-2 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800',

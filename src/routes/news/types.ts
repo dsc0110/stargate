@@ -27,6 +27,7 @@ export interface MultipleFeedResponse {
 	success: boolean;
 	feeds?: FeedData[];
 	availableCategories?: string[];
+	categoryFeeds?: Record<string, string[]>; // Maps category name to array of feed source names
 	error?: string;
 	cacheInfo?: {
 		timestamp: number;
@@ -38,6 +39,7 @@ export interface PageData {
 	feeds?: FeedData[];
 	availableCategories?: string[];
 	selectedCategories?: string[];
+	categoryFeeds?: Record<string, string[]>; // Maps category name to array of feed source names
 	error?: string;
 	cacheInfo?: {
 		timestamp: number;
