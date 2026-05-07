@@ -48,5 +48,5 @@ export interface PageData {
 }
 
 export interface PageServerLoad {
-	(event: Parameters<import('../news/$types').PageServerLoad>[0]): Promise<PageData> | PageData;
+	(event: Parameters<import('./$types').PageServerLoad>[0]): Promise<PageData> | PageData;
 }

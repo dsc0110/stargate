@@ -1,13 +1,12 @@
 <script lang="ts">
 	import SlashIcon from '$lib/slash-icon.svelte';
-	import { Newspaper, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
+	import { RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
 
 	const linksSidebar = {
 		public: [
 			{ label: 'home', href: '/', icon: SlashIcon },
-			{ label: 'news', href: '/news', icon: Newspaper },
-			{ label: 'journals', href: '/journals', icon: RssIcon }
+			{ label: 'feeds', href: '/feeds', icon: RssIcon }
 		],
 		private: [
 			{ label: 'portfolio', href: '/portfolio', icon: DollarSign },

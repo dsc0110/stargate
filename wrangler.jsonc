@@ -38,12 +38,10 @@
 			{ "name": "Titanic", "url": "https://www.titanic-magazin.de/ich.war.bei.der.waffen.rss", "category": "Fun" },
 			{ "name": "Twitterperlen", "url": "https://www.twitterperlen.de/feed", "category": "Fun" },
 			{ "name": "Transfermarkt", "url": "https://www.transfermarkt.de/rss/news", "category": "Sport" },
-			{ "name": "Sportschau", "url": "https://www.sportschau.de/fussball/index~rss2.xml", "category": "Sport" }
-		],
-		"JOURNALS_FEEDS": [
-			{ "name": "Init 7", "url": "https://blog.init7.net/en/feed/" },
-			{ "name": "Astral Codex Ten", "url": "https://astralcodexten.substack.com/feed" },
-			{ "name": "Wait But Why", "url": "https://waitbutwhy.com/feed" }
+			{ "name": "Sportschau", "url": "https://www.sportschau.de/fussball/index~rss2.xml", "category": "Sport" },
+			{ "name": "Init 7", "url": "https://blog.init7.net/en/feed/", "category": "Blog" },
+			{ "name": "Astral Codex Ten", "url": "https://astralcodexten.substack.com/feed", "category": "Blog" },
+			{ "name": "Wait But Why", "url": "https://waitbutwhy.com/feed", "category": "Blog" }
 		],
 		"BODY_SIZE_CM": 181
 	}

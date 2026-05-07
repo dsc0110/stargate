@@ -4,7 +4,6 @@
 	import { page } from '$app/state';
 	import { SHARED_STYLES, getChipClasses } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
-	import { FEED_CONFIG } from './config';
 	import FeedList from '$lib/feed-list.svelte';
 
 	let { data }: { data: PageData } = $props();
@@ -108,8 +107,8 @@
 </script>
 
 <svelte:head>
-	<title>news</title>
-	<meta name="description" content="news" />
+	<title>feeds</title>
+	<meta name="description" content="feeds" />
 </svelte:head>
 
 <div id="subheader">
@@ -167,7 +166,7 @@
 			{data.error}
 		</div>
 	{:else if data.feeds && selectedCategory}
-		<FeedList feeds={filteredFeeds} initialLimit={FEED_CONFIG.INITIAL_ITEMS_LIMIT} loadMoreIncrement={FEED_CONFIG.LOAD_MORE_INCREMENT} />
+		<FeedList feeds={filteredFeeds} />
 	{:else if !selectedCategory}
 		<!-- Show nothing when no category selected -->
 	{/if}

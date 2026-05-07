@@ -12,7 +12,6 @@ declare global {
 			env: {
 				STARGATE_BUCKET: R2Bucket;
 				NEWS_FEEDS: Array<{ name: string; url: string; category: string }>;
-				JOURNALS_FEEDS: Array<{ name: string; url: string; category: string }>;
 				BODY_SIZE_CM: string;
 			};
 			cf: CfProperties;
