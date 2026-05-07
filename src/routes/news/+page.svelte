@@ -4,7 +4,7 @@
 	import { page } from '$app/state';
 	import { SHARED_STYLES, getChipClasses } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
-	import FeedList from './feed-list.svelte';
+	import FeedList from '../feeds/feed-list.svelte';
 
 	let { data }: { data: PageData } = $props();
 
@@ -107,8 +107,8 @@
 </script>
 
 <svelte:head>
-	<title>feeds</title>
-	<meta name="description" content="feeds" />
+	<title>news</title>
+	<meta name="description" content="news" />
 </svelte:head>
 
 <div id="subheader">

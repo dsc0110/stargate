@@ -7,7 +7,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const selectedCategoriesArray = selectedCategories.split(',').filter(Boolean);
 
 		// Always make API call to get available categories, even if no categories selected
-		const response = await fetch(`/feeds?categories=${encodeURIComponent(selectedCategories)}`, {
+		const response = await fetch(`/news?categories=${encodeURIComponent(selectedCategories)}`, {
 			method: 'GET',
 			headers: {
 				accept: 'application/json'
@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const contentType = response.headers.get('content-type') || '';
 		if (!response.ok || !contentType.includes('application/json')) {
 			const bodyText = await response.text();
-			console.error('Unexpected /feeds response:', response.status, contentType, bodyText.slice(0, 200));
+			console.error('Unexpected /news response:', response.status, contentType, bodyText.slice(0, 200));
 			return {
 				error: 'Failed to load feed data',
 				availableCategories: [],

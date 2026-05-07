@@ -1,5 +1,5 @@
 <script>
-	import { SHARED_STYLES } from './shared-styles.ts';
+	import { SHARED_STYLES } from '../../lib/shared-styles.ts';
 
 	const { item, feedName } = $props();
 </script>
