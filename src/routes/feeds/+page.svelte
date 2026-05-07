@@ -2,7 +2,7 @@
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { SHARED_STYLES, getChipClasses } from '$lib/shared-styles';
+	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import FeedList from './feed-list.svelte';
 
@@ -146,7 +146,7 @@
 
 				<!-- Feed sources chips -->
 				{#if selectedFeedSources.length > 0}
-					<div class="flex flex-wrap gap-2 items-center max-w-xl">
+					<div class="flex flex-wrap gap-1 items-center max-w-xl">
 						{#each selectedFeedSources as source (source)}
 							<button class={`${SHARED_STYLES.chipBase} ${selectedSource === source ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} onclick={() => selectSource(source)}>
 								{source}

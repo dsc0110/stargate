@@ -1,6 +1,6 @@
 <script lang="ts">
 	import FeedItem from './feed-item.svelte';
-	import type { FeedData, FeedItem as RSSFeedItem } from './rss-service';
+	import type { FeedData, FeedItem as RSSFeedItem } from './types';
 	import { fade } from 'svelte/transition';
 
 	interface FeedItemWithSource extends RSSFeedItem {
@@ -48,14 +48,14 @@
 
 <!-- Display items sorted by date -->
 {#each allItems as item, index (`${index}-${item.feedName}-${item.link || item.title}`)}
-	<div class="feed-enter" style={`animation-delay: ${index * 20}ms`} out:fade={{ duration: 200 }}>
+	<div class="feed-enter" style={`animation-delay: ${220 + index * 90}ms`} out:fade={{ duration: 200 }}>
 		<FeedItem {item} feedName={item.feedName} />
 	</div>
 {/each}
 
 <style>
 	.feed-enter {
-		animation: feed-enter 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+		animation: feed-enter 1200ms cubic-bezier(0.22, 1, 0.36, 1) both;
 	}
 
 	@keyframes feed-enter {

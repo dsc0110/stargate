@@ -11,7 +11,7 @@ declare global {
 		interface Platform {
 			env: {
 				STARGATE_BUCKET: R2Bucket;
-				NEWS_FEEDS: Array<{ name: string; url: string; category: string }>;
+				RSS_FEEDS: Array<{ name: string; url: string; category: string }>;
 				BODY_SIZE_CM: string;
 			};
 			cf: CfProperties;

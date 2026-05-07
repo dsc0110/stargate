@@ -8,7 +8,7 @@ declare namespace Cloudflare {
 	interface Env {
 		STARGATE_BUCKET: R2Bucket;
 		ASSETS: Fetcher;
-		NEWS_FEEDS: string;
+		RSS_FEEDS: string;
 		BODY_SIZE_CM: string;
 	}
 }
@@ -17,7 +17,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, 'NEWS_FEEDS' | 'BODY_SIZE_CM'>> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, 'RSS_FEEDS' | 'BODY_SIZE_CM'>> {}
 }
 
 // Begin runtime types

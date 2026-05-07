@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { FeedConfig } from './types';
+import type { FeedConfig, RSSConfig } from './types';
 import { getOptimizedConfig } from './config';
-import { RSSService, type RSSConfig } from './rss-service';
+import { RSSService } from './rss-service';
 
 // Get optimized configuration and create RSS service
 const config = getOptimizedConfig();
@@ -11,13 +11,13 @@ const rssService = new RSSService(config as RSSConfig);
 export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
 		// Get feed configuration from environment variable
-		const newsFeeds = platform?.env?.NEWS_FEEDS || (process.env.NEWS_FEEDS ? JSON.parse(process.env.NEWS_FEEDS) : null);
+		const newsFeeds = platform?.env?.RSS_FEEDS || (process.env.RSS_FEEDS ? JSON.parse(process.env.RSS_FEEDS) : null);
 
 		if (!newsFeeds) {
 			return json(
 				{
 					success: false,
-					error: 'NEWS_FEEDS environment variable not found. Run with: wrangler pages dev'
+					error: 'RSS_FEEDS environment variable not found. Run with: wrangler pages dev'
 				},
 				{ status: 500 }
 			);
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		try {
 			availableFeeds = Array.isArray(newsFeeds) ? newsFeeds : JSON.parse(newsFeeds);
 		} catch (error) {
-			console.error('Failed to parse NEWS_FEEDS:', error);
+			console.error('Failed to parse RSS_FEEDS:', error);
 			return json(
 				{
 					success: false,

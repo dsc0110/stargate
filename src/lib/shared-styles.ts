@@ -43,10 +43,3 @@ export const SHARED_STYLES = {
 export function getButtonClasses(isActive: boolean): string {
 	return `${SHARED_STYLES.buttonBase} ${isActive ? SHARED_STYLES.buttonActive : SHARED_STYLES.buttonInactive}`;
 }
-
-/**
- * Get chip classes based on active state
- */
-export function getChipClasses(isActive: boolean): string {
-	return `${SHARED_STYLES.chipBase} ${isActive ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`;
-}
