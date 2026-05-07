@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 import type { FeedConfig, RSSConfig } from './types';
 import { getOptimizedConfig } from './config';
 import { RSSService } from './rss-service';
+import { env } from '$env/dynamic/private';
 
 // Get optimized configuration and create RSS service
 const config = getOptimizedConfig();
@@ -10,32 +11,46 @@ const rssService = new RSSService(config as RSSConfig);
 
 export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
-		// Get feed configuration from environment variable
-		const newsFeeds = platform?.env?.RSS_FEEDS || (process.env.RSS_FEEDS ? JSON.parse(process.env.RSS_FEEDS) : null);
-
-		if (!newsFeeds) {
+		if (platform?.env?.STARGATE_BUCKET === undefined) {
 			return json(
 				{
 					success: false,
-					error: 'RSS_FEEDS environment variable not found. Run with: wrangler pages dev'
+					error: 'STARGATE_BUCKET binding not available'
 				},
 				{ status: 500 }
 			);
 		}
 
+		const feedsObject = await platform.env.STARGATE_BUCKET.get('feeds/rss-feeds.json');
 		let availableFeeds: FeedConfig[] = [];
 
-		try {
-			availableFeeds = Array.isArray(newsFeeds) ? newsFeeds : JSON.parse(newsFeeds);
-		} catch (error) {
-			console.error('Failed to parse RSS_FEEDS:', error);
-			return json(
-				{
-					success: false,
-					error: 'Invalid feed configuration format'
-				},
-				{ status: 500 }
-			);
+		if (feedsObject === null) {
+			try {
+				const devRssFeedsJson = JSON.parse(env.DEV_RSS_FEEDS ?? '[]');
+				availableFeeds = Array.isArray(devRssFeedsJson) ? devRssFeedsJson : [];
+			} catch {
+				return json(
+					{
+						success: false,
+						error: 'Feed configuration file feeds/rss-feeds.json not found in bucket and RSS_FEEDS env invalid'
+					},
+					{ status: 500 }
+				);
+			}
+		} else {
+			try {
+				const parsed = JSON.parse(await feedsObject.text());
+				availableFeeds = Array.isArray(parsed) ? parsed : [];
+			} catch (error) {
+				console.error('Failed to parse feeds/rss-feeds.json:', error);
+				return json(
+					{
+						success: false,
+						error: 'Invalid feed configuration format in feeds/rss-feeds.json'
+					},
+					{ status: 500 }
+				);
+			}
 		}
 
 		// Get unique categories

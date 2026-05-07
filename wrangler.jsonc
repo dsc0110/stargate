@@ -23,27 +23,6 @@
 		}
 	],
 	"vars": {
-		"RSS_FEEDS": [
-			{ "name": "Tagesschau", "url": "https://www.tagesschau.de/infoservices/alle-meldungen-100~rss2.xml", "category": "News" },
-			{ "name": "SRF", "url": "https://www.srf.ch/news/bnf/rss/19032223", "category": "News" },
-			{ "name": "BBC", "url": "https://feeds.bbci.co.uk/news/world/rss.xml", "category": "News" },
-			{ "name": "Aljazeera", "url": "https://www.aljazeera.com/xml/rss/all.xml", "category": "News" },
-			{ "name": "HN", "url": "https://hnrss.org/frontpage", "category": "Tech" },
-			{ "name": "TC", "url": "https://techcrunch.com/feed/", "category": "Tech" },
-			{ "name": "CF", "url": "https://developers.cloudflare.com/changelog/rss/index.xml", "category": "Tech" },
-			{ "name": "Ars", "url": "https://feeds.arstechnica.com/arstechnica/index", "category": "Tech" },
-			{ "name": "Science", "url": "https://science.sciencemag.org/rss/current.xml", "category": "Journals" },
-			{ "name": "Telepolis", "url": "https://www.telepolis.de/feed.xml", "category": "Journals" },
-			{ "name": "Kino", "url": "https://www.kino.de/feed/film/", "category": "Journals" },
-			{ "name": "Postillon", "url": "https://feeds.feedburner.com/blogspot/rkEL", "category": "Fun" },
-			{ "name": "Titanic", "url": "https://www.titanic-magazin.de/ich.war.bei.der.waffen.rss", "category": "Fun" },
-			{ "name": "Twitterperlen", "url": "https://www.twitterperlen.de/feed", "category": "Fun" },
-			{ "name": "tm.de", "url": "https://www.transfermarkt.de/rss/news", "category": "Sport" },
-			{ "name": "Sportschau", "url": "https://www.sportschau.de/fussball/index~rss2.xml", "category": "Sport" },
-			{ "name": "Init7", "url": "https://blog.init7.net/en/feed/", "category": "Blogs" },
-			{ "name": "AstralCodex", "url": "https://astralcodexten.substack.com/feed", "category": "Blogs" },
-			{ "name": "Zürich", "url": "https://www.stadt-zuerich.ch/de/politik-und-verwaltung/stadtverwaltung/prd/ssz/_jcr_content/mainparsys/teaser.rss", "category": "Blogs" }
-		],
 		"BODY_SIZE_CM": 181
 	}
 	/**
