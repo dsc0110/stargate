@@ -1,5 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
@@ -15,10 +16,19 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 
 		const object = await platform?.env.STARGATE_BUCKET.get('scale/scale-results.json');
 		if (object === null) {
-			return {
-				scaleResults: [],
-				bodySizeCm
-			};
+			try {
+				const devScaleResultsJson = JSON.parse(env.DEV_SCALE_RESULTS ?? '[]');
+				const scaleResults = Array.isArray(devScaleResultsJson) ? devScaleResultsJson.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
+				return {
+					scaleResults,
+					bodySizeCm
+				};
+			} catch {
+				return {
+					scaleResults: [],
+					bodySizeCm
+				};
+			}
 		}
 
 		const parsed = JSON.parse(await object.text());
