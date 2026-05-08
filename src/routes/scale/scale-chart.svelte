@@ -4,9 +4,10 @@
 	interface Props {
 		scaleResults: any[];
 		bodySizeCm: number;
+		recentOnly?: boolean;
 	}
 
-	let { scaleResults, bodySizeCm: _bodySizeCm }: Props = $props();
+	let { scaleResults, bodySizeCm: _bodySizeCm, recentOnly = false }: Props = $props();
 	let chart: ApexCharts | undefined;
 	let chartElement = $state<HTMLDivElement>();
 
@@ -21,9 +22,18 @@
 			.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
 
-	let dates = $derived(chartData.map((item) => item.date));
-	let weights = $derived(chartData.map((item) => item.weight));
-	let bodyFats = $derived(chartData.map((item) => item.bodyFat));
+	let recentChartData = $derived.by(() => {
+		const oneYearAgo = new Date();
+		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+		return chartData.filter((item) => new Date(item.date) >= oneYearAgo);
+	});
+
+	let visibleChartData = $derived(recentOnly ? recentChartData : chartData);
+
+	let dates = $derived(visibleChartData.map((item) => item.date));
+	let weights = $derived(visibleChartData.map((item) => item.weight));
+	let bodyFats = $derived(visibleChartData.map((item) => item.bodyFat));
 
 	// Get both series data - show both weight and bodyFat when available at same datapoint
 	let chartSeries = $derived([
@@ -33,6 +43,10 @@
 
 	// Create filtered categories for x-axis labels (show first label of each year)
 	let filteredDates = $derived.by(() => {
+		if (recentOnly) {
+			return dates;
+		}
+
 		const seenYears = new Set();
 		return dates.map((date) => {
 			const year = new Date(date).getFullYear();
@@ -74,7 +88,18 @@
 			],
 			chart: {
 				height: 350,
-				type: 'line' as const
+				type: 'line' as const,
+				toolbar: {
+					show: false,
+					tools: {
+						download: false,
+						selection: false,
+						zoom: false,
+						zoomin: false,
+						zoomout: false,
+						pan: false
+					}
+				}
 			},
 			colors: ['var(--color-primary-500)', 'var(--color-tertiary-500)'],
 			stroke: {
@@ -95,6 +120,13 @@
 					formatter: function (value: any) {
 						if (value === '') return '';
 						const date = new Date(value);
+
+						if (recentOnly) {
+							const month = String(date.getMonth() + 1).padStart(2, '0');
+							const year = String(date.getFullYear());
+							return `${month}/${year}`;
+						}
+
 						return date.getFullYear().toString();
 					}
 				}
@@ -149,6 +181,23 @@
 					fontSize: '12px',
 					fontFamily: undefined
 				},
+				x: {
+					show: true,
+					formatter: function (value: any, opts: any) {
+						if (opts && typeof opts.dataPointIndex !== 'undefined') {
+							const actualDate = dates[opts.dataPointIndex];
+							if (actualDate) {
+								const date = new Date(actualDate);
+								return date.toLocaleDateString('de-DE', {
+									year: 'numeric',
+									month: 'short',
+									day: 'numeric'
+								});
+							}
+						}
+						return value;
+					}
+				},
 				marker: {
 					show: true
 				},
@@ -165,20 +214,17 @@
 		chart.render();
 	}
 
-	// Initialize or update chart when data or metric changes
+	// Recreate chart whenever visible dataset or mode changes.
 	$effect(() => {
-		if (chartElement && chartData.length > 0) {
-			const currentFiltered = filteredDates;
+		if (!chartElement) return;
 
-			if (!chart) {
-				// Initialize chart if it doesn't exist yet
-				initChart();
-			} else {
-				// Update existing chart with new data
-				chart.updateOptions({
-					series: chartSeries
-				});
-			}
+		if (chart) {
+			chart.destroy();
+			chart = undefined;
+		}
+
+		if (visibleChartData.length > 0) {
+			initChart();
 		}
 	});
 
@@ -193,10 +239,12 @@
 </script>
 
 <div class="scale-chart w-full h-full flex flex-col items-center justify-center">
-	{#if chartData.length > 0}
+	{#if visibleChartData.length > 0}
 		<div class="w-full">
 			<div bind:this={chartElement} class="w-full"></div>
 		</div>
+	{:else}
+		<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">No scale results in the last year.</div>
 	{/if}
 </div>
 

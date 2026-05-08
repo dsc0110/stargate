@@ -14,6 +14,7 @@
 
 	let { data }: Props = $props();
 	let active: string = $state('chart');
+	let showRecentOnly = $state(true);
 
 	// Configuration for scale tabs
 	const SCALE_TABS = [
@@ -57,12 +58,22 @@
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
 		<div class="flex justify-between items-center">
-			<div class="flex items-center">
+			<div class="flex items-center gap-2">
 				{#each SCALE_TABS as tab}
 					<button type="button" class={getButtonClasses(active === tab.id)} onclick={() => (active = tab.id)}>
 						<tab.icon class={SHARED_STYLES.icon} />
 					</button>
 				{/each}
+				{#if active === 'chart'}
+					<button
+						type="button"
+						onclick={() => (showRecentOnly = !showRecentOnly)}
+						class={`${SHARED_STYLES.chipBase} ${showRecentOnly ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`}
+						title={showRecentOnly ? 'Show all results' : 'Show last 12 months'}
+					>
+						last year
+					</button>
+				{/if}
 			</div>
 			<div>
 				<AddScaleResult onScaleResultAdded={handleScaleResultAdded} />
@@ -74,7 +85,7 @@
 <!-- Dynamic Component Rendering -->
 <div>
 	{#if active === 'chart'}
-		<ScaleChart {scaleResults} bodySizeCm={data.bodySizeCm} />
+		<ScaleChart {scaleResults} bodySizeCm={data.bodySizeCm} recentOnly={showRecentOnly} />
 	{:else}
 		<ScaleTable {scaleResults} bodySizeCm={data.bodySizeCm} />
 	{/if}
