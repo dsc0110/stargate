@@ -4,7 +4,7 @@
 	import AddScaleResult from './add-scale-result.svelte';
 	import MetricCard from '$lib/metric-card.svelte';
 	import { generateScaleMetrics } from './config.js';
-	import { ChartLine, Table, Weight, Activity, Percent } from '@lucide/svelte';
+	import { ChartLine, Table, Weight, Percent } from '@lucide/svelte';
 	import { SHARED_STYLES, getButtonClasses } from '$lib/shared-styles';
 	import type { PageData } from './$types';
 
@@ -25,7 +25,6 @@
 	// Configuration for metric tabs
 	const METRIC_TABS = [
 		{ id: 'weight', icon: Weight, label: 'Weight' },
-		{ id: 'bmi', icon: Activity, label: 'BMI' },
 		{ id: 'bodyFat', icon: Percent, label: 'Body Fat' }
 	];
 

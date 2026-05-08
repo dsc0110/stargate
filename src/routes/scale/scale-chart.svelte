@@ -1,7 +1,5 @@
 <script lang="ts">
 	import ApexCharts from 'apexcharts';
-	import { onMount } from 'svelte';
-	import { calculateBMI } from './utils.js';
 
 	interface Props {
 		scaleResults: any[];
@@ -9,7 +7,7 @@
 		metric: string;
 	}
 
-	let { scaleResults, bodySizeCm, metric }: Props = $props();
+	let { scaleResults, bodySizeCm: _bodySizeCm, metric }: Props = $props();
 	let chart: ApexCharts | undefined;
 	let chartElement = $state<HTMLDivElement>();
 
@@ -19,8 +17,7 @@
 			.map((entry) => ({
 				date: entry.date,
 				weight: entry.weight,
-				bodyFat: entry.bodyFat,
-				bmi: bodySizeCm > 0 ? calculateBMI(entry.weight, bodySizeCm) : 0
+				bodyFat: entry.bodyFat
 			}))
 			.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
@@ -30,11 +27,6 @@
 		weight: {
 			name: 'Weight (kg)',
 			unit: ' kg',
-			decimals: 1
-		},
-		bmi: {
-			name: 'BMI',
-			unit: '',
 			decimals: 1
 		},
 		bodyFat: {
@@ -47,7 +39,6 @@
 	let dates = $derived(chartData.map((item) => item.date));
 	let weights = $derived(chartData.map((item) => item.weight));
 	let bodyFats = $derived(chartData.map((item) => item.bodyFat));
-	let bmis = $derived(chartData.map((item) => item.bmi));
 
 	// Get current metric configuration
 	let currentMetricConfig = $derived(METRIC_CONFIG[metric as keyof typeof METRIC_CONFIG] || METRIC_CONFIG.weight);
@@ -55,8 +46,6 @@
 	// Get series data based on selected metric
 	let seriesData = $derived.by(() => {
 		switch (metric) {
-			case 'bmi':
-				return bmis;
 			case 'bodyFat':
 				return bodyFats;
 			default:
@@ -75,10 +64,6 @@
 			}
 			return '';
 		});
-	});
-
-	onMount(() => {
-		// Chart will be initialized by the effect below when data is available
 	});
 
 	function initChart() {
@@ -117,7 +102,7 @@
 				labels: {
 					show: true,
 					style: {
-						colors: ['var(--color-surface-600)']
+						colors: ['var(--scale-chart-axis-label-color)']
 					},
 					formatter: function (value: any) {
 						if (value === '') return '';
@@ -137,7 +122,7 @@
 					show: true,
 					offsetX: -10,
 					style: {
-						colors: ['var(--color-surface-500)'],
+						colors: ['var(--scale-chart-axis-label-color)'],
 						fontSize: '11px'
 					},
 					formatter: function (value: number) {
@@ -159,13 +144,9 @@
 					fontSize: '12px',
 					fontFamily: undefined
 				},
-				onDatasetHover: {
-					highlightDataSeries: false
-				},
 				x: {
 					show: true,
 					formatter: function (value: any, opts: any) {
-						// Show the exact date in tooltip with proper formatting
 						if (opts && typeof opts.dataPointIndex !== 'undefined') {
 							const actualDate = dates[opts.dataPointIndex];
 							if (actualDate) {
@@ -179,15 +160,6 @@
 						}
 						return value;
 					}
-				},
-				y: {
-					formatter: function (value: any) {
-						return value.toFixed(currentMetricConfig.decimals) + currentMetricConfig.unit;
-					}
-				},
-				z: {
-					formatter: undefined,
-					title: 'Size: '
 				},
 				marker: {
 					show: true
@@ -219,43 +191,7 @@
 			} else {
 				// Update existing chart with new data
 				chart.updateOptions({
-					series: [{ name: currentConfig.name, data: currentData }],
-					legend: {
-						labels: {
-							colors: ['var(--color-tertiary-500)']
-						}
-					},
-					xaxis: {
-						categories: currentFiltered,
-						labels: {
-							show: true,
-							style: {
-								colors: ['var(--color-surface-600)']
-							},
-							formatter: function (value: any) {
-								if (value === '') return '';
-								const date = new Date(value);
-								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
-							}
-						}
-					},
-					yaxis: {
-						labels: {
-							style: {
-								colors: ['var(--color-surface-500)']
-							},
-							formatter: function (value: number) {
-								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
-							}
-						}
-					},
-					tooltip: {
-						y: {
-							formatter: function (value: any) {
-								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
-							}
-						}
-					}
+					series: [{ name: currentConfig.name, data: currentData }]
 				});
 			}
 		}
@@ -271,10 +207,20 @@
 	});
 </script>
 
-<div class="w-full h-full flex flex-col items-center justify-center">
+<div class="scale-chart w-full h-full flex flex-col items-center justify-center">
 	{#if chartData.length > 0}
 		<div class="w-full">
 			<div bind:this={chartElement} class="w-full"></div>
 		</div>
 	{/if}
 </div>
+
+<style>
+	:global(.scale-chart) {
+		--scale-chart-axis-label-color: var(--color-surface-700);
+	}
+
+	:global(.dark .scale-chart) {
+		--scale-chart-axis-label-color: var(--color-surface-200);
+	}
+</style>
