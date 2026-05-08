@@ -4,10 +4,9 @@
 	interface Props {
 		scaleResults: any[];
 		bodySizeCm: number;
-		metric: string;
 	}
 
-	let { scaleResults, bodySizeCm: _bodySizeCm, metric }: Props = $props();
+	let { scaleResults, bodySizeCm: _bodySizeCm }: Props = $props();
 	let chart: ApexCharts | undefined;
 	let chartElement = $state<HTMLDivElement>();
 
@@ -17,41 +16,20 @@
 			.map((entry) => ({
 				date: entry.date,
 				weight: entry.weight,
-				bodyFat: entry.bodyFat
+				bodyFat: entry.bodyFat ?? null
 			}))
 			.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
-
-	// Metric configuration
-	const METRIC_CONFIG = {
-		weight: {
-			name: 'Weight (kg)',
-			unit: ' kg',
-			decimals: 1
-		},
-		bodyFat: {
-			name: 'Body Fat (%)',
-			unit: '%',
-			decimals: 1
-		}
-	};
 
 	let dates = $derived(chartData.map((item) => item.date));
 	let weights = $derived(chartData.map((item) => item.weight));
 	let bodyFats = $derived(chartData.map((item) => item.bodyFat));
 
-	// Get current metric configuration
-	let currentMetricConfig = $derived(METRIC_CONFIG[metric as keyof typeof METRIC_CONFIG] || METRIC_CONFIG.weight);
-
-	// Get series data based on selected metric
-	let seriesData = $derived.by(() => {
-		switch (metric) {
-			case 'bodyFat':
-				return bodyFats;
-			default:
-				return weights;
-		}
-	});
+	// Get both series data - show both weight and bodyFat when available at same datapoint
+	let chartSeries = $derived([
+		{ name: 'Weight (kg)', data: weights },
+		{ name: 'Body Fat (%)', data: bodyFats }
+	]);
 
 	// Create filtered categories for x-axis labels (show first label of each year)
 	let filteredDates = $derived.by(() => {
@@ -69,97 +47,107 @@
 	function initChart() {
 		if (!chartElement) return;
 
+		// Calculate dynamic min/max for weight axis
+		const validWeights = weights.filter((w) => w != null);
+		const weightMin = validWeights.length > 0 ? Math.min(...validWeights) : 0;
+		const weightMax = validWeights.length > 0 ? Math.max(...validWeights) : 100;
+		const weightPadding = (weightMax - weightMin) * 0.1 || 10;
+
+		// Calculate dynamic min/max for body fat axis
+		const validBodyFats = bodyFats.filter((bf) => bf != null);
+		const bodyFatMin = validBodyFats.length > 0 ? Math.min(...validBodyFats) : 0;
+		const bodyFatMax = validBodyFats.length > 0 ? Math.max(...validBodyFats) : 100;
+		const bodyFatPadding = (bodyFatMax - bodyFatMin) * 0.1 || 10;
+
 		const options = {
+			series: [
+				{
+					name: 'Weight (kg)',
+					type: 'column',
+					data: weights
+				},
+				{
+					name: 'Body Fat (%)',
+					type: 'line',
+					data: bodyFats
+				}
+			],
 			chart: {
-				type: 'line' as const,
-				height: 400,
-				toolbar: {
-					show: false,
-					tools: {
-						download: false,
-						selection: false,
-						zoom: false,
-						zoomin: false,
-						zoomout: false,
-						pan: false
-					}
-				}
+				height: 350,
+				type: 'line' as const
 			},
-			legend: {
-				labels: {
-					colors: ['var(--color-tertiary-500)']
-				}
+			colors: ['var(--color-primary-500)', 'var(--color-tertiary-500)'],
+			stroke: {
+				width: [0, 4]
 			},
-			colors: ['var(--color-secondary-500)'],
 			dataLabels: {
-				style: {
-					colors: ['black']
-				}
+				enabled: true,
+				enabledOnSeries: [1]
 			},
-			series: [{ name: currentMetricConfig.name, data: seriesData }],
+			labels: dates,
 			xaxis: {
 				categories: filteredDates,
 				labels: {
 					show: true,
 					style: {
-						colors: ['var(--scale-chart-axis-label-color)']
+						colors: 'var(--scale-chart-label-color)'
 					},
 					formatter: function (value: any) {
 						if (value === '') return '';
 						const date = new Date(value);
 						return date.getFullYear().toString();
 					}
-				},
-				crosshairs: {
-					show: false
-				},
-				tooltip: {
-					enabled: false
 				}
 			},
-			yaxis: {
+			legend: {
 				labels: {
-					show: true,
-					offsetX: -10,
-					style: {
-						colors: ['var(--scale-chart-axis-label-color)'],
-						fontSize: '11px'
+					colors: 'var(--scale-chart-label-color)'
+				}
+			},
+			yaxis: [
+				{
+					min: Math.floor((weightMin - weightPadding) * 10) / 10,
+					max: Math.ceil((weightMax + weightPadding) * 10) / 10,
+					title: {
+						text: 'Weight (kg)',
+						style: {
+							color: 'var(--scale-chart-label-color)'
+						}
 					},
-					formatter: function (value: number) {
-						return value.toFixed(currentMetricConfig.decimals) + currentMetricConfig.unit;
+					labels: {
+						style: {
+							colors: 'var(--scale-chart-label-color)'
+						}
+					}
+				},
+				{
+					opposite: true,
+					min: Math.floor((bodyFatMin - bodyFatPadding) * 10) / 10,
+					max: Math.ceil((bodyFatMax + bodyFatPadding) * 10) / 10,
+					title: {
+						text: 'Body Fat (%)',
+						style: {
+							color: 'var(--scale-chart-label-color)'
+						}
+					},
+					labels: {
+						style: {
+							colors: 'var(--scale-chart-label-color)'
+						}
 					}
 				}
-			},
+			],
 			tooltip: {
 				enabled: true,
-				enabledOnSeries: undefined,
 				shared: true,
 				followCursor: false,
 				intersect: false,
-				inverseOrder: false,
 				hideEmptySeries: true,
 				fillSeriesColor: false,
 				theme: 'dark',
 				style: {
 					fontSize: '12px',
 					fontFamily: undefined
-				},
-				x: {
-					show: true,
-					formatter: function (value: any, opts: any) {
-						if (opts && typeof opts.dataPointIndex !== 'undefined') {
-							const actualDate = dates[opts.dataPointIndex];
-							if (actualDate) {
-								const date = new Date(actualDate);
-								return date.toLocaleDateString('de-DE', {
-									year: 'numeric',
-									month: 'short',
-									day: 'numeric'
-								});
-							}
-						}
-						return value;
-					}
 				},
 				marker: {
 					show: true
@@ -180,9 +168,6 @@
 	// Initialize or update chart when data or metric changes
 	$effect(() => {
 		if (chartElement && chartData.length > 0) {
-			// Access reactive values to ensure this effect runs when they change
-			const currentData = seriesData;
-			const currentConfig = currentMetricConfig;
 			const currentFiltered = filteredDates;
 
 			if (!chart) {
@@ -191,7 +176,7 @@
 			} else {
 				// Update existing chart with new data
 				chart.updateOptions({
-					series: [{ name: currentConfig.name, data: currentData }]
+					series: chartSeries
 				});
 			}
 		}
@@ -217,10 +202,10 @@
 
 <style>
 	:global(.scale-chart) {
-		--scale-chart-axis-label-color: var(--color-surface-700);
+		--scale-chart-label-color: #000000;
 	}
 
 	:global(.dark .scale-chart) {
-		--scale-chart-axis-label-color: var(--color-surface-200);
+		--scale-chart-label-color: #ffffff;
 	}
 </style>

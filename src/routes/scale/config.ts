@@ -20,7 +20,7 @@ export const SCALE_CONFIG = {
 };
 
 /**
- * Generate dynamic metrics based on scale data (using newest entry)
+ * Generate dynamic metrics based on scale data (using newest entry for weight, last non-null bodyFat)
  */
 export function generateScaleMetrics(scaleResults: any[], bodySizeCm: number) {
 	try {
@@ -32,7 +32,11 @@ export function generateScaleMetrics(scaleResults: any[], bodySizeCm: number) {
 		}
 
 		const weight = `${newestEntry.weight} kg`;
-		const bodyFat = `${newestEntry.bodyFat}%`;
+
+		// Find the most recent entry with a non-null bodyFat value
+		const lastBodyFatEntry = scaleResults.find((entry) => entry.bodyFat != null);
+		const bodyFat = lastBodyFatEntry?.bodyFat == null ? '-' : `${lastBodyFatEntry.bodyFat}%`;
+
 		const bmi = bodySizeCm > 0 ? calculateBMI(newestEntry.weight, bodySizeCm).toString() : '0.0';
 
 		return [

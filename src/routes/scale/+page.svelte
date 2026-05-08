@@ -4,7 +4,7 @@
 	import AddScaleResult from './add-scale-result.svelte';
 	import MetricCard from '$lib/metric-card.svelte';
 	import { generateScaleMetrics } from './config.js';
-	import { ChartLine, Table, Weight, Percent } from '@lucide/svelte';
+	import { ChartLine, Table } from '@lucide/svelte';
 	import { SHARED_STYLES, getButtonClasses } from '$lib/shared-styles';
 	import type { PageData } from './$types';
 
@@ -14,18 +14,11 @@
 
 	let { data }: Props = $props();
 	let active: string = $state('chart');
-	let selectedMetric: string = $state('weight');
 
 	// Configuration for scale tabs
 	const SCALE_TABS = [
 		{ id: 'table', icon: Table },
 		{ id: 'chart', icon: ChartLine }
-	];
-
-	// Configuration for metric tabs
-	const METRIC_TABS = [
-		{ id: 'weight', icon: Weight, label: 'Weight' },
-		{ id: 'bodyFat', icon: Percent, label: 'Body Fat' }
 	];
 
 	// Use state for scale results data that can be updated
@@ -70,16 +63,6 @@
 						<tab.icon class={SHARED_STYLES.icon} />
 					</button>
 				{/each}
-
-				{#if active === 'chart'}
-					<div class="ml-4 border-l pl-4 flex items-center gap-1">
-						{#each METRIC_TABS as metric}
-							<button type="button" class={getButtonClasses(selectedMetric === metric.id)} title={metric.label} onclick={() => (selectedMetric = metric.id)}>
-								<metric.icon class={SHARED_STYLES.icon} />
-							</button>
-						{/each}
-					</div>
-				{/if}
 			</div>
 			<div>
 				<AddScaleResult onScaleResultAdded={handleScaleResultAdded} />
@@ -91,7 +74,7 @@
 <!-- Dynamic Component Rendering -->
 <div>
 	{#if active === 'chart'}
-		<ScaleChart {scaleResults} bodySizeCm={data.bodySizeCm} metric={selectedMetric} />
+		<ScaleChart {scaleResults} bodySizeCm={data.bodySizeCm} />
 	{:else}
 		<ScaleTable {scaleResults} bodySizeCm={data.bodySizeCm} />
 	{/if}

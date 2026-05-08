@@ -49,7 +49,7 @@
 						{#if item}
 							<td class="text-xs">{formatDate(item.date)}</td>
 							<td class="text-xs">{item.weight}</td>
-							<td class="text-xs">{item.bodyFat}</td>
+							<td class="text-xs">{item.bodyFat ?? '-'}</td>
 						{:else}
 							<td class="text-xs">&nbsp;</td>
 							<td class="text-xs">&nbsp;</td>

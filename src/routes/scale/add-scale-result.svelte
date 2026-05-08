@@ -42,9 +42,20 @@
 		return '';
 	}
 
+	function validateOptionalNumberField(value: string, fieldName: string): string {
+		if (!value || value.trim() === '') {
+			return '';
+		}
+		const numValue = parseFloat(value);
+		if (isNaN(numValue) || numValue <= 0) {
+			return `Please enter a valid positive number for ${fieldName}`;
+		}
+		return '';
+	}
+
 	function validateForm(): boolean {
 		formErrors.weight = validateNumberField(formData.weight, 'Weight');
-		formErrors.bodyFat = validateNumberField(formData.bodyFat, 'Body Fat');
+		formErrors.bodyFat = validateOptionalNumberField(formData.bodyFat, 'Body Fat');
 
 		return !formErrors.weight && !formErrors.bodyFat;
 	}
@@ -238,7 +249,7 @@
 						<div class="space-y-1">
 							<div class="input-group grid-cols-[auto_1fr_auto]" class:border-error-500={formErrors.bodyFat}>
 								<div class="ig-cell preset-tonal">%</div>
-								<input class="ig-input" class:border-error-500={formErrors.bodyFat} type="number" step="0.1" name="bodyFat" placeholder="Body Fat" bind:value={formData.bodyFat} oninput={handleInput('bodyFat')} required />
+								<input class="ig-input" class:border-error-500={formErrors.bodyFat} type="number" step="0.1" name="bodyFat" placeholder="Body Fat (optional)" bind:value={formData.bodyFat} oninput={handleInput('bodyFat')} />
 							</div>
 							{#if formErrors.bodyFat}
 								<div class="text-error-500 text-sm">{formErrors.bodyFat}</div>
