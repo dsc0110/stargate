@@ -233,11 +233,4 @@ export class RSSService {
 			}
 		}, this.config.CACHE_DURATION);
 	}
-
-	// Clean up resources
-	destroy(): void {
-		if (this.cleanupInterval) {
-			clearInterval(this.cleanupInterval);
-		}
-	}
 }
