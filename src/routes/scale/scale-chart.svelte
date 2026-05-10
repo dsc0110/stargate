@@ -30,16 +30,23 @@
 	});
 
 	let visibleChartData = $derived(recentOnly ? recentChartData : chartData);
+	let showBodyFat = $derived(recentOnly);
 
 	let dates = $derived(visibleChartData.map((item) => item.date));
 	let weights = $derived(visibleChartData.map((item) => item.weight));
 	let bodyFats = $derived(visibleChartData.map((item) => item.bodyFat));
 
-	// Get both series data - show both weight and bodyFat when available at same datapoint
-	let chartSeries = $derived([
-		{ name: 'Weight (kg)', data: weights },
-		{ name: 'Body Fat (%)', data: bodyFats }
-	]);
+	// Body fat is only shown in last-year mode.
+	let chartSeries = $derived.by(() => {
+		if (showBodyFat) {
+			return [
+				{ name: 'Weight (kg)', type: 'column', data: weights },
+				{ name: 'Body Fat (%)', type: 'line', data: bodyFats }
+			];
+		}
+
+		return [{ name: 'Weight (kg)', type: 'column', data: weights }];
+	});
 
 	// Create filtered categories for x-axis labels (show first label of each year)
 	let filteredDates = $derived.by(() => {
@@ -74,18 +81,7 @@
 		const bodyFatPadding = (bodyFatMax - bodyFatMin) * 0.1 || 10;
 
 		const options = {
-			series: [
-				{
-					name: 'Weight (kg)',
-					type: 'column',
-					data: weights
-				},
-				{
-					name: 'Body Fat (%)',
-					type: 'line',
-					data: bodyFats
-				}
-			],
+			series: chartSeries,
 			chart: {
 				height: 350,
 				type: 'line' as const,
@@ -101,13 +97,13 @@
 					}
 				}
 			},
-			colors: ['var(--color-primary-500)', 'var(--color-tertiary-500)'],
+			colors: showBodyFat ? ['var(--color-primary-500)', 'var(--color-tertiary-500)'] : ['var(--color-primary-500)'],
 			stroke: {
-				width: [0, 4]
+				width: showBodyFat ? [0, 4] : [0]
 			},
 			dataLabels: {
-				enabled: true,
-				enabledOnSeries: [1]
+				enabled: showBodyFat,
+				enabledOnSeries: showBodyFat ? [1] : []
 			},
 			labels: dates,
 			xaxis: {
@@ -140,12 +136,12 @@
 				{
 					min: Math.floor((weightMin - weightPadding) * 10) / 10,
 					max: Math.ceil((weightMax + weightPadding) * 10) / 10,
-					title: {
-						text: 'Weight (kg)',
-						style: {
-							color: 'var(--scale-chart-label-color)'
-						}
-					},
+					// title: {
+					// 	text: 'Weight (kg)',
+					// 	style: {
+					// 		color: 'var(--scale-chart-label-color)'
+					// 	}
+					// },
 					labels: {
 						style: {
 							colors: 'var(--scale-chart-label-color)'
@@ -156,12 +152,12 @@
 					opposite: true,
 					min: Math.floor((bodyFatMin - bodyFatPadding) * 10) / 10,
 					max: Math.ceil((bodyFatMax + bodyFatPadding) * 10) / 10,
-					title: {
-						text: 'Body Fat (%)',
-						style: {
-							color: 'var(--scale-chart-label-color)'
-						}
-					},
+					// title: {
+					// 	text: 'Body Fat (%)',
+					// 	style: {
+					// 		color: 'var(--scale-chart-label-color)'
+					// 	}
+					// },
 					labels: {
 						style: {
 							colors: 'var(--scale-chart-label-color)'
