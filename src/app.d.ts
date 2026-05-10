@@ -11,7 +11,6 @@ declare global {
 		interface Platform {
 			env: {
 				STARGATE_BUCKET: R2Bucket;
-				BODY_SIZE_CM: string;
 			};
 			cf: CfProperties;
 			ctx: ExecutionContext;

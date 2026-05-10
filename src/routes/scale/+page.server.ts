@@ -10,8 +10,7 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 			};
 		}
 
-		// Get body size from environment variable
-		const bodySizeCm = parseFloat(platform?.env.BODY_SIZE_CM || '0');
+		const bodySizeCm = 181;
 
 		const object = await platform?.env.STARGATE_BUCKET.get('scale/scale-results.json');
 		if (object === null) {

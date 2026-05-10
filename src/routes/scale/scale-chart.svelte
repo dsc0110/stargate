@@ -132,39 +132,37 @@
 					colors: 'var(--scale-chart-label-color)'
 				}
 			},
-			yaxis: [
-				{
-					min: Math.floor((weightMin - weightPadding) * 10) / 10,
-					max: Math.ceil((weightMax + weightPadding) * 10) / 10,
-					// title: {
-					// 	text: 'Weight (kg)',
-					// 	style: {
-					// 		color: 'var(--scale-chart-label-color)'
-					// 	}
-					// },
-					labels: {
-						style: {
-							colors: 'var(--scale-chart-label-color)'
+			yaxis: showBodyFat
+				? [
+						{
+							min: Math.floor((weightMin - weightPadding) * 10) / 10,
+							max: Math.ceil((weightMax + weightPadding) * 10) / 10,
+							labels: {
+								style: {
+									colors: 'var(--scale-chart-label-color)'
+								}
+							}
+						},
+						{
+							opposite: true,
+							min: Math.floor((bodyFatMin - bodyFatPadding) * 10) / 10,
+							max: Math.ceil((bodyFatMax + bodyFatPadding) * 10) / 10,
+							labels: {
+								style: {
+									colors: 'var(--scale-chart-label-color)'
+								}
+							}
 						}
-					}
-				},
-				{
-					opposite: true,
-					min: Math.floor((bodyFatMin - bodyFatPadding) * 10) / 10,
-					max: Math.ceil((bodyFatMax + bodyFatPadding) * 10) / 10,
-					// title: {
-					// 	text: 'Body Fat (%)',
-					// 	style: {
-					// 		color: 'var(--scale-chart-label-color)'
-					// 	}
-					// },
-					labels: {
-						style: {
-							colors: 'var(--scale-chart-label-color)'
+					]
+				: {
+						min: Math.floor((weightMin - weightPadding) * 10) / 10,
+						max: Math.ceil((weightMax + weightPadding) * 10) / 10,
+						labels: {
+							style: {
+								colors: 'var(--scale-chart-label-color)'
+							}
 						}
-					}
-				}
-			],
+					},
 			tooltip: {
 				enabled: true,
 				shared: true,
