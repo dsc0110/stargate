@@ -168,6 +168,10 @@
 	{:else if data.feeds && selectedCategory}
 		<FeedList feeds={filteredFeeds} />
 	{:else if !selectedCategory}
-		<!-- Show nothing when no category selected -->
+		{#if availableCategories.length === 0}
+			<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">No feeds configured yet.</div>
+		{:else}
+			<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">Select a category to view feeds.</div>
+		{/if}
 	{/if}
 </div>

@@ -1,7 +1,6 @@
 import { fail } from '@sveltejs/kit';
 import { ConversionHelper } from './utils.js';
 import type { Actions, PageServerLoad } from './$types';
-import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
@@ -11,13 +10,7 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 
 		const object = await platform?.env.STARGATE_BUCKET.get('portfolio/portfolio.json');
 		if (object === null) {
-			try {
-				const devPortfolioJson = JSON.parse(env.DEV_PORTFOLIO ?? '[]');
-				const portfolio = Array.isArray(devPortfolioJson) ? devPortfolioJson.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) : [];
-				return { portfolio };
-			} catch {
-				return { portfolio: [] };
-			}
+			return { portfolio: [] };
 		}
 
 		const parsed = JSON.parse(await object.text());

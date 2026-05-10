@@ -84,7 +84,9 @@
 
 <!-- Dynamic Component Rendering -->
 <div>
-	{#if active === 'chart'}
+	{#if scaleResults.length === 0}
+		<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">No scale results yet. Add your first measurement to get started.</div>
+	{:else if active === 'chart'}
 		<ScaleChart {scaleResults} bodySizeCm={data.bodySizeCm} recentOnly={showRecentOnly} />
 	{:else}
 		<ScaleTable {scaleResults} bodySizeCm={data.bodySizeCm} />
