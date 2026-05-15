@@ -118,7 +118,10 @@
 			<div class="flex items-center gap-4 w-full">
 				<div class="relative dropdown-container">
 					<!-- Compact dropdown button -->
-					<button class="flex items-center gap-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
+					<button
+						class={`flex items-center gap-2 p-2 border rounded-lg text-sm ${isDropdownOpen ? 'backdrop-blur-md bg-black/10 dark:bg-white/10 border-white/30 dark:border-white/20' : 'border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+						onclick={() => (isDropdownOpen = !isDropdownOpen)}
+					>
 						<span>{selectedCategory || 'Select category...'}</span>
 						<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
