@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { ShuffleIcon } from '@lucide/svelte';
+	import { PanelLeftOpenIcon, PanelRightOpenIcon, ShuffleIcon } from '@lucide/svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 
 	type StudyPageData = {
@@ -12,11 +12,14 @@
 
 	let { data }: { data: StudyPageData } = $props();
 
-	// Fullscreen feature removed
+	let isRightPanelOpen = $state(true);
 	let layoverActive = $state(false);
 	let layoverStartX = $state(0);
+	let layoverImageWidth = $state(0);
 
-	// Fullscreen feature removed
+	function togglePanelSide() {
+		isRightPanelOpen = !isRightPanelOpen;
+	}
 
 	function startLayover(event: PointerEvent) {
 		const target = event.currentTarget as HTMLElement | null;
@@ -25,6 +28,7 @@
 		}
 
 		const rect = target.getBoundingClientRect();
+		layoverImageWidth = rect.width;
 		layoverStartX = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
 		layoverActive = true;
 		target?.setPointerCapture?.(event.pointerId);
@@ -63,7 +67,20 @@
 				<button class={`${SHARED_STYLES.buttonPrimary} cursor-pointer`} type="button" onclick={showAnotherPicture} disabled={data.studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
 					<ShuffleIcon class="size-4" />
 				</button>
-				<!-- Fullscreen button removed -->
+				<button
+					class={`${SHARED_STYLES.buttonPrimary} cursor-pointer`}
+					type="button"
+					onclick={togglePanelSide}
+					aria-pressed={isRightPanelOpen}
+					aria-label={isRightPanelOpen ? 'Panel right open' : 'Panel left open'}
+					title={isRightPanelOpen ? 'Panel right open' : 'Panel left open'}
+				>
+					{#if isRightPanelOpen}
+						<PanelRightOpenIcon class="size-4" />
+					{:else}
+						<PanelLeftOpenIcon class="size-4" />
+					{/if}
+				</button>
 				<div class="text-sm text-surface-500 dark:text-surface-400 truncate">
 					{data.studyImageName}
 				</div>
@@ -88,7 +105,11 @@
 			/>
 
 			{#if layoverActive}
-				<div class="absolute top-0 right-0 bottom-0 pointer-events-none bg-white" style={`left: ${layoverStartX}px;`}></div>
+				{#if isRightPanelOpen}
+					<div class="absolute top-0 right-0 bottom-0 pointer-events-none bg-white" style={`left: ${layoverStartX}px;`}></div>
+				{:else}
+					<div class="absolute top-0 left-0 bottom-0 pointer-events-none bg-white" style={`width: ${Math.max(0, Math.min(layoverImageWidth, layoverStartX))}px;`}></div>
+				{/if}
 			{/if}
 		</div>
 	</article>
