@@ -9,7 +9,9 @@ declare global {
 		// interface PageData {}
 		// interface PageState {}
 		interface Platform {
-			env: { STARGATE_BUCKET: R2Bucket };
+			env: {
+				STARGATE_BUCKET: R2Bucket;
+			};
 			cf: CfProperties;
 			ctx: ExecutionContext;
 		}

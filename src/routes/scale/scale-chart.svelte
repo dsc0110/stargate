@@ -1,15 +1,13 @@
 <script lang="ts">
 	import ApexCharts from 'apexcharts';
-	import { onMount } from 'svelte';
-	import { calculateBMI } from './utils.js';
 
 	interface Props {
 		scaleResults: any[];
 		bodySizeCm: number;
-		metric: string;
+		recentOnly?: boolean;
 	}
 
-	let { scaleResults, bodySizeCm, metric }: Props = $props();
+	let { scaleResults, bodySizeCm: _bodySizeCm, recentOnly = false }: Props = $props();
 	let chart: ApexCharts | undefined;
 	let chartElement = $state<HTMLDivElement>();
 
@@ -19,53 +17,43 @@
 			.map((entry) => ({
 				date: entry.date,
 				weight: entry.weight,
-				bodyFat: entry.bodyFat,
-				bmi: bodySizeCm > 0 ? calculateBMI(entry.weight, bodySizeCm) : 0
+				bodyFat: entry.bodyFat ?? null
 			}))
 			.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
 	);
 
-	// Metric configuration
-	const METRIC_CONFIG = {
-		weight: {
-			name: 'Weight (kg)',
-			unit: ' kg',
-			decimals: 1
-		},
-		bmi: {
-			name: 'BMI',
-			unit: '',
-			decimals: 1
-		},
-		bodyFat: {
-			name: 'Body Fat (%)',
-			unit: '%',
-			decimals: 1
+	let recentChartData = $derived.by(() => {
+		const oneYearAgo = new Date();
+		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+		return chartData.filter((item) => new Date(item.date) >= oneYearAgo);
+	});
+
+	let visibleChartData = $derived(recentOnly ? recentChartData : chartData);
+	let showBodyFat = $derived(recentOnly);
+
+	let dates = $derived(visibleChartData.map((item) => item.date));
+	let weights = $derived(visibleChartData.map((item) => item.weight));
+	let bodyFats = $derived(visibleChartData.map((item) => item.bodyFat));
+
+	// Body fat is only shown in last-year mode.
+	let chartSeries = $derived.by(() => {
+		if (showBodyFat) {
+			return [
+				{ name: 'Weight (kg)', type: 'column', data: weights },
+				{ name: 'Body Fat (%)', type: 'line', data: bodyFats }
+			];
 		}
-	};
 
-	let dates = $derived(chartData.map((item) => item.date));
-	let weights = $derived(chartData.map((item) => item.weight));
-	let bodyFats = $derived(chartData.map((item) => item.bodyFat));
-	let bmis = $derived(chartData.map((item) => item.bmi));
-
-	// Get current metric configuration
-	let currentMetricConfig = $derived(METRIC_CONFIG[metric as keyof typeof METRIC_CONFIG] || METRIC_CONFIG.weight);
-
-	// Get series data based on selected metric
-	let seriesData = $derived.by(() => {
-		switch (metric) {
-			case 'bmi':
-				return bmis;
-			case 'bodyFat':
-				return bodyFats;
-			default:
-				return weights;
-		}
+		return [{ name: 'Weight (kg)', type: 'column', data: weights }];
 	});
 
 	// Create filtered categories for x-axis labels (show first label of each year)
 	let filteredDates = $derived.by(() => {
+		if (recentOnly) {
+			return dates;
+		}
+
 		const seenYears = new Set();
 		return dates.map((date) => {
 			const year = new Date(date).getFullYear();
@@ -77,17 +65,26 @@
 		});
 	});
 
-	onMount(() => {
-		// Chart will be initialized by the effect below when data is available
-	});
-
 	function initChart() {
 		if (!chartElement) return;
 
+		// Calculate dynamic min/max for weight axis
+		const validWeights = weights.filter((w) => w != null);
+		const weightMin = validWeights.length > 0 ? Math.min(...validWeights) : 0;
+		const weightMax = validWeights.length > 0 ? Math.max(...validWeights) : 100;
+		const weightPadding = (weightMax - weightMin) * 0.1 || 10;
+
+		// Calculate dynamic min/max for body fat axis
+		const validBodyFats = bodyFats.filter((bf) => bf != null);
+		const bodyFatMin = validBodyFats.length > 0 ? Math.min(...validBodyFats) : 0;
+		const bodyFatMax = validBodyFats.length > 0 ? Math.max(...validBodyFats) : 100;
+		const bodyFatPadding = (bodyFatMax - bodyFatMin) * 0.1 || 10;
+
 		const options = {
+			series: chartSeries,
 			chart: {
+				height: 350,
 				type: 'line' as const,
-				height: 400,
 				toolbar: {
 					show: false,
 					tools: {
@@ -100,58 +97,77 @@
 					}
 				}
 			},
-			legend: {
-				labels: {
-					colors: ['var(--color-tertiary-500)']
-				}
+			colors: showBodyFat ? ['var(--color-primary-500)', 'var(--color-tertiary-500)'] : ['var(--color-primary-500)'],
+			stroke: {
+				width: showBodyFat ? [0, 4] : [0]
 			},
-			colors: ['var(--color-secondary-500)'],
 			dataLabels: {
-				style: {
-					colors: ['black']
-				}
+				enabled: showBodyFat,
+				enabledOnSeries: showBodyFat ? [1] : []
 			},
-			series: [{ name: currentMetricConfig.name, data: seriesData }],
+			labels: dates,
 			xaxis: {
 				categories: filteredDates,
 				labels: {
 					show: true,
 					style: {
-						colors: ['var(--color-surface-600)']
+						colors: 'var(--scale-chart-label-color)'
 					},
 					formatter: function (value: any) {
 						if (value === '') return '';
 						const date = new Date(value);
+
+						if (recentOnly) {
+							const month = String(date.getMonth() + 1).padStart(2, '0');
+							const year = String(date.getFullYear());
+							return `${month}/${year}`;
+						}
+
 						return date.getFullYear().toString();
 					}
-				},
-				crosshairs: {
-					show: false
-				},
-				tooltip: {
-					enabled: false
 				}
 			},
-			yaxis: {
+			legend: {
 				labels: {
-					show: true,
-					offsetX: -10,
-					style: {
-						colors: ['var(--color-surface-500)'],
-						fontSize: '11px'
-					},
-					formatter: function (value: number) {
-						return value.toFixed(currentMetricConfig.decimals) + currentMetricConfig.unit;
-					}
+					colors: 'var(--scale-chart-label-color)'
 				}
 			},
+			yaxis: showBodyFat
+				? [
+						{
+							min: Math.floor((weightMin - weightPadding) * 10) / 10,
+							max: Math.ceil((weightMax + weightPadding) * 10) / 10,
+							labels: {
+								style: {
+									colors: 'var(--scale-chart-label-color)'
+								}
+							}
+						},
+						{
+							opposite: true,
+							min: Math.floor((bodyFatMin - bodyFatPadding) * 10) / 10,
+							max: Math.ceil((bodyFatMax + bodyFatPadding) * 10) / 10,
+							labels: {
+								style: {
+									colors: 'var(--scale-chart-label-color)'
+								}
+							}
+						}
+					]
+				: {
+						min: Math.floor((weightMin - weightPadding) * 10) / 10,
+						max: Math.ceil((weightMax + weightPadding) * 10) / 10,
+						labels: {
+							style: {
+								colors: 'var(--scale-chart-label-color)'
+							}
+						}
+					},
 			tooltip: {
 				enabled: true,
-				enabledOnSeries: undefined,
 				shared: true,
 				followCursor: false,
 				intersect: false,
-				inverseOrder: false,
 				hideEmptySeries: true,
 				fillSeriesColor: false,
 				theme: 'dark',
@@ -159,13 +175,9 @@
 					fontSize: '12px',
 					fontFamily: undefined
 				},
-				onDatasetHover: {
-					highlightDataSeries: false
-				},
 				x: {
 					show: true,
 					formatter: function (value: any, opts: any) {
-						// Show the exact date in tooltip with proper formatting
 						if (opts && typeof opts.dataPointIndex !== 'undefined') {
 							const actualDate = dates[opts.dataPointIndex];
 							if (actualDate) {
@@ -179,15 +191,6 @@
 						}
 						return value;
 					}
-				},
-				y: {
-					formatter: function (value: any) {
-						return value.toFixed(currentMetricConfig.decimals) + currentMetricConfig.unit;
-					}
-				},
-				z: {
-					formatter: undefined,
-					title: 'Size: '
 				},
 				marker: {
 					show: true
@@ -205,59 +208,17 @@
 		chart.render();
 	}
 
-	// Initialize or update chart when data or metric changes
+	// Recreate chart whenever visible dataset or mode changes.
 	$effect(() => {
-		if (chartElement && chartData.length > 0) {
-			// Access reactive values to ensure this effect runs when they change
-			const currentData = seriesData;
-			const currentConfig = currentMetricConfig;
-			const currentFiltered = filteredDates;
+		if (!chartElement) return;
 
-			if (!chart) {
-				// Initialize chart if it doesn't exist yet
-				initChart();
-			} else {
-				// Update existing chart with new data
-				chart.updateOptions({
-					series: [{ name: currentConfig.name, data: currentData }],
-					legend: {
-						labels: {
-							colors: ['var(--color-tertiary-500)']
-						}
-					},
-					xaxis: {
-						categories: currentFiltered,
-						labels: {
-							show: true,
-							style: {
-								colors: ['var(--color-surface-600)']
-							},
-							formatter: function (value: any) {
-								if (value === '') return '';
-								const date = new Date(value);
-								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
-							}
-						}
-					},
-					yaxis: {
-						labels: {
-							style: {
-								colors: ['var(--color-surface-500)']
-							},
-							formatter: function (value: number) {
-								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
-							}
-						}
-					},
-					tooltip: {
-						y: {
-							formatter: function (value: any) {
-								return value.toFixed(currentConfig.decimals) + currentConfig.unit;
-							}
-						}
-					}
-				});
-			}
+		if (chart) {
+			chart.destroy();
+			chart = undefined;
+		}
+
+		if (visibleChartData.length > 0) {
+			initChart();
 		}
 	});
 
@@ -271,15 +232,22 @@
 	});
 </script>
 
-<div class="w-full h-full flex flex-col items-center justify-center">
-	{#if chartData.length > 0}
+<div class="scale-chart w-full h-full flex flex-col items-center justify-center">
+	{#if visibleChartData.length > 0}
 		<div class="w-full">
 			<div bind:this={chartElement} class="w-full"></div>
 		</div>
 	{:else}
-		<div class="text-center text-gray-500 dark:text-gray-400">
-			<p>No scale data available for chart</p>
-			<p class="text-sm mt-2">Add some scale results to see the trends</p>
-		</div>
+		<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">No scale results in the last year.</div>
 	{/if}
 </div>
+
+<style>
+	:global(.scale-chart) {
+		--scale-chart-label-color: #000000;
+	}
+
+	:global(.dark .scale-chart) {
+		--scale-chart-label-color: #ffffff;
+	}
+</style>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import ApexCharts from 'apexcharts';
-	import { onMount } from 'svelte';
 	import { calculatePortfolioTotal } from './utils.js';
 
 	interface Props {
@@ -37,10 +36,6 @@
 		});
 	});
 
-	onMount(() => {
-		// Chart will be initialized by the effect below when data is available
-	});
-
 	function initChart() {
 		if (!chartElement) return;
 
@@ -65,7 +60,7 @@
 					colors: ['var(--color-tertiary-500)']
 				}
 			},
-			colors: ['var(--color-secondary-500)', 'var(--color-primary-500), var(--color-tertiary-500)'],
+			colors: ['var(--color-secondary-500)'],
 			dataLabels: {
 				style: {
 					colors: ['var(--color-tertiary-500)']
@@ -77,7 +72,7 @@
 				labels: {
 					show: true,
 					style: {
-						colors: ['var(--color-surface-600)']
+						colors: ['var(--portfolio-chart-axis-label-color)']
 					},
 					formatter: function (value: any) {
 						if (value === '') return '';
@@ -97,7 +92,7 @@
 					show: true,
 					offsetX: -10,
 					style: {
-						colors: ['var(--color-surface-500)'],
+						colors: ['var(--portfolio-chart-axis-label-color)'],
 						fontSize: '11px'
 					},
 					formatter: function (value: any) {
@@ -186,40 +181,7 @@
 			} else {
 				// Update existing chart with new data
 				chart.updateOptions({
-					series: [{ name: 'Portfolio Total', data: totals }],
-					legend: {
-						labels: {
-							colors: ['var(--color-tertiary-500)']
-						}
-					},
-					xaxis: {
-						categories: filteredDates,
-						labels: {
-							show: true,
-							style: {
-								colors: ['var(--color-surface-600)']
-							},
-							formatter: function (value: any) {
-								if (value === '') return '';
-								const date = new Date(value);
-								return date.toLocaleDateString('de-DE', { month: 'short', year: '2-digit' });
-							}
-						}
-					},
-					yaxis: {
-						labels: {
-							style: {
-								colors: ['var(--color-surface-500)']
-							},
-							formatter: function (value: any) {
-								return (
-									value.toLocaleString('de-DE', {
-										maximumFractionDigits: 0
-									}) + '€'
-								);
-							}
-						}
-					}
+					series: [{ name: 'Portfolio Total', data: totals }]
 				});
 			}
 		}
@@ -235,15 +197,20 @@
 	});
 </script>
 
-<div class="w-full h-full flex flex-col items-center justify-center">
+<div class="portfolio-chart w-full h-full flex flex-col items-center justify-center">
 	{#if chartData.length > 0}
 		<div class="w-full">
 			<div bind:this={chartElement} class="w-full"></div>
 		</div>
-	{:else}
-		<div class="text-center text-gray-500 dark:text-gray-400">
-			<p>No portfolio data available for chart</p>
-			<p class="text-sm mt-2">Add some portfolio entries to see the trends</p>
-		</div>
 	{/if}
 </div>
+
+<style>
+	:global(.portfolio-chart) {
+		--portfolio-chart-axis-label-color: var(--color-surface-700);
+	}
+
+	:global(.dark .portfolio-chart) {
+		--portfolio-chart-axis-label-color: var(--color-surface-200);
+	}
+</style>

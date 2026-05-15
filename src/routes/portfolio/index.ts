@@ -2,5 +2,5 @@
 // Makes imports cleaner and provides a single entry point
 
 export { PORTFOLIO_CONFIG, generateMetrics } from './config.js';
-export { isValidTabId, calculatePortfolioTotal, calculateCurrentValue, calculateYearOverYear, calculateMillionForecast } from './utils.js';
+export { calculatePortfolioTotal, calculateCurrentValue, calculateYearOverYear, calculateMillionForecast } from './utils.js';
 export type { PortfolioMetric, PortfolioTab, PortfolioData, PortfolioProps } from './types.js';

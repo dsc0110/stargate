@@ -1,15 +1,17 @@
 <script lang="ts">
-	import { House, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon, BoomBoxIcon } from '@lucide/svelte';
+	import SlashIcon from '$lib/slash-icon.svelte';
+	import { RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
+	import { page } from '$app/state';
 
 	const linksSidebar = {
 		public: [
-			{ label: 'Home', href: '/', icon: House },
-			{ label: 'Feed', href: '/feed', icon: RssIcon }
+			{ label: 'home', href: '/', icon: SlashIcon },
+			{ label: 'feeds', href: '/feeds', icon: RssIcon }
 		],
 		private: [
-			{ label: 'Portfolio', href: '/portfolio', icon: DollarSign },
-			{ label: 'Scale', href: '/scale', icon: ScaleIcon },
-			{ label: 'Study', href: '/study', icon: GraduationCapIcon }
+			{ label: 'portfolio', href: '/portfolio', icon: DollarSign },
+			{ label: 'scale', href: '/scale', icon: ScaleIcon },
+			{ label: 'study', href: '/study', icon: GraduationCapIcon }
 		]
 	};
 
@@ -23,7 +25,8 @@
 	<!-- <p>{category}</p> -->
 	{#each links as link (link)}
 		{@const Icon = link.icon}
-		<a href={link.href} title={link.label} aria-label={link.label} class="flex items-center gap-2 p-2 rounded hover:text-primary-500" onclick={closeMobileMenu}>
+		{@const isActive = page.url.pathname === link.href}
+		<a href={link.href} title={link.label} aria-label={link.label} class="flex items-center gap-2 p-2 rounded {isActive ? 'text-tertiary-600' : 'hover:text-tertiary-600'}" onclick={closeMobileMenu}>
 			<Icon class="size-4" />
 			<span>{link.label}</span>
 		</a>

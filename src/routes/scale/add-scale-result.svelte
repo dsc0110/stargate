@@ -2,6 +2,7 @@
 	import { DatePicker, parseDate, Portal as SkeletonPortal, Dialog } from '@skeletonlabs/skeleton-svelte';
 	import { enhance } from '$app/forms';
 	import { XIcon, SquarePlus } from '@lucide/svelte';
+	import { SHARED_STYLES } from '$lib/shared-styles';
 
 	// Props
 	interface Props {
@@ -12,10 +13,6 @@
 
 	// Animation configuration
 	const animation = 'transition transition-discrete opacity-0 translate-y-[100px] starting:data-[state=open]:opacity-0 starting:data-[state=open]:translate-y-[100px] data-[state=open]:opacity-100 data-[state=open]:translate-y-0';
-
-	// Style constants
-	const buttonStyle = 'btn rounded-lg px-2 py-2 transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-transparent';
-	const iconStyle = 'w-6 h-6';
 
 	// Dialog state
 	let isDialogOpen = $state(false);
@@ -45,9 +42,20 @@
 		return '';
 	}
 
+	function validateOptionalNumberField(value: string, fieldName: string): string {
+		if (!value || value.trim() === '') {
+			return '';
+		}
+		const numValue = parseFloat(value);
+		if (isNaN(numValue) || numValue <= 0) {
+			return `Please enter a valid positive number for ${fieldName}`;
+		}
+		return '';
+	}
+
 	function validateForm(): boolean {
 		formErrors.weight = validateNumberField(formData.weight, 'Weight');
-		formErrors.bodyFat = validateNumberField(formData.bodyFat, 'Body Fat');
+		formErrors.bodyFat = validateOptionalNumberField(formData.bodyFat, 'Body Fat');
 
 		return !formErrors.weight && !formErrors.bodyFat;
 	}
@@ -109,14 +117,14 @@
 </script>
 
 <Dialog open={isDialogOpen} onOpenChange={(details: { open: boolean }) => (isDialogOpen = details.open)}>
-	<Dialog.Trigger class={buttonStyle}><SquarePlus class={iconStyle} /></Dialog.Trigger>
+	<Dialog.Trigger class={SHARED_STYLES.buttonGrey}><SquarePlus class={SHARED_STYLES.icon} /></Dialog.Trigger>
 	<SkeletonPortal>
 		<Dialog.Backdrop class="fixed inset-0 z-50 bg-surface-50-950/50" />
 		<Dialog.Positioner class="fixed inset-0 z-50 flex justify-center items-center p-4">
 			<Dialog.Content class="card bg-surface-100-900 w-full max-w-xl p-4 space-y-4 shadow-xl {animation}">
 				<header class="flex justify-between items-center">
 					<Dialog.Title class="text-lg font-bold">Add Scale Result</Dialog.Title>
-					<Dialog.CloseTrigger class="btn-icon hover:preset-tonal">
+					<Dialog.CloseTrigger class={SHARED_STYLES.buttonIconClose}>
 						<XIcon class="size-4" />
 					</Dialog.CloseTrigger>
 				</header>
@@ -241,7 +249,7 @@
 						<div class="space-y-1">
 							<div class="input-group grid-cols-[auto_1fr_auto]" class:border-error-500={formErrors.bodyFat}>
 								<div class="ig-cell preset-tonal">%</div>
-								<input class="ig-input" class:border-error-500={formErrors.bodyFat} type="number" step="0.1" name="bodyFat" placeholder="Body Fat" bind:value={formData.bodyFat} oninput={handleInput('bodyFat')} required />
+								<input class="ig-input" class:border-error-500={formErrors.bodyFat} type="number" step="0.1" name="bodyFat" placeholder="Body Fat (optional)" bind:value={formData.bodyFat} oninput={handleInput('bodyFat')} />
 							</div>
 							{#if formErrors.bodyFat}
 								<div class="text-error-500 text-sm">{formErrors.bodyFat}</div>
@@ -257,8 +265,8 @@
 						{/if}
 
 						<fieldset class="flex justify-end gap-2">
-							<Dialog.CloseTrigger class="btn preset-tonal" onclick={resetForm} disabled={submitting}>Cancel</Dialog.CloseTrigger>
-							<button type="submit" class="btn preset-outlined-surface-300-700" disabled={submitting}>
+							<Dialog.CloseTrigger class={SHARED_STYLES.buttonSecondary} onclick={resetForm} disabled={submitting}>Cancel</Dialog.CloseTrigger>
+							<button type="submit" class={SHARED_STYLES.buttonPrimary} disabled={submitting}>
 								{submitting ? 'Saving...' : 'Submit'}
 							</button>
 						</fieldset>

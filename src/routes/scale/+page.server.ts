@@ -1,26 +1,27 @@
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { getScaleEnvironment } from './utils.js';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
+		const bodySizeCm = 181;
+		const isProd = process.env.NODE_ENV === 'production';
+		if (!isProd) {
+			return {
+				scaleResults: []
+			};
+		}
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return {
 				scaleResults: [],
-				bodySizeCm: 0,
-				birthDate: ''
+				bodySizeCm
 			};
 		}
-
-		// Get environment variables using the utility function
-		const { bodySizeCm, birthDate } = getScaleEnvironment(platform?.env);
 
 		const object = await platform?.env.STARGATE_BUCKET.get('scale/scale-results.json');
 		if (object === null) {
 			return {
 				scaleResults: [],
-				bodySizeCm,
-				birthDate
+				bodySizeCm
 			};
 		}
 
@@ -29,15 +30,13 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 
 		return {
 			scaleResults,
-			bodySizeCm,
-			birthDate
+			bodySizeCm
 		};
 	} catch (error) {
 		console.error('Error getting scale results data:', error);
 		return {
 			scaleResults: [],
-			bodySizeCm: 0,
-			birthDate: ''
+			bodySizeCm: 181
 		};
 	}
 };
@@ -54,7 +53,16 @@ export const actions: Actions = {
 			const formData = await request.formData();
 			const date = formData.get('date') as string;
 			const weight = parseFloat(formData.get('weight') as string);
-			const bodyFat = parseFloat(formData.get('bodyFat') as string);
+			const bodyFatInput = (formData.get('bodyFat') as string | null)?.trim() ?? '';
+			const bodyFat = bodyFatInput === '' ? null : parseFloat(bodyFatInput);
+
+			if (isNaN(weight) || weight <= 0) {
+				return fail(400, { message: 'Please enter a valid weight.' });
+			}
+
+			if (bodyFat !== null && (isNaN(bodyFat) || bodyFat <= 0)) {
+				return fail(400, { message: 'Please enter a valid body fat percentage or leave it empty.' });
+			}
 
 			// Create the scale result item - only store raw data
 			const scaleResultItem = {

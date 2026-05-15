@@ -1,9 +1,14 @@
-import { fail, json } from '@sveltejs/kit';
-import { ConversionHelper } from '../scale/utils.js';
+import { fail } from '@sveltejs/kit';
+import { ConversionHelper } from './utils.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
+		const isProd = process.env.NODE_ENV === 'production';
+		if (!isProd) {
+			return { portfolio: [] };
+		}
+
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return { portfolio: [] };
 		}
