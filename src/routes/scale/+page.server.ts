@@ -3,14 +3,19 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
+		const bodySizeCm = 181;
+		const isProd = process.env.NODE_ENV === 'production';
+		if (!isProd) {
+			return {
+				scaleResults: []
+			};
+		}
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return {
 				scaleResults: [],
-				bodySizeCm: 0
+				bodySizeCm
 			};
 		}
-
-		const bodySizeCm = 181;
 
 		const object = await platform?.env.STARGATE_BUCKET.get('scale/scale-results.json');
 		if (object === null) {
@@ -31,7 +36,7 @@ export const load: PageServerLoad = async ({ request, platform }) => {
 		console.error('Error getting scale results data:', error);
 		return {
 			scaleResults: [],
-			bodySizeCm: 0
+			bodySizeCm: 181
 		};
 	}
 };

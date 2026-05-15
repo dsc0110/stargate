@@ -4,6 +4,11 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
+		const isProd = process.env.NODE_ENV === 'production';
+		if (!isProd) {
+			return { portfolio: [] };
+		}
+
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return { portfolio: [] };
 		}
