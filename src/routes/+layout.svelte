@@ -5,7 +5,7 @@
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
-	let { children } = $props();
+	let { children, data } = $props();
 
 	function toggleTheme() {
 		const html = document.documentElement;
@@ -117,7 +117,7 @@
 						<div class="mt-6 flow-root">
 							<div class="-my-6 divide-y divide-white/10">
 								<div class="space-y-2 py-6">
-									<Navigation />
+									<Navigation isPrivateAccessAllowed={data.isPrivateAccessAllowed} myDomain={data.myDomain} />
 								</div>
 							</div>
 						</div>
@@ -132,7 +132,7 @@
 			{@render children()}
 		</main>
 		<aside class="p-4 hidden lg:block">
-			<Navigation />
+			<Navigation isPrivateAccessAllowed={data.isPrivateAccessAllowed} myDomain={data.myDomain} />
 		</aside>
 	</div>
 </div>

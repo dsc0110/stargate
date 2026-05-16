@@ -20,29 +20,43 @@
 	let layoverImageWidth = $state(0);
 	let selectedCategory = $state('');
 	let isDropdownOpen = $state(false);
+	let pointerDownX = 0;
+	let pointerDownY = 0;
 
 	function togglePanelSide() {
 		isRightPanelOpen = !isRightPanelOpen;
 	}
 
-	function startLayover(event: PointerEvent) {
+	function toggleLayover(event: PointerEvent) {
 		const target = event.currentTarget as HTMLElement | null;
 		if (!target) {
 			return;
 		}
 
-		const rect = target.getBoundingClientRect();
-		layoverImageWidth = rect.width;
-		layoverStartX = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
-		layoverActive = true;
-		target?.setPointerCapture?.(event.pointerId);
-	}
+		if (event.type === 'pointerdown') {
+			// Store the initial pointer position
+			pointerDownX = event.clientX;
+			pointerDownY = event.clientY;
+			target?.setPointerCapture?.(event.pointerId);
+		} else if (event.type === 'pointerup') {
+			// Only toggle if pointer moved less than 10px (tap gesture)
+			const moveDistance = Math.sqrt(Math.pow(event.clientX - pointerDownX, 2) + Math.pow(event.clientY - pointerDownY, 2));
 
-	function stopLayover(event: PointerEvent) {
-		layoverActive = false;
+			if (moveDistance < 10) {
+				if (layoverActive) {
+					// Deactivate layover on second click
+					layoverActive = false;
+				} else {
+					// Activate layover on first click
+					const rect = target.getBoundingClientRect();
+					layoverImageWidth = rect.width;
+					layoverStartX = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+					layoverActive = true;
+				}
+			}
 
-		const target = event.currentTarget as HTMLElement | null;
-		target?.releasePointerCapture?.(event.pointerId);
+			target?.releasePointerCapture?.(event.pointerId);
+		}
 	}
 
 	function showAnotherPicture() {
@@ -164,12 +178,11 @@
 			<img
 				src={data.studyImageSrc}
 				alt="study"
-				class="max-w-full h-auto rounded block"
+				class="max-w-full h-auto rounded block cursor-pointer"
 				style="-webkit-touch-callout: none;"
-				onpointerdown={startLayover}
-				onpointerup={stopLayover}
-				onpointercancel={stopLayover}
-				onlostpointercapture={stopLayover}
+				onpointerdown={toggleLayover}
+				onpointerup={toggleLayover}
+				onpointercancel={() => (layoverActive = false)}
 				oncontextmenu={(event) => event.preventDefault()}
 			/>
 
