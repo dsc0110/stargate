@@ -35,7 +35,17 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 		try {
 			const parsed = JSON.parse(await feedsObject.text());
-			availableFeeds = Array.isArray(parsed) ? parsed : [];
+			availableFeeds = Array.isArray(parsed)
+				? parsed
+						.filter((item): item is FeedConfig => {
+							return typeof item?.name === 'string' && typeof item?.url === 'string' && typeof item?.category === 'string' && (item.enabled === undefined || typeof item.enabled === 'boolean');
+						})
+						.map((item) => ({
+							...item,
+							enabled: item.enabled ?? true
+						}))
+						.filter((item) => item.enabled)
+				: [];
 		} catch (error) {
 			console.error('Failed to parse feeds/rss-feeds.json:', error);
 			return json(

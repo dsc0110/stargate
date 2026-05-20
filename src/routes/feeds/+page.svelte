@@ -1,17 +1,20 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { goto } from '$app/navigation';
-	import { page, navigating } from '$app/stores';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import FeedList from './feed-list.svelte';
+	import type { FeedData, MultipleFeedResponse } from './types';
 
 	let { data }: { data: PageData } = $props();
 
 	let selectedCategory = $state('');
 	let selectedSource = $state(''); // Track selected feed source
-	let hasAutoSelected = $state(false); // Track if we've already auto-selected
+	let hasAutoSelected = $state(false);
 	let isDropdownOpen = $state(false);
+	let feeds = $state<FeedData[]>([]);
+	let feedsError = $state<string | null>(null);
+	let isLoadingFeeds = $state(false);
+	let currentRequestId = 0;
 
 	// Available categories for dropdown
 	const availableCategories = $derived(data.availableCategories || []);
@@ -20,7 +23,77 @@
 	const selectedFeedSources = $derived(selectedCategory ? data.categoryFeeds?.[selectedCategory] || [] : []);
 
 	// Filter feeds based on selected source
-	const filteredFeeds = $derived(selectedSource && data.feeds ? data.feeds.filter((feed) => feed.name === selectedSource) : data.feeds || []);
+	const filteredFeeds = $derived(selectedSource ? feeds.filter((feed) => feed.name === selectedSource) : feeds);
+
+	async function loadFeedsForCategory(categoryName: string): Promise<{ feeds: FeedData[]; error: string | null }> {
+		if (!categoryName) {
+			return {
+				feeds: [],
+				error: null
+			};
+		}
+
+		try {
+			const response = await fetch(`/feeds?categories=${encodeURIComponent(categoryName)}`, {
+				method: 'GET',
+				headers: { accept: 'application/json' }
+			});
+
+			const contentType = response.headers.get('content-type') || '';
+			if (!response.ok || !contentType.includes('application/json')) {
+				const bodyText = await response.text();
+				throw new Error(`Unexpected /feeds response: ${response.status} ${contentType} ${bodyText.slice(0, 200)}`);
+			}
+
+			const payload = (await response.json()) as MultipleFeedResponse;
+			if (payload.success) {
+				return {
+					feeds: payload.feeds || [],
+					error: null
+				};
+			}
+
+			return {
+				feeds: [],
+				error: payload.error || 'Failed to load feeds'
+			};
+		} catch (error) {
+			console.error('Error loading selected feeds:', error);
+			return {
+				feeds: [],
+				error: 'Failed to load feed data'
+			};
+		}
+	}
+
+	async function updateCategoryFeeds(categoryName: string) {
+		if (!categoryName) {
+			feeds = [];
+			feedsError = null;
+			isLoadingFeeds = false;
+			return;
+		}
+
+		const requestId = ++currentRequestId;
+		isLoadingFeeds = true;
+		feedsError = null;
+
+		try {
+			const payload = await loadFeedsForCategory(categoryName);
+			if (requestId !== currentRequestId) return;
+
+			feeds = payload.feeds;
+			feedsError = payload.error;
+		} catch {
+			if (requestId !== currentRequestId) return;
+			feeds = [];
+			feedsError = 'Failed to load feed data';
+		} finally {
+			if (requestId === currentRequestId) {
+				isLoadingFeeds = false;
+			}
+		}
+	}
 
 	// Toggle category selection (single selection only)
 	const selectCategory = (categoryName: string) => {
@@ -32,13 +105,7 @@
 		clearTimeout(categoryChangeTimeout);
 
 		categoryChangeTimeout = setTimeout(() => {
-			console.log('Debounced category change to:', newCategory);
-			// Use $page.url (from SvelteKit store)
-			const url = new URL($page.url);
-			if (newCategory) {
-				url.searchParams.set('categories', newCategory);
-			}
-			goto(url.toString());
+			void updateCategoryFeeds(newCategory);
 		}, 300);
 	};
 
@@ -70,20 +137,23 @@
 
 	// Update selectedCategory when data changes
 	$effect(() => {
-		const newSelectedCategory = data.selectedCategories?.[0] || '';
-		selectedCategory = newSelectedCategory;
-		console.log('Category changed to:', selectedCategory);
+		if (hasAutoSelected) return;
 
-		// Reset auto-select flag if user manually selected a category
-		if (newSelectedCategory) {
+		const requestedCategory = data.selectedCategories?.[0] || '';
+		const normalizedCategory = availableCategories.find((category) => category.toLowerCase() === requestedCategory.toLowerCase()) || '';
+
+		if (normalizedCategory) {
+			selectedCategory = normalizedCategory;
 			hasAutoSelected = true;
+			if (browser) {
+				void updateCategoryFeeds(normalizedCategory);
+			}
 		}
 	});
 
 	// Auto-select first category on initial load
 	$effect(() => {
 		if (browser && !hasAutoSelected && !selectedCategory && data.availableCategories && data.availableCategories.length > 0) {
-			console.log('Auto-selecting first category:', data.availableCategories[0]);
 			hasAutoSelected = true;
 			handleAutoSelect(data.availableCategories[0]);
 		}
@@ -93,15 +163,12 @@
 	let categoryChangeTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	const dropdownTriggerClass = $derived(`${SHARED_STYLES.dropdownTriggerBase} ${isDropdownOpen || selectedCategory ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`);
-	const isLoadingFeeds = $derived(Boolean($navigating && $navigating.to?.url.pathname === '/feeds'));
 
 	// Auto-select handler
 	function handleAutoSelect(categoryName: string) {
 		selectedCategory = categoryName;
-		// Use $page.url (from SvelteKit store)
-		const url = new URL($page.url);
-		url.searchParams.set('categories', categoryName);
-		goto(url.toString());
+		selectedSource = '';
+		void updateCategoryFeeds(categoryName);
 	}
 </script>
 
@@ -158,10 +225,10 @@
 </div>
 
 <div id="feeditems" class="py-4">
-	{#if data.error}
+	{#if feedsError}
 		<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
 			<strong>Error:</strong>
-			{data.error}
+			{feedsError}
 		</div>
 	{:else if selectedCategory}
 		{#if isLoadingFeeds}

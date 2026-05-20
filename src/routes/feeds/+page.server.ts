@@ -6,8 +6,8 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 		const selectedCategories = url.searchParams.get('categories') || '';
 		const selectedCategoriesArray = selectedCategories.split(',').filter(Boolean);
 
-		// Always make API call to get available categories, even if no categories selected
-		const response = await fetch(`/feeds?categories=${encodeURIComponent(selectedCategories)}`, {
+		// Load feed configuration metadata once; item loading happens client-side by category.
+		const response = await fetch('/feeds', {
 			method: 'GET',
 			headers: {
 				accept: 'application/json'
@@ -29,7 +29,7 @@ export const load: PageServerLoad = async ({ fetch, url }) => {
 
 		if (data.success) {
 			return {
-				feeds: data.feeds || [],
+				feeds: [],
 				availableCategories: data.availableCategories || [],
 				categoryFeeds: data.categoryFeeds || {},
 				selectedCategories: selectedCategoriesArray,
