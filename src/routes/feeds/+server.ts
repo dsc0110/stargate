@@ -1,8 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getOptimizedConfig, RSSService } from './utils';
 import type { FeedConfig, RSSConfig } from './types';
-import { getOptimizedConfig } from './config';
-import { RSSService } from './rss-service';
 
 // Get optimized configuration and create RSS service
 const config = getOptimizedConfig();

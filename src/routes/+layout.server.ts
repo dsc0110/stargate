@@ -2,6 +2,7 @@ import { MY_DOMAIN } from '$env/static/private';
 
 export function load({ cookies }) {
 	let isPrivateAccessAllowed = false;
+	const isDevelopment = process.env.NODE_ENV === 'development';
 
 	try {
 		const token = cookies.get('CF_Authorization');
@@ -21,6 +22,11 @@ export function load({ cookies }) {
 		}
 	} catch (error) {
 		console.error('Error parsing JWT token:', error);
+	}
+
+	// In development, always allow private access
+	if (isDevelopment) {
+		isPrivateAccessAllowed = true;
 	}
 
 	return {
