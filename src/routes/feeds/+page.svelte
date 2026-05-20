@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { PageData } from './$types';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
+	import { page, navigating } from '$app/stores';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import FeedList from './feed-list.svelte';
@@ -26,21 +26,18 @@
 	const selectCategory = (categoryName: string) => {
 		const newCategory = selectedCategory === categoryName ? '' : categoryName;
 		selectedCategory = newCategory;
-		selectedSource = ''; // Reset source filter when changing category
+		selectedSource = '';
 		isDropdownOpen = false;
 
-		// Clear timeout and update URL after a delay to prevent rapid requests
 		clearTimeout(categoryChangeTimeout);
 
 		categoryChangeTimeout = setTimeout(() => {
 			console.log('Debounced category change to:', newCategory);
-
-			// Update URL with the new category parameter
-			const url = new URL(page.url);
+			// Use $page.url (from SvelteKit store)
+			const url = new URL($page.url);
 			if (newCategory) {
 				url.searchParams.set('categories', newCategory);
 			}
-
 			goto(url.toString());
 		}, 300);
 	};
@@ -95,16 +92,14 @@
 	// Debounced category change to prevent rapid requests
 	let categoryChangeTimeout: ReturnType<typeof setTimeout> | undefined;
 
-	const dropdownTriggerClass = $derived(
-		`${SHARED_STYLES.dropdownTriggerBase} ${isDropdownOpen || selectedCategory ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`
-	);
+	const dropdownTriggerClass = $derived(`${SHARED_STYLES.dropdownTriggerBase} ${isDropdownOpen || selectedCategory ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`);
+	const isLoadingFeeds = $derived(Boolean($navigating && $navigating.to?.url.pathname === '/feeds'));
 
 	// Auto-select handler
 	function handleAutoSelect(categoryName: string) {
 		selectedCategory = categoryName;
-
-		// Update URL with new category
-		const url = new URL(page.url);
+		// Use $page.url (from SvelteKit store)
+		const url = new URL($page.url);
 		url.searchParams.set('categories', categoryName);
 		goto(url.toString());
 	}
@@ -121,10 +116,7 @@
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
 				<div class="relative dropdown-container">
-					<button
-						class={dropdownTriggerClass}
-						onclick={() => (isDropdownOpen = !isDropdownOpen)}
-					>
+					<button class={dropdownTriggerClass} onclick={() => (isDropdownOpen = !isDropdownOpen)}>
 						<span>{selectedCategory || 'Select category...'}</span>
 						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -171,8 +163,21 @@
 			<strong>Error:</strong>
 			{data.error}
 		</div>
-	{:else if data.feeds && selectedCategory}
-		<FeedList feeds={filteredFeeds} />
+	{:else if selectedCategory}
+		{#if isLoadingFeeds}
+			<!-- Loading placeholder -->
+			<div class="border border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-2 animate-pulse bg-gray-100 dark:bg-gray-800/40">
+				<div class="flex items-start justify-between gap-3">
+					<div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
+					<div class="flex flex-col sm:flex-row gap-1 sm:gap-2 flex-shrink-0">
+						<div class="h-5 w-16 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+						<div class="h-5 w-14 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+					</div>
+				</div>
+			</div>
+		{:else}
+			<FeedList feeds={filteredFeeds} />
+		{/if}
 	{:else if !selectedCategory}
 		{#if availableCategories.length === 0}
 			<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">No feeds configured yet.</div>

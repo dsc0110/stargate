@@ -15,6 +15,7 @@ type StudyPageResponse = {
 	studyImageName: string | null;
 	studyImageNames: string[];
 	availableCategories: string[];
+	categoryImageCounts: Record<string, number>;
 	selectedCategory: string;
 };
 
@@ -33,6 +34,7 @@ function createEmptyResponse(): StudyPageResponse {
 		studyImageName: null,
 		studyImageNames: [],
 		availableCategories: [],
+		categoryImageCounts: {},
 		selectedCategory: ''
 	};
 }
@@ -86,6 +88,15 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 	}
 
 	const availableCategories = [...new Set(indexItems.map((item) => item.category?.trim()).filter((category): category is string => Boolean(category)))].sort((a, b) => a.localeCompare(b));
+	const categoryImageCounts = indexItems.reduce<Record<string, number>>((counts, item) => {
+		const category = item.category?.trim();
+		if (!category) {
+			return counts;
+		}
+
+		counts[category] = (counts[category] ?? 0) + 1;
+		return counts;
+	}, {});
 
 	const requestedCategory = url.searchParams.get('category')?.trim() ?? '';
 	const selectedCategory = availableCategories.includes(requestedCategory) ? requestedCategory : (availableCategories[0] ?? '');
@@ -97,6 +108,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 		return {
 			...createEmptyResponse(),
 			availableCategories,
+			categoryImageCounts,
 			selectedCategory
 		};
 	}
@@ -110,6 +122,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 			studyImageName: null,
 			studyImageNames: imageNames,
 			availableCategories,
+			categoryImageCounts,
 			selectedCategory
 		};
 	}
@@ -121,6 +134,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 			studyImageName: null,
 			studyImageNames: imageNames,
 			availableCategories,
+			categoryImageCounts,
 			selectedCategory
 		};
 	}
@@ -130,6 +144,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 		studyImageName,
 		studyImageNames: imageNames,
 		availableCategories,
+		categoryImageCounts,
 		selectedCategory
 	};
 };
