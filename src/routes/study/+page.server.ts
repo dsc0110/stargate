@@ -1,63 +1,6 @@
 import type { PageServerLoad } from './$types';
-
-const STUDY_PREFIX = 'study/';
-const STUDY_INDEX_KEY = `${STUDY_PREFIX}index.json`;
-const IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.avif'];
-
-type StudyIndexItem = {
-	filename: string;
-	category?: string;
-	timestamp?: string;
-};
-
-type StudyPageResponse = {
-	studyImageSrc: string | null;
-	studyImageName: string | null;
-	studyImageNames: string[];
-	availableCategories: string[];
-	categoryImageCounts: Record<string, number>;
-	selectedCategory: string;
-};
-
-function isStudyImageKey(key: string) {
-	return IMAGE_EXTENSIONS.some((extension) => key.toLowerCase().endsWith(extension));
-}
-
-function toStudyImageKey(filename: string) {
-	const normalized = filename.trim().replace(/^\/+/, '');
-	return `${STUDY_PREFIX}${normalized}`;
-}
-
-function createEmptyResponse(): StudyPageResponse {
-	return {
-		studyImageSrc: null,
-		studyImageName: null,
-		studyImageNames: [],
-		availableCategories: [],
-		categoryImageCounts: {},
-		selectedCategory: ''
-	};
-}
-
-function pickRandomItem(items: string[], exclude?: string) {
-	const candidates = exclude ? items.filter((item) => item !== exclude) : items;
-	if (candidates.length === 0) {
-		return null;
-	}
-
-	return candidates[Math.floor(Math.random() * candidates.length)];
-}
-
-function toDataUrl(contentType: string, bytes: Uint8Array) {
-	let binary = '';
-	const chunkSize = 0x8000;
-
-	for (let index = 0; index < bytes.length; index += chunkSize) {
-		binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
-	}
-
-	return `data:${contentType};base64,${btoa(binary)}`;
-}
+import type { StudyIndexItem } from './types';
+import { createEmptyResponse, isStudyImageKey, pickRandomItem, STUDY_INDEX_KEY, toDataUrl, toStudyImageKey } from './utils';
 
 export const load: PageServerLoad = async ({ platform, url }) => {
 	if (platform?.env.STARGATE_BUCKET === undefined) {
