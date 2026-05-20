@@ -15,6 +15,10 @@ export const SHARED_STYLES = {
 	chipBase: 'border px-1.5 py-0 rounded-full text-xs transition-all duration-200 hover:bg-transparent',
 	chipActive: 'text-primary-800 dark:text-primary-400 bg-transparent border-primary-800 dark:border-primary-400',
 	chipInactive: 'text-gray-500 dark:text-gray-400 bg-transparent border-gray-500 dark:border-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:border-primary-800 dark:hover:border-primary-400',
+	dropdownTriggerBase: 'inline-flex items-center gap-1 border px-1.5 py-0 rounded-none text-xs leading-5 transition-all duration-200',
+	dropdownMenu: 'absolute top-full left-0 mt-1 z-50 min-w-[12rem] rounded-none border border-gray-300/80 dark:border-gray-600/80 bg-white/90 dark:bg-surface-900/90 backdrop-blur-sm shadow-lg',
+	dropdownItem:
+		'flex items-center gap-2 w-full px-2 py-1 rounded-none text-xs text-left transition-colors duration-200 text-gray-500 dark:text-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:bg-surface-100/80 dark:hover:bg-surface-800/70',
 	buttonIcon: 'rounded-lg p-2 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800',
 	buttonHeaderIcon: 'inline-flex items-center justify-center text-sm/6 font-semibold transition-colors duration-200 hover:text-primary-800 dark:hover:text-primary-400',
 	buttonPrimary: 'btn preset-outlined-surface-300-700',

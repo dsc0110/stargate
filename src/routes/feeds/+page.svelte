@@ -95,6 +95,10 @@
 	// Debounced category change to prevent rapid requests
 	let categoryChangeTimeout: ReturnType<typeof setTimeout> | undefined;
 
+	const dropdownTriggerClass = $derived(
+		`${SHARED_STYLES.dropdownTriggerBase} ${isDropdownOpen || selectedCategory ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`
+	);
+
 	// Auto-select handler
 	function handleAutoSelect(categoryName: string) {
 		selectedCategory = categoryName;
@@ -115,28 +119,27 @@
 	<!-- Controls Section -->
 	{#if data.availableCategories && data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
-			<div class="flex items-center gap-4 w-full">
+			<div class="flex items-center gap-1 w-full">
 				<div class="relative dropdown-container">
-					<!-- Compact dropdown button -->
 					<button
-						class={`flex items-center gap-2 p-2 border rounded-lg text-sm ${isDropdownOpen ? 'backdrop-blur-md bg-black/10 dark:bg-white/10 border-white/30 dark:border-white/20' : 'border-gray-300 dark:border-gray-600 bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700'}`}
+						class={dropdownTriggerClass}
 						onclick={() => (isDropdownOpen = !isDropdownOpen)}
 					>
 						<span>{selectedCategory || 'Select category...'}</span>
-						<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 						</svg>
 					</button>
 
 					<!-- Dropdown menu -->
 					{#if isDropdownOpen}
-						<div class="absolute top-full left-0 mt-1 backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg shadow-lg z-50">
+						<div class={SHARED_STYLES.dropdownMenu}>
 							<div class="p-2 max-h-64 overflow-y-auto">
 								{#each availableCategories as category (category)}
-									<button class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer w-full text-left text-sm" onclick={() => selectCategory(category)}>
+									<button class={`${SHARED_STYLES.dropdownItem} cursor-pointer`} onclick={() => selectCategory(category)}>
 										<span>{category}</span>
 										{#if selectedCategory === category}
-											<svg class="w-4 h-4 ml-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+											<svg class="w-3.5 h-3.5 ml-auto text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
 												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
 											</svg>
 										{/if}
