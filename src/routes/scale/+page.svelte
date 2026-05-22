@@ -2,7 +2,8 @@
 	import ScaleTable from './scale-table.svelte';
 	import ScaleChart from './scale-chart.svelte';
 	import AddScaleResult from './add-scale-result.svelte';
-	import MetricCard from '$lib/metric-card.svelte';
+	import { onDestroy } from 'svelte';
+	import { mobileHeaderMetrics } from '$lib/mobile-header-metrics';
 	import { generateScaleMetrics } from './config.js';
 	import { ChartLine, Table } from '@lucide/svelte';
 	import { SHARED_STYLES, getButtonClasses } from '$lib/shared-styles';
@@ -33,6 +34,14 @@
 		scaleResults = data.scaleResults;
 	});
 
+	$effect(() => {
+		mobileHeaderMetrics.set(metrics);
+	});
+
+	onDestroy(() => {
+		mobileHeaderMetrics.set([]);
+	});
+
 	// Callback function to handle new scale data
 	function handleScaleResultAdded(newScaleResults: any[]) {
 		// Update both data and local state to trigger reactivity
@@ -48,13 +57,6 @@
 </svelte:head>
 
 <div id="subheader">
-	<!-- Metrics Cards -->
-	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
-		{#each metrics as metric}
-			<MetricCard label={metric.label} value={metric.value} />
-		{/each}
-	</div>
-
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
 		<div class="flex justify-between items-center">

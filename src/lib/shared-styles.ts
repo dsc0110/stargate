@@ -19,14 +19,18 @@ export const SHARED_STYLES = {
 	dropdownMenu: 'absolute top-full left-0 mt-1 z-50 min-w-[12rem] rounded-none border border-gray-300/80 dark:border-gray-600/80 bg-white/90 dark:bg-surface-900/90 backdrop-blur-sm shadow-lg',
 	dropdownItem:
 		'flex items-center gap-2 w-full px-2 py-1 rounded-none text-xs text-left transition-colors duration-200 text-gray-500 dark:text-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:bg-surface-100/80 dark:hover:bg-surface-800/70',
+	headerDropdownTrigger:
+		'inline-flex min-h-10 min-w-[13rem] items-center justify-between gap-2 rounded-xl border border-white/30 bg-black/10 px-3 py-2 text-sm font-medium text-gray-900 shadow-lg backdrop-blur-md transition-all duration-200 hover:bg-black/15 dark:border-white/20 dark:bg-white/10 dark:text-gray-100 dark:hover:bg-white/15',
+	headerDropdownMenu: 'absolute left-0 top-full z-50 mt-2 min-w-[16rem] rounded-xl border border-surface-300/90 bg-white/95 p-2 shadow-xl dark:border-surface-700/90 dark:bg-surface-900/95',
+	headerDropdownItem: 'flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors duration-200 text-surface-900 dark:text-surface-100 hover:bg-surface-200/80 dark:hover:bg-surface-800/85',
 	buttonIcon: 'rounded-lg p-2 transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800',
-	buttonHeaderIcon: 'inline-flex items-center justify-center text-sm/6 font-semibold transition-colors duration-200 hover:text-primary-800 dark:hover:text-primary-400',
+	buttonHeaderIcon: 'inline-flex items-center justify-center text-sm/6 font-semibold transition-colors duration-200 hover:text-primary-800 dark:hover:text-primary-400 sm:text-base/7 sm:px-1',
 	buttonPrimary: 'btn preset-outlined-surface-300-700',
 	buttonSecondary: 'btn preset-tonal',
 	buttonIconClose: 'btn-icon hover:preset-tonal',
 
 	// Icon styles
-	icon: 'w-6 h-6',
+	icon: 'h-6 w-6 sm:h-7 sm:w-7',
 	navIcon: 'size-7 text-tertiary-600',
 
 	// Card styles

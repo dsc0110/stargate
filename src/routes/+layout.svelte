@@ -1,11 +1,23 @@
 <script lang="ts">
 	import './layout.css';
 	import Navigation from './navigation.svelte';
+	import { headerDropdown } from '$lib/header-dropdown';
+	import MetricCard from '$lib/metric-card.svelte';
+	import { mobileHeaderMetrics } from '$lib/mobile-header-metrics';
 	import SlashIcon from '$lib/slash-icon.svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
 	let { children, data } = $props();
+	let isHeaderDropdownOpen = $state(false);
+
+	const headerLinks = [
+		{ label: 'home', href: '/', icon: SlashIcon, private: false },
+		{ label: 'feeds', href: '/feeds', icon: RssIcon, private: false },
+		{ label: 'study', href: '/study', icon: GraduationCapIcon, private: false },
+		{ label: 'scale', href: '/scale', icon: ScaleIcon, private: false },
+		{ label: 'portfolio', href: '/portfolio', icon: DollarSign, private: true }
+	];
 
 	function toggleTheme() {
 		const html = document.documentElement;
@@ -17,24 +29,39 @@
 		dialog?.close();
 	}
 
-	export function typewriter(node: Element, { speed = 1 }: { speed?: number } = {}) {
-		const valid = node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE;
+	function selectHeaderDropdownOption(value: string) {
+		headerDropdown.update((current) => {
+			current.onSelect?.(value);
+			return current;
+		});
+		isHeaderDropdownOpen = false;
+	}
 
-		if (!valid) {
-			throw new Error(`This transition only works on elements with a single text node child`);
+	function handleHeaderDropdownOutsideClick(event: Event) {
+		const target = event.target as Element;
+		if (!target.closest('.header-dropdown-container')) {
+			isHeaderDropdownOpen = false;
+		}
+	}
+
+	$effect(() => {
+		if (isHeaderDropdownOpen) {
+			document.addEventListener('click', handleHeaderDropdownOutsideClick);
+		} else {
+			document.removeEventListener('click', handleHeaderDropdownOutsideClick);
 		}
 
-		const text = node.textContent ?? '';
-		const duration = text.length / (speed * 0.01);
-
-		return {
-			duration,
-			tick: (t: number) => {
-				const i = Math.trunc(text.length * t);
-				node.textContent = text.slice(0, i);
-			}
+		return () => {
+			document.removeEventListener('click', handleHeaderDropdownOutsideClick);
 		};
-	}
+	});
+
+	$effect(() => {
+		page.url.pathname;
+		isHeaderDropdownOpen = false;
+	});
+
+	const headerDropdownTriggerClass = $derived(`${SHARED_STYLES.headerDropdownTrigger} ${isHeaderDropdownOpen || $headerDropdown.selectedValue ? 'text-primary-800 dark:text-primary-300' : 'text-gray-800 dark:text-gray-100'}`);
 </script>
 
 <svelte:head>
@@ -43,29 +70,62 @@
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
-		<nav aria-label="Global" class="flex items-center justify-between p-4 pb-2">
+		<nav aria-label="Global" class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 pb-2 pt-4 sm:px-8 sm:pb-4 sm:pt-6">
 			<!-- logo and path -->
-			<div class="flex items-center gap-2 lg:flex-1 headertext">
-				{#if page.url.pathname === '/'}
-					<SlashIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/feeds'}
-					<RssIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/portfolio'}
-					<DollarSign class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/scale'}
-					<ScaleIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/study'}
-					<GraduationCapIcon class={SHARED_STYLES.navIcon} />
-				{:else}
-					<SlashIcon class={SHARED_STYLES.navIcon} />
+			<div class="flex min-w-0 items-center gap-2 sm:flex-1 sm:gap-4">
+				{#if $mobileHeaderMetrics.length > 0}
+					<div class="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-2 sm:hidden">
+						{#each $mobileHeaderMetrics as metric (metric.label)}
+							<MetricCard label={metric.label} value={metric.value} compact />
+						{/each}
+					</div>
+					<div class="hidden min-w-0 flex-1 items-center gap-2 overflow-x-auto pr-2 sm:flex">
+						{#each $mobileHeaderMetrics as metric (metric.label)}
+							<MetricCard label={metric.label} value={metric.value} header />
+						{/each}
+					</div>
+				{:else if $headerDropdown.enabled}
+					<div class="relative header-dropdown-container min-w-0">
+						<button class={headerDropdownTriggerClass} type="button" onclick={() => (isHeaderDropdownOpen = !isHeaderDropdownOpen)}>
+							<span class="truncate">{$headerDropdown.selectedLabel || $headerDropdown.placeholder}</span>
+							<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+							</svg>
+						</button>
+
+						{#if isHeaderDropdownOpen}
+							<div class={SHARED_STYLES.headerDropdownMenu}>
+								<div class="max-h-64 overflow-y-auto p-2">
+									{#each $headerDropdown.options as option (option.value)}
+										<button class={`${SHARED_STYLES.headerDropdownItem} cursor-pointer`} type="button" onclick={() => selectHeaderDropdownOption(option.value)}>
+											<span>{option.label}</span>
+											{#if $headerDropdown.selectedValue === option.value}
+												<svg class="ml-auto h-3.5 w-3.5 text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+													<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+												</svg>
+											{/if}
+										</button>
+									{/each}
+								</div>
+							</div>
+						{/if}
+					</div>
 				{/if}
-				{#key page.url.pathname}
-					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? 'home' : page.url.pathname.slice(1)}</span>
-				{/key}
 			</div>
 
 			<!-- header icons -->
-			<div class="flex gap-x-4">
+			<div class="flex gap-x-2 sm:gap-x-5">
+				<div class="hidden items-center gap-x-4 sm:flex">
+					{#each headerLinks as link (link.href)}
+						{#if !link.private || data.isPrivateAccessAllowed}
+							{@const Icon = link.icon}
+							{@const isActive = page.url.pathname === link.href}
+							<a href={link.href} aria-label={link.label} title={link.label} class={SHARED_STYLES.buttonHeaderIcon + ` ${isActive ? 'text-tertiary-600' : ''}`}>
+								<Icon class={SHARED_STYLES.icon} />
+							</a>
+						{/if}
+					{/each}
+				</div>
 				<button type="button" class={SHARED_STYLES.buttonHeaderIcon} aria-label="Toggle Theme" onclick={toggleTheme}><SunMoon /></button>
 				<a href="https://github.com/dsc0110" class={SHARED_STYLES.buttonHeaderIcon} aria-label="Visit GitHub profile">
 					<svg class={SHARED_STYLES.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -74,7 +134,7 @@
 						></path>
 					</svg>
 				</a>
-				<button type="button" command="show-modal" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon + ' lg:hidden'}>
+				<button type="button" command="show-modal" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon + ' sm:hidden'}>
 					<span class="sr-only">Open main menu</span>
 					<Menu />
 				</button>
@@ -87,25 +147,21 @@
 				<div tabindex="-1" class="fixed inset-0 focus:outline-none">
 					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
-							<div class="flex items-center gap-2 lg:flex-1 headertext">
+							<div class="headertext flex items-center gap-2 sm:flex-1">
 								{#if page.url.pathname === '/'}
-									<SlashIcon class={SHARED_STYLES.navIcon} />
+									<SlashIcon class={SHARED_STYLES.navIcon + ' sm:hidden'} />
 								{:else if page.url.pathname === '/feeds'}
-									<RssIcon class={SHARED_STYLES.navIcon} />
+									<RssIcon class={SHARED_STYLES.navIcon + ' sm:hidden'} />
 								{:else if page.url.pathname === '/portfolio'}
-									<DollarSign class={SHARED_STYLES.navIcon} />
+									<DollarSign class={SHARED_STYLES.navIcon + ' sm:hidden'} />
 								{:else if page.url.pathname === '/scale'}
-									<ScaleIcon class={SHARED_STYLES.navIcon} />
+									<ScaleIcon class={SHARED_STYLES.navIcon + ' sm:hidden'} />
 								{:else if page.url.pathname === '/study'}
-									<GraduationCapIcon class={SHARED_STYLES.navIcon} />
+									<GraduationCapIcon class={SHARED_STYLES.navIcon + ' sm:hidden'} />
 								{:else}
-									<SlashIcon class={SHARED_STYLES.navIcon} />
+									<SlashIcon class={SHARED_STYLES.navIcon + ' sm:hidden'} />
 								{/if}
-								{#if page.url.pathname !== '/'}
-									<span>{page.url.pathname.slice(1)}</span>
-								{:else}
-									<span>home</span>
-								{/if}
+								<span>{page.url.pathname === '/' ? 'home' : page.url.pathname.slice(1)}</span>
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon}>
 								<span class="sr-only">Close menu</span>
@@ -127,12 +183,9 @@
 		</el-dialog>
 	</header>
 
-	<div class="grid grid-cols-6 gap-4">
-		<main class="col-span-6 lg:col-span-5 col-start-1 p-4 pt-2">
+	<div class="mx-auto w-full max-w-6xl px-4 pb-4 pt-2 sm:px-8">
+		<main>
 			{@render children()}
 		</main>
-		<aside class="p-4 hidden lg:block">
-			<Navigation isPrivateAccessAllowed={data.isPrivateAccessAllowed} myDomain={data.myDomain} />
-		</aside>
 	</div>
 </div>

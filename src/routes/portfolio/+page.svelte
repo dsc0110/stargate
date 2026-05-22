@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AddPortfolioItem from './add-portfolio-item.svelte';
-	import MetricCard from '$lib/metric-card.svelte';
+	import { onDestroy } from 'svelte';
+	import { mobileHeaderMetrics } from '$lib/mobile-header-metrics';
 	import PortfolioChart from './portfolio-chart.svelte';
 	import PortfolioDonut from './donut-chart.svelte';
 	import PortfolioTable from './portfolio-table.svelte';
@@ -26,6 +27,14 @@
 		portfolio = data.portfolio;
 	});
 
+	$effect(() => {
+		mobileHeaderMetrics.set(metrics);
+	});
+
+	onDestroy(() => {
+		mobileHeaderMetrics.set([]);
+	});
+
 	// Callback function to handle new portfolio data
 	function handlePortfolioAdded(newPortfolio: any[]) {
 		// Update both data and local state to trigger reactivity
@@ -44,13 +53,6 @@
 
 <!-- <SubHeader /> -->
 <div id="subheader">
-	<!-- Metrics Cards -->
-	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
-		{#each metrics as metric}
-			<MetricCard label={metric.label} value={metric.value} />
-		{/each}
-	</div>
-
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
 		<div class="flex justify-between items-center">
