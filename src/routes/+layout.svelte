@@ -24,11 +24,6 @@
 		html.classList.toggle('dark');
 	}
 
-	function closeMobileMenu() {
-		const dialog = document.getElementById('mobile-menu') as HTMLDialogElement | null;
-		dialog?.close();
-	}
-
 	function selectHeaderDropdownOption(value: string) {
 		headerDropdown.update((current) => {
 			current.onSelect?.(value);
@@ -79,7 +74,7 @@
 							<MetricCard label={metric.label} value={metric.value} compact />
 						{/each}
 					</div>
-					<div class="hidden min-w-0 flex-1 items-center gap-2 overflow-x-auto pr-2 sm:flex">
+					<div class="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto pr-2 sm:flex">
 						{#each $mobileHeaderMetrics as metric (metric.label)}
 							<MetricCard label={metric.label} value={metric.value} header />
 						{/each}
@@ -88,7 +83,7 @@
 					<div class="relative header-dropdown-container min-w-0">
 						<button class={headerDropdownTriggerClass} type="button" onclick={() => (isHeaderDropdownOpen = !isHeaderDropdownOpen)}>
 							<span class="truncate">{$headerDropdown.selectedLabel || $headerDropdown.placeholder}</span>
-							<svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<svg class="h-3.5 w-3.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 							</svg>
 						</button>
@@ -97,10 +92,10 @@
 							<div class={SHARED_STYLES.headerDropdownMenu}>
 								<div class="max-h-64 overflow-y-auto p-2">
 									{#each $headerDropdown.options as option (option.value)}
-										<button class={`${SHARED_STYLES.headerDropdownItem} cursor-pointer`} type="button" onclick={() => selectHeaderDropdownOption(option.value)}>
+										<button class={SHARED_STYLES.headerDropdownItem} type="button" onclick={() => selectHeaderDropdownOption(option.value)}>
 											<span>{option.label}</span>
 											{#if $headerDropdown.selectedValue === option.value}
-												<svg class="ml-auto h-3.5 w-3.5 text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+												<svg class="ml-auto h-3.5 w-3.5 text-primary-700 dark:text-primary-400 sm:h-5 sm:w-5" fill="currentColor" viewBox="0 0 20 20">
 													<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
 												</svg>
 											{/if}

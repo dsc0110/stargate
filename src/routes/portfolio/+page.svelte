@@ -55,7 +55,7 @@
 <div id="subheader">
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
-		<div class="flex justify-between items-center">
+		<div class="flex w-full justify-between items-center">
 			<div class="flex items-center">
 				{#each PORTFOLIO_CONFIG.TABS as tab}
 					<button type="button" class={getButtonClasses(active === tab.id)} onclick={() => (active = tab.id)}>

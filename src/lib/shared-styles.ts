@@ -2,8 +2,7 @@
 
 export const SHARED_STYLES = {
 	// Container styles
-	container: 'preset-filled-surface-100-900 rounded-xl p-1 border border-gray-200 dark:border-gray-700',
-	controlsContainer: 'bg-transparent transition-all duration-200',
+	controlsContainer: 'min-h-12 w-full bg-transparent transition-all duration-200 flex items-center',
 
 	// Button styles
 	buttonBase: 'btn rounded-lg px-2 py-2 transition-all duration-200 hover:bg-transparent',
@@ -15,10 +14,6 @@ export const SHARED_STYLES = {
 	chipBase: 'border px-1.5 py-0 rounded-full text-xs transition-all duration-200 hover:bg-transparent',
 	chipActive: 'text-primary-800 dark:text-primary-400 bg-transparent border-primary-800 dark:border-primary-400',
 	chipInactive: 'text-gray-500 dark:text-gray-400 bg-transparent border-gray-500 dark:border-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:border-primary-800 dark:hover:border-primary-400',
-	dropdownTriggerBase: 'inline-flex items-center gap-1 border px-1.5 py-0 rounded-none text-xs leading-5 transition-all duration-200',
-	dropdownMenu: 'absolute top-full left-0 mt-1 z-50 min-w-[12rem] rounded-none border border-gray-300/80 dark:border-gray-600/80 bg-white/90 dark:bg-surface-900/90 backdrop-blur-sm shadow-lg',
-	dropdownItem:
-		'flex items-center gap-2 w-full px-2 py-1 rounded-none text-xs text-left transition-colors duration-200 text-gray-500 dark:text-gray-400 hover:text-primary-800 dark:hover:text-primary-400 hover:bg-surface-100/80 dark:hover:bg-surface-800/70',
 	headerDropdownTrigger:
 		'inline-flex min-h-10 min-w-[13rem] items-center justify-between gap-2 rounded-xl border border-white/30 bg-black/10 px-3 py-2 text-sm font-medium text-gray-900 shadow-lg backdrop-blur-md transition-all duration-200 hover:bg-black/15 dark:border-white/20 dark:bg-white/10 dark:text-gray-100 dark:hover:bg-white/15',
 	headerDropdownMenu: 'absolute left-0 top-full z-50 mt-2 min-w-[16rem] rounded-xl border border-surface-300/90 bg-white/95 p-2 shadow-xl dark:border-surface-700/90 dark:bg-surface-900/95',

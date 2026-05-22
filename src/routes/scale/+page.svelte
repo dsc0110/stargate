@@ -59,7 +59,7 @@
 <div id="subheader">
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
-		<div class="flex justify-between items-center">
+		<div class="flex w-full justify-between items-center">
 			<div class="flex items-center gap-2">
 				{#each SCALE_TABS as tab}
 					<button type="button" class={getButtonClasses(active === tab.id)} onclick={() => (active = tab.id)}>
@@ -70,7 +70,7 @@
 					<button
 						type="button"
 						onclick={() => (showRecentOnly = !showRecentOnly)}
-						class={`${SHARED_STYLES.chipBase} ${showRecentOnly ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`}
+						class={`${SHARED_STYLES.chipBase} ${showRecentOnly ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`}
 						title={showRecentOnly ? 'Show all results' : 'Show last 12 months'}
 					>
 						last year

@@ -184,7 +184,7 @@
 				{#if selectedFeedSources.length > 0}
 					<div class="flex flex-wrap gap-1 items-center max-w-xl">
 						{#each selectedFeedSources as source (source)}
-							<button class={`${SHARED_STYLES.chipBase} ${selectedSource === source ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} onclick={() => selectSource(source)}>
+							<button class={`${SHARED_STYLES.chipBase} sm:px-2.5 sm:py-0.5 sm:text-sm ${selectedSource === source ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`} onclick={() => selectSource(source)}>
 								{source}
 							</button>
 						{/each}
