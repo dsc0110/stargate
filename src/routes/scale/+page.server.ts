@@ -4,12 +4,6 @@ import type { Actions, PageServerLoad } from './$types';
 export const load: PageServerLoad = async ({ request, platform }) => {
 	try {
 		const bodySizeCm = 181;
-		const isProd = process.env.NODE_ENV === 'production';
-		if (!isProd) {
-			return {
-				scaleResults: []
-			};
-		}
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return {
 				scaleResults: [],

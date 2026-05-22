@@ -1,8 +1,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { getOptimizedConfig, RSSService } from './utils';
 import type { FeedConfig, RSSConfig } from './types';
-import { getOptimizedConfig } from './config';
-import { RSSService } from './rss-service';
 
 // Get optimized configuration and create RSS service
 const config = getOptimizedConfig();
@@ -11,46 +10,51 @@ const rssService = new RSSService(config as RSSConfig);
 export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
 		let availableFeeds: FeedConfig[] = [];
-		const isProd = process.env.NODE_ENV === 'production';
 
-		if (!isProd) {
-			availableFeeds = [];
-		} else {
-			if (platform?.env?.STARGATE_BUCKET === undefined) {
-				return json(
-					{
-						success: false,
-						error: 'STARGATE_BUCKET binding not available'
-					},
-					{ status: 500 }
-				);
-			}
+		if (platform?.env?.STARGATE_BUCKET === undefined) {
+			return json(
+				{
+					success: false,
+					error: 'STARGATE_BUCKET binding not available'
+				},
+				{ status: 500 }
+			);
+		}
 
-			const feedsObject = await platform.env.STARGATE_BUCKET.get('feeds/rss-feeds.json');
+		const feedsObject = await platform.env.STARGATE_BUCKET.get('feeds/rss-feeds.json');
 
-			if (feedsObject === null) {
-				return json(
-					{
-						success: false,
-						error: 'Feed configuration file feeds/rss-feeds.json not found in bucket'
-					},
-					{ status: 500 }
-				);
-			}
+		if (feedsObject === null) {
+			return json(
+				{
+					success: false,
+					error: 'Feed configuration file feeds/rss-feeds.json not found in bucket'
+				},
+				{ status: 500 }
+			);
+		}
 
-			try {
-				const parsed = JSON.parse(await feedsObject.text());
-				availableFeeds = Array.isArray(parsed) ? parsed : [];
-			} catch (error) {
-				console.error('Failed to parse feeds/rss-feeds.json:', error);
-				return json(
-					{
-						success: false,
-						error: 'Invalid feed configuration format in feeds/rss-feeds.json'
-					},
-					{ status: 500 }
-				);
-			}
+		try {
+			const parsed = JSON.parse(await feedsObject.text());
+			availableFeeds = Array.isArray(parsed)
+				? parsed
+						.filter((item): item is FeedConfig => {
+							return typeof item?.name === 'string' && typeof item?.url === 'string' && typeof item?.category === 'string' && (item.enabled === undefined || typeof item.enabled === 'boolean');
+						})
+						.map((item) => ({
+							...item,
+							enabled: item.enabled ?? true
+						}))
+						.filter((item) => item.enabled)
+				: [];
+		} catch (error) {
+			console.error('Failed to parse feeds/rss-feeds.json:', error);
+			return json(
+				{
+					success: false,
+					error: 'Invalid feed configuration format in feeds/rss-feeds.json'
+				},
+				{ status: 500 }
+			);
 		}
 
 		// Get unique categories

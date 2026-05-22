@@ -1,17 +1,20 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import FeedList from './feed-list.svelte';
+	import type { FeedData, MultipleFeedResponse } from './types';
 
 	let { data }: { data: PageData } = $props();
 
 	let selectedCategory = $state('');
 	let selectedSource = $state(''); // Track selected feed source
-	let hasAutoSelected = $state(false); // Track if we've already auto-selected
+	let hasAutoSelected = $state(false);
 	let isDropdownOpen = $state(false);
+	let feeds = $state<FeedData[]>([]);
+	let feedsError = $state<string | null>(null);
+	let isLoadingFeeds = $state(false);
+	let currentRequestId = 0;
 
 	// Available categories for dropdown
 	const availableCategories = $derived(data.availableCategories || []);
@@ -20,28 +23,89 @@
 	const selectedFeedSources = $derived(selectedCategory ? data.categoryFeeds?.[selectedCategory] || [] : []);
 
 	// Filter feeds based on selected source
-	const filteredFeeds = $derived(selectedSource && data.feeds ? data.feeds.filter((feed) => feed.name === selectedSource) : data.feeds || []);
+	const filteredFeeds = $derived(selectedSource ? feeds.filter((feed) => feed.name === selectedSource) : feeds);
+
+	async function loadFeedsForCategory(categoryName: string): Promise<{ feeds: FeedData[]; error: string | null }> {
+		if (!categoryName) {
+			return {
+				feeds: [],
+				error: null
+			};
+		}
+
+		try {
+			const response = await fetch(`/feeds?categories=${encodeURIComponent(categoryName)}`, {
+				method: 'GET',
+				headers: { accept: 'application/json' }
+			});
+
+			const contentType = response.headers.get('content-type') || '';
+			if (!response.ok || !contentType.includes('application/json')) {
+				const bodyText = await response.text();
+				throw new Error(`Unexpected /feeds response: ${response.status} ${contentType} ${bodyText.slice(0, 200)}`);
+			}
+
+			const payload = (await response.json()) as MultipleFeedResponse;
+			if (payload.success) {
+				return {
+					feeds: payload.feeds || [],
+					error: null
+				};
+			}
+
+			return {
+				feeds: [],
+				error: payload.error || 'Failed to load feeds'
+			};
+		} catch (error) {
+			console.error('Error loading selected feeds:', error);
+			return {
+				feeds: [],
+				error: 'Failed to load feed data'
+			};
+		}
+	}
+
+	async function updateCategoryFeeds(categoryName: string) {
+		if (!categoryName) {
+			feeds = [];
+			feedsError = null;
+			isLoadingFeeds = false;
+			return;
+		}
+
+		const requestId = ++currentRequestId;
+		isLoadingFeeds = true;
+		feedsError = null;
+
+		try {
+			const payload = await loadFeedsForCategory(categoryName);
+			if (requestId !== currentRequestId) return;
+
+			feeds = payload.feeds;
+			feedsError = payload.error;
+		} catch {
+			if (requestId !== currentRequestId) return;
+			feeds = [];
+			feedsError = 'Failed to load feed data';
+		} finally {
+			if (requestId === currentRequestId) {
+				isLoadingFeeds = false;
+			}
+		}
+	}
 
 	// Toggle category selection (single selection only)
 	const selectCategory = (categoryName: string) => {
 		const newCategory = selectedCategory === categoryName ? '' : categoryName;
 		selectedCategory = newCategory;
-		selectedSource = ''; // Reset source filter when changing category
+		selectedSource = '';
 		isDropdownOpen = false;
 
-		// Clear timeout and update URL after a delay to prevent rapid requests
 		clearTimeout(categoryChangeTimeout);
 
 		categoryChangeTimeout = setTimeout(() => {
-			console.log('Debounced category change to:', newCategory);
-
-			// Update URL with the new category parameter
-			const url = new URL(page.url);
-			if (newCategory) {
-				url.searchParams.set('categories', newCategory);
-			}
-
-			goto(url.toString());
+			void updateCategoryFeeds(newCategory);
 		}, 300);
 	};
 
@@ -73,20 +137,23 @@
 
 	// Update selectedCategory when data changes
 	$effect(() => {
-		const newSelectedCategory = data.selectedCategories?.[0] || '';
-		selectedCategory = newSelectedCategory;
-		console.log('Category changed to:', selectedCategory);
+		if (hasAutoSelected) return;
 
-		// Reset auto-select flag if user manually selected a category
-		if (newSelectedCategory) {
+		const requestedCategory = data.selectedCategories?.[0] || '';
+		const normalizedCategory = availableCategories.find((category) => category.toLowerCase() === requestedCategory.toLowerCase()) || '';
+
+		if (normalizedCategory) {
+			selectedCategory = normalizedCategory;
 			hasAutoSelected = true;
+			if (browser) {
+				void updateCategoryFeeds(normalizedCategory);
+			}
 		}
 	});
 
 	// Auto-select first category on initial load
 	$effect(() => {
 		if (browser && !hasAutoSelected && !selectedCategory && data.availableCategories && data.availableCategories.length > 0) {
-			console.log('Auto-selecting first category:', data.availableCategories[0]);
 			hasAutoSelected = true;
 			handleAutoSelect(data.availableCategories[0]);
 		}
@@ -95,14 +162,13 @@
 	// Debounced category change to prevent rapid requests
 	let categoryChangeTimeout: ReturnType<typeof setTimeout> | undefined;
 
+	const dropdownTriggerClass = $derived(`${SHARED_STYLES.dropdownTriggerBase} ${isDropdownOpen || selectedCategory ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`);
+
 	// Auto-select handler
 	function handleAutoSelect(categoryName: string) {
 		selectedCategory = categoryName;
-
-		// Update URL with new category
-		const url = new URL(page.url);
-		url.searchParams.set('categories', categoryName);
-		goto(url.toString());
+		selectedSource = '';
+		void updateCategoryFeeds(categoryName);
 	}
 </script>
 
@@ -115,25 +181,24 @@
 	<!-- Controls Section -->
 	{#if data.availableCategories && data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
-			<div class="flex items-center gap-4 w-full">
+			<div class="flex items-center gap-1 w-full">
 				<div class="relative dropdown-container">
-					<!-- Compact dropdown button -->
-					<button class="flex items-center gap-2 p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-transparent hover:bg-gray-50 dark:hover:bg-gray-700 text-sm" onclick={() => (isDropdownOpen = !isDropdownOpen)}>
+					<button class={dropdownTriggerClass} onclick={() => (isDropdownOpen = !isDropdownOpen)}>
 						<span>{selectedCategory || 'Select category...'}</span>
-						<svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
 						</svg>
 					</button>
 
 					<!-- Dropdown menu -->
 					{#if isDropdownOpen}
-						<div class="absolute top-full left-0 mt-1 backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg shadow-lg z-50">
+						<div class={SHARED_STYLES.dropdownMenu}>
 							<div class="p-2 max-h-64 overflow-y-auto">
 								{#each availableCategories as category (category)}
-									<button class="flex items-center gap-2 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer w-full text-left text-sm" onclick={() => selectCategory(category)}>
+									<button class={`${SHARED_STYLES.dropdownItem} cursor-pointer`} onclick={() => selectCategory(category)}>
 										<span>{category}</span>
 										{#if selectedCategory === category}
-											<svg class="w-4 h-4 ml-auto text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+											<svg class="w-3.5 h-3.5 ml-auto text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
 												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
 											</svg>
 										{/if}
@@ -160,13 +225,26 @@
 </div>
 
 <div id="feeditems" class="py-4">
-	{#if data.error}
+	{#if feedsError}
 		<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
 			<strong>Error:</strong>
-			{data.error}
+			{feedsError}
 		</div>
-	{:else if data.feeds && selectedCategory}
-		<FeedList feeds={filteredFeeds} />
+	{:else if selectedCategory}
+		{#if isLoadingFeeds}
+			<!-- Loading placeholder -->
+			<div class="border border-gray-300 dark:border-gray-700 rounded-lg p-3 mb-2 animate-pulse bg-gray-100 dark:bg-gray-800/40">
+				<div class="flex items-start justify-between gap-3">
+					<div class="h-4 bg-gray-300 dark:bg-gray-700 rounded w-2/3 mb-2"></div>
+					<div class="flex flex-col sm:flex-row gap-1 sm:gap-2 flex-shrink-0">
+						<div class="h-5 w-16 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+						<div class="h-5 w-14 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+					</div>
+				</div>
+			</div>
+		{:else}
+			<FeedList feeds={filteredFeeds} />
+		{/if}
 	{:else if !selectedCategory}
 		{#if availableCategories.length === 0}
 			<div class="w-full text-center text-surface-500 dark:text-surface-400 text-sm py-8">No feeds configured yet.</div>

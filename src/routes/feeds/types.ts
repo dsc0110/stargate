@@ -27,6 +27,7 @@ export interface FeedConfig {
 	name: string;
 	url: string;
 	category: string;
+	enabled?: boolean;
 }
 
 export interface FeedItem {
