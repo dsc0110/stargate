@@ -28,8 +28,9 @@
 		{#each links as link (link)}
 			{@const Icon = link.icon}
 			{@const isActive = page.url.pathname === link.href}
-			<a href={link.href} title={link.label} aria-label={link.label} class="flex items-center gap-2 p-2 rounded {isActive ? 'text-tertiary-600' : 'hover:text-tertiary-600'}" onclick={closeMobileMenu}>
-				<Icon class="size-4" />
+			<a href={link.href} title={link.label} aria-label={link.label} class="my-1.5 flex w-full items-center gap-4 rounded-lg px-7 py-4 text-xl {isActive ? 'text-tertiary-600' : 'hover:text-tertiary-600'}" onclick={closeMobileMenu}>
+				<Icon class="size-6" />
+				<span class="text-base opacity-75">&lt;{category}&gt;</span>
 				<span>{link.label}</span>
 			</a>
 		{/each}

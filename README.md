@@ -1,10 +1,15 @@
-# sv
+# Stargate
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This application is used as a portal between my public and private services. Therefore I found the akronym stargate suitable. It has a long history as a technical playground. It existed already in multiple techstacks and hosted on all kind of plattforms.
 
-## Creating a project 1
+## Techstack
 
-If you're seeing this, you've probably already done this step. Congrats!
+- UI framework [Svelte 5](https://svelte.dev/)
+- Design system [Skeleton.dev](https://www.skeleton.dev)
+- Charts [Apexcharts](https://apexcharts.com/)
+- Hosted on [Cloudflare Workers](https://www.cloudflare.com/products/workers/)
+- Storage [Cloudflare R2](https://www.cloudflare.com/products/r2/)
+- Secured by [Cloudflare Access](https://www.cloudflare.com/products/access/)
 
 ```sh
 # create a new project in the current directory
