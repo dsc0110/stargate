@@ -122,7 +122,7 @@
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
 				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={data.studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
-					<ShuffleIcon class="size-5 sm:size-7" />
+					<ShuffleIcon class="size-6 sm:size-7" />
 				</button>
 				<button
 					class={panelToggleButtonClass}
@@ -133,9 +133,9 @@
 					title={isRightPanelOpen ? 'Panel right open' : 'Panel left open'}
 				>
 					{#if isRightPanelOpen}
-						<PanelRightOpenIcon class="size-5 sm:size-7" />
+						<PanelRightOpenIcon class="size-6 sm:size-7" />
 					{:else}
-						<PanelLeftOpenIcon class="size-5 sm:size-7" />
+						<PanelLeftOpenIcon class="size-6 sm:size-7" />
 					{/if}
 				</button>
 			</div>
