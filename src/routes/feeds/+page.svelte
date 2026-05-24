@@ -163,10 +163,10 @@
 			enabled: true,
 			placeholder: 'Select category...',
 			selectedValue: selectedCategory,
-			selectedLabel: selectedCategory,
+			selectedLabel: selectedCategory.toLowerCase(),
 			options: availableCategories.map((category) => ({
 				value: category,
-				label: category
+				label: category.toLowerCase()
 			})),
 			onSelect: (value: string) => selectCategory(value)
 		});

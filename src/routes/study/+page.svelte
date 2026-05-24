@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import { headerDropdown } from '$lib/header-dropdown';
-	import { PanelLeftOpenIcon, PanelRightOpenIcon, ShuffleIcon } from '@lucide/svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import type { StudyPageData } from './types';
 	import { getCategoryLabel } from './utils';
@@ -102,10 +101,10 @@
 			enabled: true,
 			placeholder: 'Select category...',
 			selectedValue: selectedCategory,
-			selectedLabel: selectedCategory,
+			selectedLabel: selectedCategory.toLowerCase(),
 			options: data.availableCategories.map((category) => ({
 				value: category,
-				label: getCategoryLabel(category, data.categoryImageCounts)
+				label: getCategoryLabel(category, data.categoryImageCounts).toLowerCase()
 			})),
 			onSelect: (value: string) => selectCategory(value)
 		});
@@ -131,21 +130,17 @@
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
 				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={data.studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
-					<ShuffleIcon class="size-4" />
+					<span>shuffle</span>
 				</button>
 				<button
 					class={panelToggleButtonClass}
 					type="button"
 					onclick={togglePanelSide}
 					aria-pressed={isRightPanelOpen}
-					aria-label={isRightPanelOpen ? 'Panel right open' : 'Panel left open'}
-					title={isRightPanelOpen ? 'Panel right open' : 'Panel left open'}
+					aria-label={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
+					title={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 				>
-					{#if isRightPanelOpen}
-						<PanelRightOpenIcon class="size-4" />
-					{:else}
-						<PanelLeftOpenIcon class="size-4" />
-					{/if}
+					<span>{isRightPanelOpen ? 'hide →←' : '←→ hide'}</span>
 				</button>
 			</div>
 		</div>
@@ -153,12 +148,12 @@
 </div>
 
 {#if data.studyImageSrc}
-	<article class="p-4">
-		<div class="relative inline-block rounded overflow-hidden">
+	<div class="py-4">
+		<div class="relative w-full rounded overflow-hidden">
 			<img
 				src={data.studyImageSrc}
 				alt="study"
-				class="max-w-full h-auto rounded block cursor-pointer"
+				class="w-full h-auto block cursor-pointer"
 				style="-webkit-touch-callout: none;"
 				onpointerdown={toggleLayover}
 				onpointerup={toggleLayover}
@@ -174,7 +169,7 @@
 				{/if}
 			{/if}
 		</div>
-	</article>
+	</div>
 {:else}
-	<article class="p-4 text-sm opacity-70">study image not found in R2.</article>
+	<div class="py-4 text-sm opacity-70">study image not found in R2.</div>
 {/if}
