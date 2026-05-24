@@ -10,6 +10,7 @@
 	let isHeaderDropdownOpen = $state(false);
 
 	const headerLinks = [
+		{ label: 'root', href: '/', icon: SlashIcon, private: false },
 		{ label: 'feeds', href: '/feeds', icon: RssIcon, private: false },
 		{ label: 'study', href: '/study', icon: GraduationCapIcon, private: false },
 		{ label: 'scale', href: '/scale', icon: ScaleIcon, private: false },
@@ -77,11 +78,11 @@
 		isHeaderDropdownOpen = false;
 	});
 
-	const pageTitle = $derived(page.url.pathname === '/' ? '' : page.url.pathname.slice(1));
+	const pageTitle = $derived(page.url.pathname === '/' ? 'about' : page.url.pathname.slice(1));
 </script>
 
 <svelte:head>
-	<title>{page.url.pathname === '/' ? '' : page.url.pathname.slice(1)}</title>
+	<title>{data.myDomain || ''}</title>
 </svelte:head>
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
@@ -169,11 +170,7 @@
 								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center" onclick={closeMobileMenu}>
 									<SlashIcon class={SHARED_STYLES.navIcon} />
 								</a>
-								{#if page.url.pathname !== '/'}
-									<span>{page.url.pathname.slice(1)}</span>
-								{:else}
-									<span class="select-none opacity-0" aria-hidden="true">home</span>
-								{/if}
+								<span>about</span>
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon}>
 								<span class="sr-only">Close menu</span>

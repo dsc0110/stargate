@@ -30,7 +30,7 @@
 				href={link.href}
 				title={link.label}
 				aria-label={link.label}
-				class="mx-auto flex w-full max-w-sm items-center justify-start gap-3 rounded-lg px-4 py-4 text-2xl font-semibold {isActive ? 'text-tertiary-600' : 'hover:text-tertiary-600'}"
+				class="flex w-full items-center justify-start gap-3 rounded-lg py-4 pr-4 text-2xl font-semibold {isActive ? 'text-tertiary-600' : 'hover:text-tertiary-600'}"
 				onclick={closeMobileMenu}
 			>
 				<Icon class="size-7 shrink-0" />

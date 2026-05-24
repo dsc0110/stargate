@@ -38,7 +38,6 @@
 </script>
 
 <svelte:head>
-	<title>portfolio</title>
 	<meta name="description" content="portfolio" />
 </svelte:head>
 

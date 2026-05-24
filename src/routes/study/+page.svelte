@@ -123,7 +123,6 @@
 </script>
 
 <svelte:head>
-	<title>study</title>
 	<meta name="description" content="study" />
 </svelte:head>
 

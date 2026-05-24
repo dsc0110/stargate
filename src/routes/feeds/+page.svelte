@@ -184,7 +184,6 @@
 </script>
 
 <svelte:head>
-	<title>feeds</title>
 	<meta name="description" content="feeds" />
 </svelte:head>
 

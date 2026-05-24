@@ -43,7 +43,6 @@
 </script>
 
 <svelte:head>
-	<title>scale</title>
 	<meta name="description" content="scale" />
 </svelte:head>
 
