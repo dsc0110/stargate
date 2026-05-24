@@ -7,6 +7,11 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+	overflow-y: scroll;
+	scrollbar-gutter: stable;
+}
+
 [data-theme='stargate'] {
 	--text-scaling: 1.067;
 	--base-font-color: var(--color-surface-950);

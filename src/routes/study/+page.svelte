@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { headerDropdown } from '$lib/header-dropdown';
 	import { PanelLeftOpenIcon, PanelRightOpenIcon, ShuffleIcon } from '@lucide/svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import type { StudyPageData } from './types';
@@ -13,11 +14,8 @@
 	let layoverStartX = $state(0);
 	let layoverImageWidth = $state(0);
 	let selectedCategory = $state('');
-	let isDropdownOpen = $state(false);
 	let pointerDownX = 0;
 	let pointerDownY = 0;
-
-	const dropdownTriggerClass = $derived(`${SHARED_STYLES.dropdownTriggerBase} ${isDropdownOpen || selectedCategory ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`);
 
 	const shuffleButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-1.5`;
 	const panelToggleButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-1.5`;
@@ -73,7 +71,6 @@
 
 	function selectCategory(categoryName: string) {
 		selectedCategory = categoryName;
-		isDropdownOpen = false;
 
 		const url = new URL(page.url);
 		if (categoryName) {
@@ -85,26 +82,42 @@
 		goto(url.toString());
 	}
 
-	function handleOutsideClick(event: Event) {
-		const target = event.target as Element;
-		if (!target.closest('.dropdown-container')) {
-			isDropdownOpen = false;
-		}
-	}
-
 	$effect(() => {
 		selectedCategory = data.selectedCategory || '';
 	});
 
 	$effect(() => {
-		if (isDropdownOpen) {
-			document.addEventListener('click', handleOutsideClick);
-		} else {
-			document.removeEventListener('click', handleOutsideClick);
+		if (data.availableCategories.length === 0) {
+			headerDropdown.set({
+				enabled: false,
+				placeholder: 'Select...',
+				selectedValue: '',
+				selectedLabel: '',
+				options: []
+			});
+			return;
 		}
 
+		headerDropdown.set({
+			enabled: true,
+			placeholder: 'Select category...',
+			selectedValue: selectedCategory,
+			selectedLabel: selectedCategory,
+			options: data.availableCategories.map((category) => ({
+				value: category,
+				label: getCategoryLabel(category, data.categoryImageCounts)
+			})),
+			onSelect: (value: string) => selectCategory(value)
+		});
+
 		return () => {
-			document.removeEventListener('click', handleOutsideClick);
+			headerDropdown.set({
+				enabled: false,
+				placeholder: 'Select...',
+				selectedValue: '',
+				selectedLabel: '',
+				options: []
+			});
 		};
 	});
 </script>
@@ -118,31 +131,6 @@
 	{#if data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
-				<div class="relative dropdown-container">
-					<button class={dropdownTriggerClass} type="button" onclick={() => (isDropdownOpen = !isDropdownOpen)} aria-label="Select category" title="Select category">
-						<span>{selectedCategory ? getCategoryLabel(selectedCategory, data.categoryImageCounts) : 'Select category...'}</span>
-						<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-						</svg>
-					</button>
-
-					{#if isDropdownOpen}
-						<div class={SHARED_STYLES.dropdownMenu}>
-							<div class="p-2 max-h-64 overflow-y-auto">
-								{#each data.availableCategories as category (category)}
-									<button class={`${SHARED_STYLES.dropdownItem} cursor-pointer`} type="button" onclick={() => selectCategory(category)}>
-										<span>{getCategoryLabel(category, data.categoryImageCounts)}</span>
-										{#if selectedCategory === category}
-											<svg class="w-3.5 h-3.5 ml-auto text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-												<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-											</svg>
-										{/if}
-									</button>
-								{/each}
-							</div>
-						</div>
-					{/if}
-				</div>
 				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={data.studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
 					<ShuffleIcon class="size-4" />
 				</button>

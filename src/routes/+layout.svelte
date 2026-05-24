@@ -1,11 +1,20 @@
 <script lang="ts">
 	import './layout.css';
 	import Navigation from './navigation.svelte';
+	import { headerDropdown } from '$lib/header-dropdown';
 	import SlashIcon from '$lib/slash-icon.svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
 	import { page } from '$app/state';
 	let { children, data } = $props();
+	let isHeaderDropdownOpen = $state(false);
+
+	const headerLinks = [
+		{ label: 'feeds', href: '/feeds', icon: RssIcon, private: false },
+		{ label: 'study', href: '/study', icon: GraduationCapIcon, private: false },
+		{ label: 'scale', href: '/scale', icon: ScaleIcon, private: false },
+		{ label: 'portfolio', href: '/portfolio', icon: DollarSign, private: true }
+	];
 
 	function toggleTheme() {
 		const html = document.documentElement;
@@ -15,6 +24,21 @@
 	function closeMobileMenu() {
 		const dialog = document.getElementById('mobile-menu') as HTMLDialogElement | null;
 		dialog?.close();
+	}
+
+	function selectHeaderDropdownOption(value: string) {
+		headerDropdown.update((current) => {
+			current.onSelect?.(value);
+			return current;
+		});
+		isHeaderDropdownOpen = false;
+	}
+
+	function handleHeaderDropdownOutsideClick(event: Event) {
+		const target = event.target as Element;
+		if (!target.closest('.header-dropdown-container')) {
+			isHeaderDropdownOpen = false;
+		}
 	}
 
 	export function typewriter(node: Element, { speed = 1 }: { speed?: number } = {}) {
@@ -35,37 +59,91 @@
 			}
 		};
 	}
+
+	$effect(() => {
+		if (isHeaderDropdownOpen) {
+			document.addEventListener('click', handleHeaderDropdownOutsideClick);
+		} else {
+			document.removeEventListener('click', handleHeaderDropdownOutsideClick);
+		}
+
+		return () => {
+			document.removeEventListener('click', handleHeaderDropdownOutsideClick);
+		};
+	});
+
+	$effect(() => {
+		page.url.pathname;
+		isHeaderDropdownOpen = false;
+	});
+
+	const pageTitle = $derived(page.url.pathname === '/' ? '' : page.url.pathname.slice(1));
 </script>
 
 <svelte:head>
-	<title>{page.url.pathname === '/' ? 'home' : page.url.pathname.slice(1)}</title>
+	<title>{page.url.pathname === '/' ? '' : page.url.pathname.slice(1)}</title>
 </svelte:head>
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
-		<nav aria-label="Global" class="flex items-center justify-between p-4 pb-2">
+		<nav aria-label="Global" class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 pb-2 pt-4 lg:px-6">
 			<!-- logo and path -->
 			<div class="flex items-center gap-2 lg:flex-1 headertext">
-				{#if page.url.pathname === '/'}
+				<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center">
 					<SlashIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/feeds'}
-					<RssIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/portfolio'}
-					<DollarSign class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/scale'}
-					<ScaleIcon class={SHARED_STYLES.navIcon} />
-				{:else if page.url.pathname === '/study'}
-					<GraduationCapIcon class={SHARED_STYLES.navIcon} />
+				</a>
+				{#if $headerDropdown.enabled}
+					<div class="relative header-dropdown-container min-w-0">
+						<button class={SHARED_STYLES.headerDropdownTrigger} type="button" onclick={() => (isHeaderDropdownOpen = !isHeaderDropdownOpen)}>
+							<span class="truncate">{$headerDropdown.selectedLabel || $headerDropdown.placeholder}</span>
+							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+							</svg>
+						</button>
+
+						{#if isHeaderDropdownOpen}
+							<div class={SHARED_STYLES.headerDropdownMenu}>
+								<div class="max-h-64 overflow-y-auto p-2">
+									{#each $headerDropdown.options as option (option.value)}
+										<button class={SHARED_STYLES.headerDropdownItem} type="button" onclick={() => selectHeaderDropdownOption(option.value)}>
+											<span>{option.label}</span>
+											{#if $headerDropdown.selectedValue === option.value}
+												<svg class="ml-auto h-5 w-5 text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
+													<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+												</svg>
+											{/if}
+										</button>
+									{/each}
+								</div>
+							</div>
+						{/if}
+					</div>
 				{:else}
-					<SlashIcon class={SHARED_STYLES.navIcon} />
+					<div class="min-h-[1em] min-w-[4ch]">
+						{#if pageTitle}
+							{#key page.url.pathname}
+								<span in:typewriter={{ speed: 3 }}>{pageTitle}</span>
+							{/key}
+						{:else}
+							<span class="select-none opacity-0" aria-hidden="true">home</span>
+						{/if}
+					</div>
 				{/if}
-				{#key page.url.pathname}
-					<span in:typewriter={{ speed: 3 }}>{page.url.pathname == '/' ? 'home' : page.url.pathname.slice(1)}</span>
-				{/key}
 			</div>
 
 			<!-- header icons -->
 			<div class="flex gap-x-4">
+				<div class="hidden items-center gap-x-4 lg:flex">
+					{#each headerLinks as link (link.href)}
+						{#if !link.private || data.isPrivateAccessAllowed}
+							{@const Icon = link.icon}
+							{@const isActive = page.url.pathname === link.href}
+							<a href={link.href} aria-label={link.label} title={link.label} class={SHARED_STYLES.buttonHeaderIcon + ` ${isActive ? 'text-tertiary-600' : ''}`}>
+								<Icon class={SHARED_STYLES.icon} />
+							</a>
+						{/if}
+					{/each}
+				</div>
 				<button type="button" class={SHARED_STYLES.buttonHeaderIcon} aria-label="Toggle Theme" onclick={toggleTheme}><SunMoon /></button>
 				<a href="https://github.com/dsc0110" class={SHARED_STYLES.buttonHeaderIcon} aria-label="Visit GitHub profile">
 					<svg class={SHARED_STYLES.icon} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -88,23 +166,13 @@
 					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
-								{#if page.url.pathname === '/'}
+								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center" onclick={closeMobileMenu}>
 									<SlashIcon class={SHARED_STYLES.navIcon} />
-								{:else if page.url.pathname === '/feeds'}
-									<RssIcon class={SHARED_STYLES.navIcon} />
-								{:else if page.url.pathname === '/portfolio'}
-									<DollarSign class={SHARED_STYLES.navIcon} />
-								{:else if page.url.pathname === '/scale'}
-									<ScaleIcon class={SHARED_STYLES.navIcon} />
-								{:else if page.url.pathname === '/study'}
-									<GraduationCapIcon class={SHARED_STYLES.navIcon} />
-								{:else}
-									<SlashIcon class={SHARED_STYLES.navIcon} />
-								{/if}
+								</a>
 								{#if page.url.pathname !== '/'}
 									<span>{page.url.pathname.slice(1)}</span>
 								{:else}
-									<span>home</span>
+									<span class="select-none opacity-0" aria-hidden="true">home</span>
 								{/if}
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon}>
@@ -127,12 +195,9 @@
 		</el-dialog>
 	</header>
 
-	<div class="grid grid-cols-6 gap-4">
-		<main class="col-span-6 lg:col-span-5 col-start-1 p-4 pt-2">
+	<div class="mx-auto w-full max-w-6xl px-4 lg:px-6">
+		<main class="pt-2">
 			{@render children()}
 		</main>
-		<aside class="p-4 hidden lg:block">
-			<Navigation isPrivateAccessAllowed={data.isPrivateAccessAllowed} myDomain={data.myDomain} />
-		</aside>
 	</div>
 </div>
