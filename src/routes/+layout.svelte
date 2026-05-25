@@ -42,6 +42,13 @@
 		}
 	}
 
+	function getHeaderLinkForPath(pathname: string) {
+		if (pathname === '/') return headerLinks[0];
+		const firstSegment = pathname.split('/').filter(Boolean)[0];
+		const sectionPath = firstSegment ? `/${firstSegment}` : '/';
+		return headerLinks.find((link) => link.href === sectionPath) ?? headerLinks[0];
+	}
+
 	export function typewriter(node: Element, { speed = 1 }: { speed?: number } = {}) {
 		const valid = node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE;
 
@@ -78,7 +85,9 @@
 		isHeaderDropdownOpen = false;
 	});
 
-	const pageTitle = $derived(page.url.pathname === '/' ? 'about' : page.url.pathname.slice(1));
+	const currentHeaderLink = $derived(getHeaderLinkForPath(page.url.pathname));
+	const CurrentPageIcon = $derived(currentHeaderLink.icon);
+	const pageTitle = $derived(currentHeaderLink.href === '/' ? '' : currentHeaderLink.label);
 </script>
 
 <svelte:head>
@@ -90,9 +99,9 @@
 		<nav aria-label="Global" class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 pb-2 pt-4 lg:px-6">
 			<!-- logo and path -->
 			<div class="flex items-center gap-2 lg:flex-1 headertext">
-				<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center">
-					<SlashIcon class={SHARED_STYLES.navIcon} />
-				</a>
+				<span aria-hidden="true" class="inline-flex items-center">
+					<CurrentPageIcon class={SHARED_STYLES.navIcon} />
+				</span>
 				{#if $headerDropdown.enabled}
 					<div class="relative header-dropdown-container min-w-0">
 						<button class={SHARED_STYLES.headerDropdownTrigger} type="button" onclick={() => (isHeaderDropdownOpen = !isHeaderDropdownOpen)}>
@@ -167,10 +176,10 @@
 					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
-								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center" onclick={closeMobileMenu}>
+								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center gap-2" onclick={closeMobileMenu}>
 									<SlashIcon class={SHARED_STYLES.navIcon} />
+									<span>home</span>
 								</a>
-								<span>about</span>
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon}>
 								<span class="sr-only">Close menu</span>

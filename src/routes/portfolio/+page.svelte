@@ -33,8 +33,6 @@
 		portfolio = newPortfolio;
 		// metrics will automatically recalculate via $derived
 	}
-
-	$inspect(portfolio).with(console.trace);
 </script>
 
 <svelte:head>
