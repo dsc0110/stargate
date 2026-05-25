@@ -71,15 +71,6 @@
 
 	function selectCategory(categoryName: string) {
 		selectedCategory = categoryName;
-
-		const url = new URL(page.url);
-		if (categoryName) {
-			url.searchParams.set('category', categoryName);
-		} else {
-			url.searchParams.delete('category');
-		}
-		url.searchParams.delete('image');
-		goto(url.toString());
 	}
 
 	$effect(() => {

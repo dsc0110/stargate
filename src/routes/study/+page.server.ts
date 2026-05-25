@@ -41,8 +41,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 		return counts;
 	}, {});
 
-	const requestedCategory = url.searchParams.get('category')?.trim() ?? '';
-	const selectedCategory = availableCategories.includes(requestedCategory) ? requestedCategory : (availableCategories[0] ?? '');
+	const selectedCategory = availableCategories[0] ?? '';
 
 	const filteredItems = selectedCategory ? indexItems.filter((item) => item.category?.trim() === selectedCategory) : indexItems;
 	const imageNames = filteredItems.map((item) => toStudyImageKey(item.filename));

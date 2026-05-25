@@ -2,20 +2,12 @@
 	import './layout.css';
 	import Navigation from './navigation.svelte';
 	import { headerDropdown } from '$lib/header-dropdown';
-	import SlashIcon from '$lib/slash-icon.svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
-	import { Menu, SunMoon, RssIcon, DollarSign, ScaleIcon, GraduationCapIcon } from '@lucide/svelte';
+	import { Menu, SunMoon } from '@lucide/svelte';
+	import { ALL_NAV_LINKS, HOME_LINK, getSidebarLinkForPath } from './sidebar-links';
 	import { page } from '$app/state';
 	let { children, data } = $props();
 	let isHeaderDropdownOpen = $state(false);
-
-	const headerLinks = [
-		{ label: 'root', href: '/', icon: SlashIcon, private: false },
-		{ label: 'feeds', href: '/feeds', icon: RssIcon, private: false },
-		{ label: 'study', href: '/study', icon: GraduationCapIcon, private: false },
-		{ label: 'scale', href: '/scale', icon: ScaleIcon, private: false },
-		{ label: 'portfolio', href: '/portfolio', icon: DollarSign, private: true }
-	];
 
 	function toggleTheme() {
 		const html = document.documentElement;
@@ -40,13 +32,6 @@
 		if (!target.closest('.header-dropdown-container')) {
 			isHeaderDropdownOpen = false;
 		}
-	}
-
-	function getHeaderLinkForPath(pathname: string) {
-		if (pathname === '/') return headerLinks[0];
-		const firstSegment = pathname.split('/').filter(Boolean)[0];
-		const sectionPath = firstSegment ? `/${firstSegment}` : '/';
-		return headerLinks.find((link) => link.href === sectionPath) ?? headerLinks[0];
 	}
 
 	export function typewriter(node: Element, { speed = 1 }: { speed?: number } = {}) {
@@ -85,9 +70,9 @@
 		isHeaderDropdownOpen = false;
 	});
 
-	const currentHeaderLink = $derived(getHeaderLinkForPath(page.url.pathname));
+	const currentHeaderLink = $derived(getSidebarLinkForPath(page.url.pathname));
 	const CurrentPageIcon = $derived(currentHeaderLink.icon);
-	const pageTitle = $derived(currentHeaderLink.href === '/' ? 'home' : currentHeaderLink.label);
+	const pageTitle = $derived(currentHeaderLink.label);
 </script>
 
 <svelte:head>
@@ -144,12 +129,12 @@
 			<!-- header icons -->
 			<div class="flex gap-x-4">
 				<div class="hidden items-center gap-x-4 lg:flex">
-					{#each headerLinks as link (link.href)}
+					{#each ALL_NAV_LINKS as link (link.href)}
 						{#if !link.private || data.isPrivateAccessAllowed}
 							{@const Icon = link.icon}
 							{@const isActive = page.url.pathname === link.href}
-							<a href={link.href} aria-label={link.label} title={link.label} class={SHARED_STYLES.buttonHeaderIcon + ` ${isActive ? 'text-tertiary-600' : ''}`}>
-								<Icon class={SHARED_STYLES.icon} />
+							<a href={link.href} aria-label={link.label} title={link.label} class={SHARED_STYLES.buttonHeaderIcon}>
+								<Icon class={`${SHARED_STYLES.icon} ${isActive ? 'text-tertiary-600' : ''}`} />
 							</a>
 						{/if}
 					{/each}
@@ -176,9 +161,9 @@
 					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
-								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center gap-2 no-underline text-inherit" onclick={closeMobileMenu}>
-									<SlashIcon class={`${SHARED_STYLES.navIcon} ${page.url.pathname === '/' ? '!text-tertiary-600' : '!text-gray-800 dark:!text-gray-100'}`} />
-									<span>home</span>
+								<a href={HOME_LINK.href} aria-label="Go to home" title={HOME_LINK.label} class="inline-flex items-center gap-2 no-underline text-inherit" onclick={closeMobileMenu}>
+									<HOME_LINK.icon class={`${SHARED_STYLES.navIcon} ${page.url.pathname === HOME_LINK.href ? '!text-tertiary-600' : '!text-gray-800 dark:!text-gray-100'}`} />
+									<span>{HOME_LINK.label}</span>
 								</a>
 							</div>
 							<button type="button" command="close" commandfor="mobile-menu" class={SHARED_STYLES.buttonIcon}>
