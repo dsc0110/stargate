@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import { ArrowLeft, ArrowRight, Shuffle } from '@lucide/svelte';
 	import { headerDropdown } from '$lib/header-dropdown';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import type { StudyPageData } from './types';
@@ -130,6 +131,7 @@
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
 				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={data.studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
+					<Shuffle class="size-4 shrink-0" />
 					<span>shuffle</span>
 				</button>
 				<button
@@ -140,7 +142,12 @@
 					aria-label={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 					title={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 				>
-					<span>{isRightPanelOpen ? 'hide →←' : '←→ hide'}</span>
+					{#if isRightPanelOpen}
+						<ArrowLeft class="size-4 shrink-0" />
+					{:else}
+						<ArrowRight class="size-4 shrink-0" />
+					{/if}
+					<span>toggle</span>
 				</button>
 			</div>
 		</div>

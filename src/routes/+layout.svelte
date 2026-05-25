@@ -87,7 +87,7 @@
 
 	const currentHeaderLink = $derived(getHeaderLinkForPath(page.url.pathname));
 	const CurrentPageIcon = $derived(currentHeaderLink.icon);
-	const pageTitle = $derived(currentHeaderLink.href === '/' ? '' : currentHeaderLink.label);
+	const pageTitle = $derived(currentHeaderLink.href === '/' ? 'home' : currentHeaderLink.label);
 </script>
 
 <svelte:head>
@@ -176,8 +176,8 @@
 					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
-								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center gap-2" onclick={closeMobileMenu}>
-									<SlashIcon class={SHARED_STYLES.navIcon} />
+								<a href="/" aria-label="Go to home" title="home" class="inline-flex items-center gap-2 no-underline text-inherit" onclick={closeMobileMenu}>
+									<SlashIcon class={`${SHARED_STYLES.navIcon} ${page.url.pathname === '/' ? '!text-tertiary-600' : '!text-gray-800 dark:!text-gray-100'}`} />
 									<span>home</span>
 								</a>
 							</div>
