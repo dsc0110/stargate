@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 	import { ArrowLeft, ArrowRight, Shuffle } from '@lucide/svelte';
 	import { headerDropdown } from '$lib/header-dropdown';
 	import { SHARED_STYLES } from '$lib/shared-styles';
@@ -14,6 +13,11 @@
 	let layoverStartX = $state(0);
 	let layoverImageWidth = $state(0);
 	let selectedCategory = $state('');
+	let studyImageSrc = $state<string | null>(null);
+	let studyImageName = $state<string | null>(null);
+	let studyImageNames = $state<string[]>([]);
+	let currentRequestId = 0;
+	let hasInitializedFromData = $state(false);
 	let pointerDownX = 0;
 	let pointerDownY = 0;
 
@@ -57,24 +61,90 @@
 	}
 
 	function showAnotherPicture() {
-		if (data.studyImageNames.length === 0) {
+		if (studyImageNames.length === 0) {
 			return;
 		}
 
-		const candidates = data.studyImageNames.filter((name: string) => name !== data.studyImageName);
-		const nextImageName = candidates.length > 0 ? candidates[Math.floor(Math.random() * candidates.length)] : data.studyImageNames[0];
-
-		const url = new URL(page.url);
-		url.searchParams.set('image', nextImageName);
-		goto(url.toString());
+		void loadStudyImage(selectedCategory, studyImageName);
 	}
 
 	function selectCategory(categoryName: string) {
 		selectedCategory = categoryName;
+		layoverActive = false;
+		void loadStudyImage(categoryName);
+	}
+
+	type StudyImageResponse = {
+		success: boolean;
+		studyImageSrc: string | null;
+		studyImageName: string | null;
+		studyImageNames: string[];
+		error?: string;
+	};
+
+	async function loadStudyImage(categoryName: string, excludeImageName?: string | null) {
+		if (!browser || !categoryName) {
+			studyImageSrc = null;
+			studyImageName = null;
+			studyImageNames = [];
+			return;
+		}
+
+		const requestId = ++currentRequestId;
+
+		const params = new URLSearchParams();
+		params.set('category', categoryName);
+		if (excludeImageName) {
+			params.set('exclude', excludeImageName);
+		}
+
+		try {
+			const response = await fetch(`/study?${params.toString()}`, {
+				method: 'GET',
+				headers: { accept: 'application/json' }
+			});
+
+			if (!response.ok) {
+				throw new Error(`Unexpected /study response: ${response.status}`);
+			}
+
+			const payload = (await response.json()) as StudyImageResponse;
+			if (requestId !== currentRequestId) {
+				return;
+			}
+
+			if (!payload.success) {
+				studyImageSrc = null;
+				studyImageName = null;
+				studyImageNames = [];
+				return;
+			}
+
+			studyImageSrc = payload.studyImageSrc;
+			studyImageName = payload.studyImageName;
+			studyImageNames = payload.studyImageNames || [];
+		} catch (error) {
+			if (requestId !== currentRequestId) {
+				return;
+			}
+
+			console.error('Failed to load study image:', error);
+			studyImageSrc = null;
+			studyImageName = null;
+			studyImageNames = [];
+		}
 	}
 
 	$effect(() => {
+		if (hasInitializedFromData) {
+			return;
+		}
+
 		selectedCategory = data.selectedCategory || '';
+		studyImageSrc = data.studyImageSrc;
+		studyImageName = data.studyImageName;
+		studyImageNames = data.studyImageNames || [];
+		hasInitializedFromData = true;
 	});
 
 	$effect(() => {
@@ -121,7 +191,7 @@
 	{#if data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
-				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={data.studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
+				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
 					<Shuffle class="size-4 shrink-0" />
 					<span>shuffle</span>
 				</button>
@@ -145,11 +215,11 @@
 	{/if}
 </div>
 
-{#if data.studyImageSrc}
+{#if studyImageSrc}
 	<div class="py-4">
 		<div class="relative w-full rounded overflow-hidden">
 			<img
-				src={data.studyImageSrc}
+				src={studyImageSrc}
 				alt="study"
 				class="w-full h-auto block cursor-pointer"
 				style="-webkit-touch-callout: none;"

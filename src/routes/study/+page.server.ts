@@ -2,7 +2,7 @@ import type { PageServerLoad } from './$types';
 import type { StudyIndexItem } from './types';
 import { createEmptyResponse, isStudyImageKey, pickRandomItem, STUDY_INDEX_KEY, toDataUrl, toStudyImageKey } from './utils';
 
-export const load: PageServerLoad = async ({ platform, url }) => {
+export const load: PageServerLoad = async ({ platform }) => {
 	if (platform?.env.STARGATE_BUCKET === undefined) {
 		return createEmptyResponse();
 	}
@@ -55,8 +55,7 @@ export const load: PageServerLoad = async ({ platform, url }) => {
 		};
 	}
 
-	const requestedImageName = url.searchParams.get('image') || undefined;
-	const studyImageName = imageNames.includes(requestedImageName ?? '') ? requestedImageName : (pickRandomItem(imageNames) ?? imageNames[0]);
+	const studyImageName = pickRandomItem(imageNames) ?? imageNames[0];
 
 	if (!studyImageName) {
 		return {
