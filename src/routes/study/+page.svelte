@@ -216,12 +216,12 @@
 </div>
 
 {#if studyImageSrc}
-	<div class="py-4">
+	<div class="py-4 w-full">
 		<div class="relative w-full h-[calc(100vh-9rem)] min-h-[320px] rounded overflow-hidden bg-surface-100/60 dark:bg-surface-900/40">
 			<img
 				src={studyImageSrc}
 				alt="study"
-				class="w-full h-full object-contain block cursor-pointer select-none"
+				class="w-full h-full block cursor-pointer select-none"
 				style="-webkit-touch-callout: none;"
 				onpointerdown={toggleLayover}
 				onpointerup={toggleLayover}
