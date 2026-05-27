@@ -16,6 +16,15 @@
 	let active: string = $state('chart');
 	let showRecentOnly = $state(true);
 
+	// Compute the "last 12 months" label dynamically
+	const recentOnlyLabel = (() => {
+		const now = new Date();
+		const past = new Date(now.getFullYear(), now.getMonth() - 12, 1);
+		const fmt = (d: Date) =>
+			`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+		return `${fmt(past)} - ${fmt(now)}`;
+	})();
+
 	// Configuration for scale tabs
 	const SCALE_TABS = [
 		{ id: 'table', icon: Table },
@@ -70,7 +79,7 @@
 						class={`${SHARED_STYLES.chipBase} ${showRecentOnly ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`}
 						title={showRecentOnly ? 'Show all results' : 'Show last 12 months'}
 					>
-						last year
+						{recentOnlyLabel}
 					</button>
 				{/if}
 			</div>

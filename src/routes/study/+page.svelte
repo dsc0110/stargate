@@ -203,12 +203,13 @@
 					aria-label={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 					title={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 				>
+					<span>L</span>
 					{#if isRightPanelOpen}
 						<ArrowLeft class="size-4 shrink-0" />
 					{:else}
 						<ArrowRight class="size-4 shrink-0" />
 					{/if}
-					<span>toggle</span>
+					<span>R</span>
 				</button>
 			</div>
 		</div>
