@@ -4,9 +4,9 @@ import { calculateBMI } from './utils.js';
 export const SCALE_CONFIG = {
 	// Metric labels configuration
 	METRIC_LABELS: {
-		WEIGHT: 'Weight',
-		BMI: 'BMI',
-		BODY_FAT: 'Body Fat'
+		WEIGHT: 'Ø Weight',
+		BMI: 'Ø BMI',
+		BODY_FAT: 'Ø Body Fat'
 	},
 
 	// Static metrics for fallback
@@ -20,24 +20,34 @@ export const SCALE_CONFIG = {
 };
 
 /**
- * Generate dynamic metrics based on scale data (using newest entry for weight, last non-null bodyFat)
+ * Generate dynamic metrics based on scale data averages from the last 12 months.
  */
 export function generateScaleMetrics(scaleResults: any[], bodySizeCm: number) {
 	try {
-		// Get the newest entry (first one since data is sorted by date descending)
-		const newestEntry = scaleResults[0];
+		const now = new Date();
+		const twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, now.getDate());
 
-		if (!newestEntry) {
+		const recentResults = scaleResults.filter((entry) => {
+			const entryDate = new Date(entry.date);
+			return entryDate >= twelveMonthsAgo && entryDate <= now;
+		});
+
+		if (recentResults.length === 0) {
 			return SCALE_CONFIG.DEFAULT_METRICS;
 		}
 
-		const weight = `${newestEntry.weight} kg`;
+		const avgWeight = recentResults.reduce((sum, entry) => sum + entry.weight, 0) / recentResults.length;
+		const weight = `${avgWeight.toFixed(1)} kg`;
 
-		// Find the most recent entry with a non-null bodyFat value
-		const lastBodyFatEntry = scaleResults.find((entry) => entry.bodyFat != null);
-		const bodyFat = lastBodyFatEntry?.bodyFat == null ? '-' : `${lastBodyFatEntry.bodyFat}%`;
+		const recentBodyFats = recentResults
+			.map((entry) => entry.bodyFat)
+			.filter((bodyFat) => bodyFat != null);
+		const bodyFat =
+			recentBodyFats.length === 0
+				? '-'
+				: `${(recentBodyFats.reduce((sum, value) => sum + value, 0) / recentBodyFats.length).toFixed(1)}%`;
 
-		const bmi = bodySizeCm > 0 ? calculateBMI(newestEntry.weight, bodySizeCm).toString() : '0.0';
+		const bmi = bodySizeCm > 0 ? calculateBMI(avgWeight, bodySizeCm).toString() : '0.0';
 
 		return [
 			{ label: SCALE_CONFIG.METRIC_LABELS.WEIGHT, value: weight },
