@@ -42,7 +42,7 @@
 <!-- <SubHeader /> -->
 <div id="subheader">
 	<!-- Metrics Cards -->
-	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
+	<div class="grid grid-cols-3 gap-2 lg:gap-4 mb-4">
 		{#each metrics as metric}
 			<MetricCard label={metric.label} value={metric.value} />
 		{/each}

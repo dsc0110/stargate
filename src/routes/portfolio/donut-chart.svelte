@@ -81,7 +81,7 @@
 			},
 			responsive: [
 				{
-					breakpoint: 768,
+					breakpoint: 1024,
 					options: {
 						chart: {
 							height: 300

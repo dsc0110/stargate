@@ -34,10 +34,10 @@ export const SHARED_STYLES = {
 	navIcon: 'size-7 text-tertiary-600',
 
 	// Card styles
-	metricCard: 'p-2 md:p-4 rounded-xl backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-200 hover:shadow-xl hover:bg-black/15 dark:hover:bg-white/15',
+	metricCard: 'p-2 lg:p-4 rounded-xl backdrop-blur-md bg-black/10 dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-200 hover:shadow-xl hover:bg-black/15 dark:hover:bg-white/15',
 	metricContent: 'space-y-1',
 	metricLabel: 'text-xs text-secondary-600 dark:text-secondary-400 font-medium',
-	metricValue: 'text-lg md:text-xl font-bold text-gray-900 dark:text-gray-100',
+	metricValue: 'text-lg lg:text-xl font-bold text-gray-900 dark:text-gray-100',
 
 	// Badge styles
 	badge: 'inline-flex items-center px-2 py-1 rounded-full text-xs font-medium',

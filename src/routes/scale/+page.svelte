@@ -20,8 +20,7 @@
 	const recentOnlyLabel = (() => {
 		const now = new Date();
 		const past = new Date(now.getFullYear(), now.getMonth() - 12, 1);
-		const fmt = (d: Date) =>
-			`${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
+		const fmt = (d: Date) => `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getFullYear()).slice(-2)}`;
 		return `${fmt(past)} - ${fmt(now)}`;
 	})();
 
@@ -57,7 +56,7 @@
 
 <div id="subheader">
 	<!-- Metrics Cards -->
-	<div class="grid grid-cols-3 gap-2 md:gap-4 mb-4">
+	<div class="grid grid-cols-3 gap-2 lg:gap-4 mb-4">
 		{#each metrics as metric}
 			<MetricCard label={metric.label} value={metric.value} />
 		{/each}

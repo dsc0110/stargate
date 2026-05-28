@@ -81,7 +81,7 @@
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto]">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
-		<nav aria-label="Global" class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 pb-2 pt-4 lg:px-6">
+		<nav aria-label="Global" class="mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2 pt-4 lg:px-8">
 			<!-- logo and path -->
 			<div class="flex items-center gap-2 lg:flex-1 headertext">
 				<span aria-hidden="true" class="inline-flex items-center">
@@ -186,7 +186,7 @@
 		</el-dialog>
 	</header>
 
-	<div class="mx-auto w-full max-w-6xl px-4 lg:px-6">
+	<div class="mx-auto w-full max-w-5xl px-2 lg:px-8">
 		<main class="pt-2">
 			{@render children()}
 		</main>
