@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import { headerDropdown } from '$lib/header-dropdown';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { browser } from '$app/environment';
 	import FeedList from './feed-list.svelte';
@@ -9,21 +8,16 @@
 	let { data }: { data: PageData } = $props();
 
 	let selectedCategory = $state('');
-	let selectedSource = $state(''); // Track selected feed source
 	let hasAutoSelected = $state(false);
 	let feeds = $state<FeedData[]>([]);
 	let feedsError = $state<string | null>(null);
 	let isLoadingFeeds = $state(false);
 	let currentRequestId = 0;
 
-	// Available categories for dropdown
+	// Available categories for chips
 	const availableCategories = $derived(data.availableCategories || []);
 
-	// Get feed sources for selected category
-	const selectedFeedSources = $derived(selectedCategory ? data.categoryFeeds?.[selectedCategory] || [] : []);
-
-	// Filter feeds based on selected source
-	const filteredFeeds = $derived(selectedSource ? feeds.filter((feed) => feed.name === selectedSource) : feeds);
+	const filteredFeeds = $derived(feeds);
 
 	async function loadFeedsForCategory(categoryName: string): Promise<{ feeds: FeedData[]; error: string | null }> {
 		if (!categoryName) {
@@ -95,22 +89,19 @@
 		}
 	}
 
-	// Toggle category selection (single selection only)
+	// Set category selection (single selection only)
 	const selectCategory = (categoryName: string) => {
-		const newCategory = selectedCategory === categoryName ? '' : categoryName;
-		selectedCategory = newCategory;
-		selectedSource = '';
+		if (selectedCategory === categoryName) {
+			return;
+		}
+
+		selectedCategory = categoryName;
 
 		clearTimeout(categoryChangeTimeout);
 
 		categoryChangeTimeout = setTimeout(() => {
-			void updateCategoryFeeds(newCategory);
+			void updateCategoryFeeds(categoryName);
 		}, 300);
-	};
-
-	// Toggle source selection
-	const selectSource = (sourceName: string) => {
-		selectedSource = selectedSource === sourceName ? '' : sourceName;
 	};
 
 	// Update selectedCategory when data changes
@@ -143,44 +134,8 @@
 	// Auto-select handler
 	function handleAutoSelect(categoryName: string) {
 		selectedCategory = categoryName;
-		selectedSource = '';
 		void updateCategoryFeeds(categoryName);
 	}
-
-	$effect(() => {
-		if (availableCategories.length === 0) {
-			headerDropdown.set({
-				enabled: false,
-				placeholder: 'Select...',
-				selectedValue: '',
-				selectedLabel: '',
-				options: []
-			});
-			return;
-		}
-
-		headerDropdown.set({
-			enabled: true,
-			placeholder: 'Select category...',
-			selectedValue: selectedCategory,
-			selectedLabel: selectedCategory.toLowerCase(),
-			options: availableCategories.map((category) => ({
-				value: category,
-				label: category.toLowerCase()
-			})),
-			onSelect: (value: string) => selectCategory(value)
-		});
-
-		return () => {
-			headerDropdown.set({
-				enabled: false,
-				placeholder: 'Select...',
-				selectedValue: '',
-				selectedLabel: '',
-				options: []
-			});
-		};
-	});
 </script>
 
 <svelte:head>
@@ -192,16 +147,13 @@
 	{#if data.availableCategories && data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
-				<!-- Feed sources chips -->
-				{#if selectedFeedSources.length > 0}
-					<div class="flex flex-wrap gap-1 items-center max-w-xl">
-						{#each selectedFeedSources as source (source)}
-							<button class={`${SHARED_STYLES.chipBase} ${selectedSource === source ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} onclick={() => selectSource(source)}>
-								{source}
-							</button>
-						{/each}
-					</div>
-				{/if}
+				<div class="flex flex-wrap gap-1 items-center max-w-xl">
+					{#each availableCategories as category (category)}
+						<button class={`${SHARED_STYLES.chipBase} ${selectedCategory === category ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} onclick={() => selectCategory(category)}>
+							{category}
+						</button>
+					{/each}
+				</div>
 			</div>
 		</div>
 	{/if}

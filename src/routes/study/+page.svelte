@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
 	import { ArrowLeft, ArrowRight, Shuffle } from '@lucide/svelte';
-	import { headerDropdown } from '$lib/header-dropdown';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import type { StudyPageData } from './types';
 	import { getCategoryLabel } from './utils';
@@ -69,6 +68,10 @@
 	}
 
 	function selectCategory(categoryName: string) {
+		if (selectedCategory === categoryName) {
+			return;
+		}
+
 		selectedCategory = categoryName;
 		layoverActive = false;
 		void loadStudyImage(categoryName);
@@ -146,41 +149,6 @@
 		studyImageNames = data.studyImageNames || [];
 		hasInitializedFromData = true;
 	});
-
-	$effect(() => {
-		if (data.availableCategories.length === 0) {
-			headerDropdown.set({
-				enabled: false,
-				placeholder: 'Select...',
-				selectedValue: '',
-				selectedLabel: '',
-				options: []
-			});
-			return;
-		}
-
-		headerDropdown.set({
-			enabled: true,
-			placeholder: 'Select category...',
-			selectedValue: selectedCategory,
-			selectedLabel: selectedCategory.toLowerCase(),
-			options: data.availableCategories.map((category) => ({
-				value: category,
-				label: getCategoryLabel(category, data.categoryImageCounts).toLowerCase()
-			})),
-			onSelect: (value: string) => selectCategory(value)
-		});
-
-		return () => {
-			headerDropdown.set({
-				enabled: false,
-				placeholder: 'Select...',
-				selectedValue: '',
-				selectedLabel: '',
-				options: []
-			});
-		};
-	});
 </script>
 
 <svelte:head>
@@ -191,6 +159,13 @@
 	{#if data.availableCategories.length > 0}
 		<div class={SHARED_STYLES.controlsContainer}>
 			<div class="flex items-center gap-1 w-full">
+				<div class="flex flex-wrap gap-1 items-center max-w-xl">
+					{#each data.availableCategories as category (category)}
+						<button class={`${SHARED_STYLES.chipBase} ${selectedCategory === category ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} type="button" onclick={() => selectCategory(category)}>
+							{getCategoryLabel(category, data.categoryImageCounts).toLowerCase()}
+						</button>
+					{/each}
+				</div>
 				<button class={shuffleButtonClass} type="button" onclick={showAnotherPicture} disabled={studyImageNames.length < 2} aria-label="Shuffle picture" title="Shuffle picture">
 					<Shuffle class="size-4 shrink-0" />
 					<span>shuffle</span>

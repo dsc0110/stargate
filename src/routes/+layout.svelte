@@ -1,13 +1,11 @@
 <script lang="ts">
 	import './layout.css';
 	import Navigation from './navigation.svelte';
-	import { headerDropdown } from '$lib/header-dropdown';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import { Menu, SunMoon } from '@lucide/svelte';
 	import { ALL_NAV_LINKS, HOME_LINK, getSidebarLinkForPath } from './sidebar-links';
 	import { page } from '$app/state';
 	let { children, data } = $props();
-	let isHeaderDropdownOpen = $state(false);
 
 	function toggleTheme() {
 		const html = document.documentElement;
@@ -17,21 +15,6 @@
 	function closeMobileMenu() {
 		const dialog = document.getElementById('mobile-menu') as HTMLDialogElement | null;
 		dialog?.close();
-	}
-
-	function selectHeaderDropdownOption(value: string) {
-		headerDropdown.update((current) => {
-			current.onSelect?.(value);
-			return current;
-		});
-		isHeaderDropdownOpen = false;
-	}
-
-	function handleHeaderDropdownOutsideClick(event: Event) {
-		const target = event.target as Element;
-		if (!target.closest('.header-dropdown-container')) {
-			isHeaderDropdownOpen = false;
-		}
 	}
 
 	export function typewriter(node: Element, { speed = 1 }: { speed?: number } = {}) {
@@ -53,26 +36,9 @@
 		};
 	}
 
-	$effect(() => {
-		if (isHeaderDropdownOpen) {
-			document.addEventListener('click', handleHeaderDropdownOutsideClick);
-		} else {
-			document.removeEventListener('click', handleHeaderDropdownOutsideClick);
-		}
-
-		return () => {
-			document.removeEventListener('click', handleHeaderDropdownOutsideClick);
-		};
-	});
-
-	$effect(() => {
-		page.url.pathname;
-		isHeaderDropdownOpen = false;
-	});
-
 	const currentHeaderLink = $derived(getSidebarLinkForPath(page.url.pathname));
 	const CurrentPageIcon = $derived(currentHeaderLink.icon);
-	const pageTitle = $derived(currentHeaderLink.label);
+	const pageTitle = $derived(page.url.pathname.startsWith('/feeds') ? 'feed' : page.url.pathname.startsWith('/study') ? 'study' : currentHeaderLink.label);
 </script>
 
 <svelte:head>
@@ -87,43 +53,15 @@
 				<span aria-hidden="true" class="inline-flex items-center">
 					<CurrentPageIcon class={SHARED_STYLES.navIcon} />
 				</span>
-				{#if $headerDropdown.enabled}
-					<div class="relative header-dropdown-container min-w-0">
-						<button class={SHARED_STYLES.headerDropdownTrigger} type="button" onclick={() => (isHeaderDropdownOpen = !isHeaderDropdownOpen)}>
-							<span class="truncate">{$headerDropdown.selectedLabel || $headerDropdown.placeholder}</span>
-							<svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-							</svg>
-						</button>
-
-						{#if isHeaderDropdownOpen}
-							<div class={SHARED_STYLES.headerDropdownMenu}>
-								<div class="max-h-64 overflow-y-auto p-2">
-									{#each $headerDropdown.options as option (option.value)}
-										<button class={SHARED_STYLES.headerDropdownItem} type="button" onclick={() => selectHeaderDropdownOption(option.value)}>
-											<span>{option.label}</span>
-											{#if $headerDropdown.selectedValue === option.value}
-												<svg class="ml-auto h-5 w-5 text-primary-700 dark:text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-													<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-												</svg>
-											{/if}
-										</button>
-									{/each}
-								</div>
-							</div>
-						{/if}
-					</div>
-				{:else}
-					<div class="min-h-[1em] min-w-[4ch]">
-						{#if pageTitle}
-							{#key page.url.pathname}
-								<span in:typewriter={{ speed: 3 }}>{pageTitle}</span>
-							{/key}
-						{:else}
-							<span class="select-none opacity-0" aria-hidden="true">home</span>
-						{/if}
-					</div>
-				{/if}
+				<div class="min-h-[1em] min-w-[4ch]">
+					{#if pageTitle}
+						{#key page.url.pathname}
+							<span in:typewriter={{ speed: 3 }}>{pageTitle}</span>
+						{/key}
+					{:else}
+						<span class="select-none opacity-0" aria-hidden="true">home</span>
+					{/if}
+				</div>
 			</div>
 
 			<!-- header icons -->
