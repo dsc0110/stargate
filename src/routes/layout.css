@@ -9,7 +9,14 @@
 
 html {
 	overflow-y: scroll;
+	overflow-x: hidden;
+	overscroll-behavior-x: none;
 	scrollbar-gutter: stable;
+}
+
+body {
+	overflow-x: hidden;
+	overscroll-behavior-x: none;
 }
 
 [data-theme='stargate'] {

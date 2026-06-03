@@ -38,14 +38,14 @@
 
 	const currentHeaderLink = $derived(getSidebarLinkForPath(page.url.pathname));
 	const CurrentPageIcon = $derived(currentHeaderLink.icon);
-	const pageTitle = $derived(page.url.pathname.startsWith('/feeds') ? 'feed' : page.url.pathname.startsWith('/study') ? 'study' : currentHeaderLink.label);
+	const pageTitle = $derived(currentHeaderLink.label);
 </script>
 
 <svelte:head>
 	<title>{data.myDomain || ''}</title>
 </svelte:head>
 
-<div class="grid h-screen grid-rows-[auto_1fr_auto]">
+<div class="grid h-screen grid-rows-[auto_1fr_auto] overflow-x-hidden overscroll-x-none touch-pan-y">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
 		<nav aria-label="Global" class="mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2 pt-4 lg:px-8">
 			<!-- logo and path -->
@@ -124,8 +124,8 @@
 		</el-dialog>
 	</header>
 
-	<div class="mx-auto w-full max-w-5xl px-2 lg:px-8">
-		<main class="pt-2">
+	<div class="mx-auto w-full max-w-5xl min-w-0 px-2 lg:px-8">
+		<main class="pt-2 min-w-0">
 			{@render children()}
 		</main>
 	</div>

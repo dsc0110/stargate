@@ -50,7 +50,7 @@
 
 	<!-- Controls Section -->
 	<div class={SHARED_STYLES.controlsContainer}>
-		<div class="flex justify-between items-center">
+		<div class="flex flex-wrap justify-between items-center gap-2">
 			<div class="flex items-center">
 				{#each PORTFOLIO_CONFIG.TABS as tab}
 					<button type="button" class={getButtonClasses(active === tab.id)} onclick={() => (active = tab.id)}>
