@@ -47,7 +47,7 @@
 
 <div class="grid h-screen grid-rows-[auto_1fr_auto] overflow-x-hidden overscroll-x-none touch-pan-y">
 	<header class="sticky top-0 z-10 backdrop-blur-sm">
-		<nav aria-label="Global" class="mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2 pt-4 lg:px-8">
+		<nav aria-label="Global" class="mx-auto flex w-full max-w-5xl items-center justify-between px-2 pb-2 pt-4 lg:px-8">
 			<!-- logo and path -->
 			<div class="flex items-center gap-2 lg:flex-1 headertext">
 				<span aria-hidden="true" class="inline-flex items-center">
@@ -96,7 +96,7 @@
 		<el-dialog>
 			<dialog id="mobile-menu" class="backdrop:bg-transparent">
 				<div tabindex="-1" class="fixed inset-0 focus:outline-none">
-					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm p-4 sm:ring-1 sm:ring-gray-100/10">
+					<el-dialog-panel class="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto backdrop-blur-sm px-2 py-4 sm:ring-1 sm:ring-gray-100/10">
 						<div class="flex items-center justify-between">
 							<div class="flex items-center gap-2 lg:flex-1 headertext">
 								<a href={HOME_LINK.href} aria-label="Go to home" title={HOME_LINK.label} class="inline-flex items-center gap-2 no-underline text-inherit" onclick={closeMobileMenu}>
