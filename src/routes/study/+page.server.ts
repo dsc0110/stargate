@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import type { StudyIndexItem } from './types';
-import { createEmptyResponse, isStudyImageKey, pickRandomItem, STUDY_INDEX_KEY, toDataUrl, toStudyImageKey } from './utils';
+import { createEmptyResponse, isStudyImageKey, STUDY_INDEX_KEY, toDataUrl, toStudyImageKey } from './utils';
 
 const STUDY_CATEGORIES = ['Español', 'Româna'] as const;
 const DEFAULT_STUDY_CATEGORY = STUDY_CATEGORIES[0];
@@ -17,6 +17,54 @@ function getStudyNamespaceForCategory(platform: App.Platform | undefined, catego
 	return platform?.env.STARGATE_STUDY_ES;
 }
 
+async function loadRandomStudyItem(platform: App.Platform | undefined, category: string, indexItems: StudyIndexItem[]) {
+	const filteredItems = indexItems.filter((item) => mapCategory(item.category) === category);
+	const imageNames = filteredItems.map((item) => toStudyImageKey(item.filename));
+	const studyNamespace = getStudyNamespaceForCategory(platform, category);
+	const cardKeys = studyNamespace === undefined ? [] : (await studyNamespace.list({ limit: 1000 })).keys.map((item) => item.name).filter((name): name is string => Boolean(name));
+	const combinedItems = [...imageNames.map((name) => ({ kind: 'image' as const, id: name })), ...cardKeys.map((key) => ({ kind: 'card' as const, id: key }))];
+	const selectedItem = combinedItems.length === 0 ? null : combinedItems[Math.floor(Math.random() * combinedItems.length)];
+
+	if (selectedItem === null) {
+		return {
+			studyImageSrc: null,
+			studyImageName: null,
+			studyCardKey: null,
+			studyCardValue: null,
+			hasStudyCards: cardKeys.length > 0
+		};
+	}
+
+	if (selectedItem.kind === 'card') {
+		return {
+			studyImageSrc: null,
+			studyImageName: null,
+			studyCardKey: selectedItem.id,
+			studyCardValue: (await studyNamespace?.get(selectedItem.id)) ?? null,
+			hasStudyCards: cardKeys.length > 0
+		};
+	}
+
+	const object = await platform?.env.STARGATE_BUCKET?.get(selectedItem.id);
+	if (object === null || object === undefined) {
+		return {
+			studyImageSrc: null,
+			studyImageName: null,
+			studyCardKey: null,
+			studyCardValue: null,
+			hasStudyCards: cardKeys.length > 0
+		};
+	}
+
+	return {
+		studyImageSrc: toDataUrl(object.httpMetadata?.contentType ?? 'image/jpeg', new Uint8Array(await object.arrayBuffer())),
+		studyImageName: selectedItem.id,
+		studyCardKey: null,
+		studyCardValue: null,
+		hasStudyCards: cardKeys.length > 0
+	};
+}
+
 export const load: PageServerLoad = async ({ platform }) => {
 	const emptyResponse = createEmptyResponse();
 	emptyResponse.availableCategories = [...STUDY_CATEGORIES];
@@ -28,7 +76,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 
 	const indexObject = await platform.env.STARGATE_BUCKET.get(STUDY_INDEX_KEY);
 	if (indexObject === null) {
-		emptyResponse.selectedViewMode = emptyResponse.hasStudyCards ? 'cards' : 'pictures';
 		return emptyResponse;
 	}
 
@@ -47,70 +94,17 @@ export const load: PageServerLoad = async ({ platform }) => {
 			});
 		}
 	} catch {
-		emptyResponse.selectedViewMode = emptyResponse.hasStudyCards ? 'cards' : 'pictures';
 		return emptyResponse;
 	}
 
 	const availableCategories = [...STUDY_CATEGORIES];
 
 	const selectedCategory = DEFAULT_STUDY_CATEGORY;
-	const studyNamespace = getStudyNamespaceForCategory(platform, selectedCategory);
-
-	if (studyNamespace !== undefined) {
-		const cardList = await studyNamespace.list({ limit: 1000 });
-		const cardKeys = cardList.keys.map((item) => item.name).filter((name): name is string => Boolean(name));
-		emptyResponse.hasStudyCards = cardKeys.length > 0;
-		emptyResponse.studyCardKey = pickRandomItem(cardKeys) ?? null;
-		if (emptyResponse.studyCardKey !== null) {
-			emptyResponse.studyCardValue = await studyNamespace.get(emptyResponse.studyCardKey);
-		}
-	}
-
-	const filteredItems = indexItems.filter((item) => mapCategory(item.category) === selectedCategory);
-	const imageNames = filteredItems.map((item) => toStudyImageKey(item.filename));
-
-	if (imageNames.length === 0) {
-		return {
-			...emptyResponse,
-			selectedViewMode: emptyResponse.hasStudyCards ? 'cards' : 'pictures',
-			availableCategories,
-			selectedCategory
-		};
-	}
-
-	const studyImageName = pickRandomItem(imageNames) ?? imageNames[0];
-
-	if (!studyImageName) {
-		return {
-			...emptyResponse,
-			selectedViewMode: 'pictures',
-			studyImageSrc: null,
-			studyImageName: null,
-			studyImageNames: imageNames,
-			availableCategories,
-			selectedCategory
-		};
-	}
-
-	const object = await platform.env.STARGATE_BUCKET.get(studyImageName);
-	if (object === null) {
-		return {
-			...emptyResponse,
-			selectedViewMode: 'pictures',
-			studyImageSrc: null,
-			studyImageName: null,
-			studyImageNames: imageNames,
-			availableCategories,
-			selectedCategory
-		};
-	}
+	const studyItem = await loadRandomStudyItem(platform, selectedCategory, indexItems);
 
 	return {
 		...emptyResponse,
-		selectedViewMode: 'pictures',
-		studyImageSrc: toDataUrl(object.httpMetadata?.contentType ?? 'image/jpeg', new Uint8Array(await object.arrayBuffer())),
-		studyImageName,
-		studyImageNames: imageNames,
+		...studyItem,
 		availableCategories,
 		selectedCategory
 	};
