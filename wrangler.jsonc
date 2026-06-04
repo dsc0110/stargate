@@ -7,7 +7,10 @@
 	"name": "stargate",
 	"main": ".svelte-kit/cloudflare/_worker.js",
 	"compatibility_date": "2025-12-11",
-	"compatibility_flags": ["nodejs_als", "nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_als",
+		"nodejs_compat"
+	],
 	"workers_dev": false,
 	"observability": {
 		"enabled": true
@@ -21,8 +24,19 @@
 			"binding": "STARGATE_BUCKET",
 			"bucket_name": "stargate-bucket"
 		}
+	],
+	"kv_namespaces": [
+		{
+			"binding": "STARGATE_STUDY_ES",
+			"id": "9a19e475f02c467f9101fcb2f7204f18",
+			"remote": true
+		},
+		{
+			"binding": "STARGATE_STUDY_RO",
+			"id": "e53d52c4eccd4a85acc8ed48c0574b10",
+			"remote": true
+		}
 	]
-
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

@@ -3,8 +3,60 @@ import type { RequestHandler } from './$types';
 import type { StudyIndexItem } from './types';
 import { isStudyImageKey, pickRandomItem, STUDY_INDEX_KEY, toDataUrl, toStudyImageKey } from './utils';
 
+const STUDY_CATEGORIES = ['Español', 'Româna'] as const;
+const DEFAULT_STUDY_CATEGORY = STUDY_CATEGORIES[0];
+
+function mapCategory(rawCategory: string | undefined) {
+	return rawCategory === 'Español' || rawCategory === 'Româna' ? rawCategory : null;
+}
+
+function getStudyNamespaceForCategory(platform: App.Platform | undefined, category: string) {
+	if (category === 'Româna') {
+		return {
+			namespace: platform?.env.STARGATE_STUDY_RO,
+			bindingName: 'STARGATE_STUDY_RO'
+		};
+	}
+
+	return {
+		namespace: platform?.env.STARGATE_STUDY_ES,
+		bindingName: 'STARGATE_STUDY_ES'
+	};
+}
+
 export const GET: RequestHandler = async ({ url, platform }) => {
 	try {
+		const requestedView = url.searchParams.get('view')?.trim() ?? 'pictures';
+
+		if (requestedView === 'cards') {
+			const requestedCategory = url.searchParams.get('category')?.trim() ?? '';
+			const { namespace, bindingName } = getStudyNamespaceForCategory(platform, requestedCategory);
+
+			if (namespace === undefined) {
+				return json(
+					{
+						success: false,
+						studyCardKey: null,
+						studyCardValue: null,
+						error: `${bindingName} binding not available`
+					},
+					{ status: 500 }
+				);
+			}
+
+			const cardList = await namespace.list({ limit: 1000 });
+			const cardKeys = cardList.keys.map((item) => item.name).filter((name): name is string => Boolean(name));
+			const excludedCardKey = url.searchParams.get('exclude') || undefined;
+			const studyCardKey = pickRandomItem(cardKeys, excludedCardKey) ?? cardKeys[0] ?? null;
+			const studyCardValue = studyCardKey ? await namespace.get(studyCardKey) : null;
+
+			return json({
+				success: true,
+				studyCardKey,
+				studyCardValue
+			});
+		}
+
 		if (platform?.env.STARGATE_BUCKET === undefined) {
 			return json(
 				{
@@ -12,6 +64,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 					studyImageSrc: null,
 					studyImageName: null,
 					studyImageNames: [],
+					studyCardKey: null,
+					studyCardValue: null,
 					error: 'STARGATE_BUCKET binding not available'
 				},
 				{ status: 500 }
@@ -25,7 +79,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 					success: true,
 					studyImageSrc: null,
 					studyImageName: null,
-					studyImageNames: []
+					studyImageNames: [],
+					studyCardKey: null,
+					studyCardValue: null
 				},
 				{ status: 200 }
 			);
@@ -51,17 +107,19 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 					studyImageSrc: null,
 					studyImageName: null,
 					studyImageNames: [],
+					studyCardKey: null,
+					studyCardValue: null,
 					error: 'Invalid study index format'
 				},
 				{ status: 500 }
 			);
 		}
 
-		const availableCategories = [...new Set(indexItems.map((item) => item.category?.trim()).filter((category): category is string => Boolean(category)))].sort((a, b) => a.localeCompare(b));
+		const availableCategories = [...STUDY_CATEGORIES];
 		const requestedCategory = url.searchParams.get('category')?.trim() ?? '';
-		const selectedCategory = availableCategories.includes(requestedCategory) ? requestedCategory : (availableCategories[0] ?? '');
+		const selectedCategory = availableCategories.includes(requestedCategory as (typeof availableCategories)[number]) ? requestedCategory : DEFAULT_STUDY_CATEGORY;
 
-		const filteredItems = selectedCategory ? indexItems.filter((item) => item.category?.trim() === selectedCategory) : indexItems;
+		const filteredItems = indexItems.filter((item) => mapCategory(item.category) === selectedCategory);
 		const imageNames = filteredItems.map((item) => toStudyImageKey(item.filename));
 
 		if (imageNames.length === 0) {
@@ -69,7 +127,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				success: true,
 				studyImageSrc: null,
 				studyImageName: null,
-				studyImageNames: []
+				studyImageNames: [],
+				studyCardKey: null,
+				studyCardValue: null
 			});
 		}
 
@@ -82,7 +142,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				success: true,
 				studyImageSrc: null,
 				studyImageName: null,
-				studyImageNames: imageNames
+				studyImageNames: imageNames,
+				studyCardKey: null,
+				studyCardValue: null
 			});
 		}
 
@@ -92,7 +154,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				success: true,
 				studyImageSrc: null,
 				studyImageName: null,
-				studyImageNames: imageNames
+				studyImageNames: imageNames,
+				studyCardKey: null,
+				studyCardValue: null
 			});
 		}
 
@@ -100,7 +164,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			success: true,
 			studyImageSrc: toDataUrl(object.httpMetadata?.contentType ?? 'image/jpeg', new Uint8Array(await object.arrayBuffer())),
 			studyImageName,
-			studyImageNames: imageNames
+			studyImageNames: imageNames,
+			studyCardKey: null,
+			studyCardValue: null
 		});
 	} catch (error) {
 		console.error('Failed to load study image:', error);
@@ -110,6 +176,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				studyImageSrc: null,
 				studyImageName: null,
 				studyImageNames: [],
+				studyCardKey: null,
+				studyCardValue: null,
 				error: error instanceof Error ? error.message : 'Unknown error occurred'
 			},
 			{ status: 500 }

@@ -16,9 +16,13 @@ export function toStudyImageKey(filename: string) {
 
 export function createEmptyResponse(): StudyPageResponse {
 	return {
+		selectedViewMode: 'pictures',
 		studyImageSrc: null,
 		studyImageName: null,
 		studyImageNames: [],
+		studyCardKey: null,
+		studyCardValue: null,
+		hasStudyCards: false,
 		availableCategories: [],
 		categoryImageCounts: {},
 		selectedCategory: ''
