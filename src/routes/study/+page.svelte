@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { ArrowLeft, ArrowRight, Shuffle } from '@lucide/svelte';
+	import { ArrowLeft, ArrowRight, IdCard, NotebookText, Shuffle } from '@lucide/svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import type { StudyPageData, StudyViewMode } from './types';
 	import { getCategoryLabel } from './utils';
@@ -26,6 +26,11 @@
 
 	const shuffleButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-1.5`;
 	const panelToggleButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-1.5`;
+	const chipGroupClass = 'flex flex-wrap items-center gap-1 rounded-lg border border-surface-300/60 bg-surface-100/70 p-1 dark:border-surface-700/60 dark:bg-surface-900/50';
+	const modeButtonClass = `${SHARED_STYLES.chipBase} cursor-pointer inline-flex items-center justify-center`;
+	const bottomControlGroupClass = 'flex flex-wrap items-center gap-1.5 rounded-xl border border-surface-300/60 bg-surface-100/80 p-1.5 dark:border-surface-700/60 dark:bg-surface-900/60';
+	const bottomModeButtonClass = `${SHARED_STYLES.chipBase} cursor-pointer inline-flex items-center justify-center min-h-10 min-w-10`;
+	const bottomActionButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-2 min-h-10 px-3 text-sm`;
 
 	function togglePanelSide() {
 		isRightPanelOpen = !isRightPanelOpen;
@@ -77,15 +82,11 @@
 		void loadStudyImage(selectedCategory, studyImageName);
 	}
 
-	function selectViewMode(mode: StudyViewMode) {
-		if (selectedViewMode === mode) {
-			return;
-		}
-
-		selectedViewMode = mode;
+	function toggleViewMode() {
+		selectedViewMode = selectedViewMode === 'pictures' ? 'cards' : 'pictures';
 		layoverActive = false;
 
-		if (mode === 'cards') {
+		if (selectedViewMode === 'cards') {
 			isCardFlipped = false;
 			void loadStudyCard(selectedCategory, studyCardKey);
 		}
@@ -95,21 +96,26 @@
 		isCardFlipped = !isCardFlipped;
 	}
 
-	function selectCategory(categoryName: string) {
-		if (selectedCategory === categoryName) {
+	function toggleCategory() {
+		if (data.availableCategories.length < 2) {
 			return;
 		}
 
-		selectedCategory = categoryName;
+		const nextCategory = data.availableCategories.find((category) => category !== selectedCategory) ?? selectedCategory;
+		if (!nextCategory || selectedCategory === nextCategory) {
+			return;
+		}
+
+		selectedCategory = nextCategory;
 		layoverActive = false;
 
 		if (selectedViewMode === 'cards') {
 			isCardFlipped = false;
-			void loadStudyCard(categoryName);
+			void loadStudyCard(nextCategory);
 			return;
 		}
 
-		void loadStudyImage(categoryName);
+		void loadStudyImage(nextCategory);
 	}
 
 	type StudyImageResponse = {
@@ -248,30 +254,16 @@
 	<div id="subheader" class="shrink-0">
 		{#if data.availableCategories.length > 0 || data.hasStudyCards}
 			<div class={SHARED_STYLES.controlsContainer}>
-				<div class="flex items-center gap-1 w-full">
+				<div class="flex items-center w-full">
 					{#if data.availableCategories.length > 0}
-						<div class="flex flex-wrap gap-1 items-center max-w-xl mr-auto">
+						<div class={`${chipGroupClass} max-w-xl`}>
 							{#each data.availableCategories as category (category)}
-								<button class={`${SHARED_STYLES.chipBase} ${selectedCategory === category ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} type="button" onclick={() => selectCategory(category)}>
+								<button class={`${SHARED_STYLES.chipBase} ${selectedCategory === category ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} type="button" onclick={toggleCategory}>
 									{getCategoryLabel(category, data.categoryImageCounts).toLowerCase()}
 								</button>
 							{/each}
 						</div>
 					{/if}
-
-					<div class="flex flex-wrap gap-1 items-center">
-						<button
-							class={`${SHARED_STYLES.chipBase} ${selectedViewMode === 'pictures' ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`}
-							type="button"
-							onclick={() => selectViewMode('pictures')}
-							disabled={data.availableCategories.length === 0}
-						>
-							picture
-						</button>
-						<button class={`${SHARED_STYLES.chipBase} ${selectedViewMode === 'cards' ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} type="button" onclick={() => selectViewMode('cards')} disabled={!data.hasStudyCards}>
-							study cards
-						</button>
-					</div>
 				</div>
 			</div>
 		{/if}
@@ -281,7 +273,7 @@
 		{#if selectedViewMode === 'cards'}
 			{#if studyCardKey}
 				<div class="h-full w-full py-2 flex items-center justify-center">
-					<button type="button" class="group w-full max-w-2xl h-full max-h-[360px] [perspective:1200px] cursor-pointer bg-transparent border-0 p-0 text-left" onclick={toggleStudyCardFlip} aria-label="Flip study card">
+					<button type="button" class="group w-full max-w-2xl h-[240px] sm:h-[300px] md:h-[360px] [perspective:1200px] cursor-pointer bg-transparent border-0 p-0 text-left" onclick={toggleStudyCardFlip} aria-label="Flip study card">
 						<div class={`relative h-full w-full rounded-xl transition-transform duration-500 [transform-style:preserve-3d] ${isCardFlipped ? '[transform:rotateY(180deg)]' : ''}`}>
 							<div
 								class="absolute inset-0 rounded-xl border border-slate-300/70 dark:border-slate-700/70 bg-gradient-to-br from-emerald-50 via-white to-teal-100 dark:from-emerald-900/40 dark:via-slate-900 dark:to-teal-900/30 p-6 shadow-xl [backface-visibility:hidden] flex items-center justify-center text-center"
@@ -329,39 +321,49 @@
 	</div>
 
 	{#if data.availableCategories.length > 0 || data.hasStudyCards}
-		<div class="pt-2 pb-2 shrink-0">
+		<div class="pt-3 pb-3 shrink-0 mt-auto sticky bottom-0 z-10 backdrop-blur-sm">
 			<div class={SHARED_STYLES.controlsContainer}>
-				<div class="flex items-center justify-end gap-1 w-full">
-					<button
-						class={shuffleButtonClass}
-						type="button"
-						onclick={showAnotherPicture}
-						disabled={selectedViewMode === 'pictures' ? studyImageNames.length < 2 : !data.hasStudyCards}
-						aria-label={selectedViewMode === 'pictures' ? 'Shuffle picture' : 'Shuffle card'}
-						title={selectedViewMode === 'pictures' ? 'Shuffle picture' : 'Shuffle card'}
-					>
-						<Shuffle class="size-4 shrink-0" />
-						<span>shuffle</span>
-					</button>
+				<div class="flex items-center justify-between gap-2 w-full">
+					<div class={bottomControlGroupClass}>
+						<button class={`${bottomModeButtonClass} ${selectedViewMode === 'pictures' ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`} type="button" onclick={toggleViewMode} disabled={data.availableCategories.length === 0}>
+							<NotebookText class="size-5 shrink-0" />
+						</button>
+						<button class={`${bottomModeButtonClass} ${selectedViewMode === 'cards' ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`} type="button" onclick={toggleViewMode} disabled={!data.hasStudyCards}>
+							<IdCard class="size-5 shrink-0" />
+						</button>
 
-					{#if selectedViewMode === 'pictures'}
 						<button
-							class={panelToggleButtonClass}
+							class={bottomActionButtonClass}
 							type="button"
 							onclick={togglePanelSide}
+							disabled={selectedViewMode !== 'pictures'}
 							aria-pressed={isRightPanelOpen}
 							aria-label={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 							title={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
 						>
 							<span>L</span>
 							{#if isRightPanelOpen}
-								<ArrowLeft class="size-4 shrink-0" />
+								<ArrowLeft class="size-5 shrink-0" />
 							{:else}
-								<ArrowRight class="size-4 shrink-0" />
+								<ArrowRight class="size-5 shrink-0" />
 							{/if}
 							<span>R</span>
 						</button>
-					{/if}
+					</div>
+
+					<div class="flex items-center gap-1">
+						<button
+							class={bottomActionButtonClass}
+							type="button"
+							onclick={showAnotherPicture}
+							disabled={selectedViewMode === 'pictures' ? studyImageNames.length < 2 : !data.hasStudyCards}
+							aria-label={selectedViewMode === 'pictures' ? 'Shuffle picture' : 'Shuffle card'}
+							title={selectedViewMode === 'pictures' ? 'Shuffle picture' : 'Shuffle card'}
+						>
+							<Shuffle class="size-5 shrink-0" />
+							<span>shuffle</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
