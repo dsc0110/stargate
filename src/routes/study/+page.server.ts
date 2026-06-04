@@ -21,10 +21,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 	const emptyResponse = createEmptyResponse();
 	emptyResponse.availableCategories = [...STUDY_CATEGORIES];
 	emptyResponse.selectedCategory = DEFAULT_STUDY_CATEGORY;
-	emptyResponse.categoryImageCounts = {
-		Español: 0,
-		Româna: 0
-	};
 
 	if (platform?.env.STARGATE_BUCKET === undefined) {
 		return emptyResponse;
@@ -56,21 +52,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 	}
 
 	const availableCategories = [...STUDY_CATEGORIES];
-	const categoryImageCounts = indexItems.reduce<Record<string, number>>(
-		(counts, item) => {
-			const category = mapCategory(item.category);
-			if (!category) {
-				return counts;
-			}
-
-			counts[category] = (counts[category] ?? 0) + 1;
-			return counts;
-		},
-		{
-			Español: 0,
-			Româna: 0
-		}
-	);
 
 	const selectedCategory = DEFAULT_STUDY_CATEGORY;
 	const studyNamespace = getStudyNamespaceForCategory(platform, selectedCategory);
@@ -93,7 +74,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 			...emptyResponse,
 			selectedViewMode: emptyResponse.hasStudyCards ? 'cards' : 'pictures',
 			availableCategories,
-			categoryImageCounts,
 			selectedCategory
 		};
 	}
@@ -108,7 +88,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 			studyImageName: null,
 			studyImageNames: imageNames,
 			availableCategories,
-			categoryImageCounts,
 			selectedCategory
 		};
 	}
@@ -122,7 +101,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 			studyImageName: null,
 			studyImageNames: imageNames,
 			availableCategories,
-			categoryImageCounts,
 			selectedCategory
 		};
 	}
@@ -134,7 +112,6 @@ export const load: PageServerLoad = async ({ platform }) => {
 		studyImageName,
 		studyImageNames: imageNames,
 		availableCategories,
-		categoryImageCounts,
 		selectedCategory
 	};
 };

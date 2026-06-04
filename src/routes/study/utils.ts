@@ -24,7 +24,6 @@ export function createEmptyResponse(): StudyPageResponse {
 		studyCardValue: null,
 		hasStudyCards: false,
 		availableCategories: [],
-		categoryImageCounts: {},
 		selectedCategory: ''
 	};
 }
@@ -47,9 +46,4 @@ export function toDataUrl(contentType: string, bytes: Uint8Array) {
 	}
 
 	return `data:${contentType};base64,${btoa(binary)}`;
-}
-
-export function getCategoryLabel(category: string, categoryImageCounts: Record<string, number>) {
-	const count = categoryImageCounts?.[category] ?? 0;
-	return `${category} (${count})`;
 }

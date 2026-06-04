@@ -15,7 +15,6 @@ export type StudyPageResponse = {
 	studyCardValue: string | null;
 	hasStudyCards: boolean;
 	availableCategories: string[];
-	categoryImageCounts: Record<string, number>;
 	selectedCategory: string;
 };
 

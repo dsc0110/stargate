@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import { ArrowLeft, ArrowRight, IdCard, NotebookText, Shuffle } from '@lucide/svelte';
+	import { ArrowLeft, ArrowRight, RotateCw, Shuffle } from '@lucide/svelte';
 	import { SHARED_STYLES } from '$lib/shared-styles';
 	import type { StudyPageData, StudyViewMode } from './types';
-	import { getCategoryLabel } from './utils';
 
 	let { data }: { data: StudyPageData } = $props();
 
@@ -24,13 +23,11 @@
 	let pointerDownX = 0;
 	let pointerDownY = 0;
 
-	const shuffleButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-1.5`;
-	const panelToggleButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-1.5`;
-	const chipGroupClass = 'flex flex-wrap items-center gap-1 rounded-lg border border-surface-300/60 bg-surface-100/70 p-1 dark:border-surface-700/60 dark:bg-surface-900/50';
-	const modeButtonClass = `${SHARED_STYLES.chipBase} cursor-pointer inline-flex items-center justify-center`;
-	const bottomControlGroupClass = 'flex flex-wrap items-center gap-1.5 rounded-xl border border-surface-300/60 bg-surface-100/80 p-1.5 dark:border-surface-700/60 dark:bg-surface-900/60';
-	const bottomModeButtonClass = `${SHARED_STYLES.chipBase} cursor-pointer inline-flex items-center justify-center min-h-10 min-w-10`;
-	const bottomActionButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-2 min-h-10 px-3 text-sm`;
+	const controlToggleGroupClass = 'inline-flex items-center gap-0.5 rounded-full border border-primary-800 p-0.5 transition-colors duration-200 dark:border-primary-400';
+	const controlToggleButtonClass = 'inline-flex items-center justify-center rounded-full px-3 py-0.5 text-xs transition-colors duration-200';
+	const controlToggleButtonActiveClass = 'text-primary-800 dark:text-primary-400';
+	const controlToggleButtonInactiveClass = 'text-gray-500 dark:text-gray-400';
+	const bottomActionButtonClass = `${SHARED_STYLES.chipBase} ${SHARED_STYLES.chipInactive} cursor-pointer inline-flex items-center gap-2 min-h-10 px-4 text-sm`;
 
 	function togglePanelSide() {
 		isRightPanelOpen = !isRightPanelOpen;
@@ -82,14 +79,35 @@
 		void loadStudyImage(selectedCategory, studyImageName);
 	}
 
-	function toggleViewMode() {
-		selectedViewMode = selectedViewMode === 'pictures' ? 'cards' : 'pictures';
+	function setViewMode(nextViewMode: StudyViewMode) {
+		if (selectedViewMode === nextViewMode) {
+			return;
+		}
+
+		selectedViewMode = nextViewMode;
 		layoverActive = false;
 
-		if (selectedViewMode === 'cards') {
+		if (nextViewMode === 'cards') {
 			isCardFlipped = false;
 			void loadStudyCard(selectedCategory, studyCardKey);
 		}
+	}
+
+	function toggleViewMode() {
+		if (selectedViewMode === 'pictures') {
+			if (!data.hasStudyCards) {
+				return;
+			}
+
+			setViewMode('cards');
+			return;
+		}
+
+		if (data.availableCategories.length === 0) {
+			return;
+		}
+
+		setViewMode('pictures');
 	}
 
 	function toggleStudyCardFlip() {
@@ -254,16 +272,41 @@
 	<div id="subheader" class="shrink-0">
 		{#if data.availableCategories.length > 0 || data.hasStudyCards}
 			<div class={SHARED_STYLES.controlsContainer}>
-				<div class="flex items-center w-full">
+				<div class="flex items-center gap-2 w-full">
 					{#if data.availableCategories.length > 0}
-						<div class={`${chipGroupClass} max-w-xl`}>
+						<div class={`${controlToggleGroupClass} max-w-xl`} role="group" aria-label="Language">
 							{#each data.availableCategories as category (category)}
-								<button class={`${SHARED_STYLES.chipBase} ${selectedCategory === category ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive} cursor-pointer`} type="button" onclick={toggleCategory}>
-									{getCategoryLabel(category, data.categoryImageCounts).toLowerCase()}
+								<button class={`${controlToggleButtonClass} ${selectedCategory === category ? controlToggleButtonActiveClass : controlToggleButtonInactiveClass}`} type="button" onclick={toggleCategory} aria-pressed={selectedCategory === category}>
+									{category.toLowerCase()}
 								</button>
 							{/each}
 						</div>
 					{/if}
+
+					<div class={controlToggleGroupClass} role="group" aria-label="View mode">
+						<button
+							class={`${controlToggleButtonClass} ${selectedViewMode === 'pictures' ? controlToggleButtonActiveClass : controlToggleButtonInactiveClass}`}
+							type="button"
+							onclick={toggleViewMode}
+							disabled={selectedViewMode === 'pictures' ? !data.hasStudyCards : data.availableCategories.length === 0}
+							aria-pressed={selectedViewMode === 'pictures'}
+							aria-label="Pages view"
+							title="Pages view"
+						>
+							<span>pages</span>
+						</button>
+						<button
+							class={`${controlToggleButtonClass} ${selectedViewMode === 'cards' ? controlToggleButtonActiveClass : controlToggleButtonInactiveClass}`}
+							type="button"
+							onclick={toggleViewMode}
+							disabled={selectedViewMode === 'pictures' ? !data.hasStudyCards : data.availableCategories.length === 0}
+							aria-pressed={selectedViewMode === 'cards'}
+							aria-label="Cards view"
+							title="Cards view"
+						>
+							<span>cards</span>
+						</button>
+					</div>
 				</div>
 			</div>
 		{/if}
@@ -323,35 +366,32 @@
 	{#if data.availableCategories.length > 0 || data.hasStudyCards}
 		<div class="pt-3 pb-3 shrink-0 mt-auto sticky bottom-0 z-10 backdrop-blur-sm">
 			<div class={SHARED_STYLES.controlsContainer}>
-				<div class="flex items-center justify-between gap-2 w-full">
-					<div class={bottomControlGroupClass}>
-						<button class={`${bottomModeButtonClass} ${selectedViewMode === 'pictures' ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`} type="button" onclick={toggleViewMode} disabled={data.availableCategories.length === 0}>
-							<NotebookText class="size-5 shrink-0" />
-						</button>
-						<button class={`${bottomModeButtonClass} ${selectedViewMode === 'cards' ? SHARED_STYLES.chipActive : SHARED_STYLES.chipInactive}`} type="button" onclick={toggleViewMode} disabled={!data.hasStudyCards}>
-							<IdCard class="size-5 shrink-0" />
-						</button>
-
-						<button
-							class={bottomActionButtonClass}
-							type="button"
-							onclick={togglePanelSide}
-							disabled={selectedViewMode !== 'pictures'}
-							aria-pressed={isRightPanelOpen}
-							aria-label={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
-							title={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
-						>
-							<span>L</span>
-							{#if isRightPanelOpen}
-								<ArrowLeft class="size-5 shrink-0" />
-							{:else}
-								<ArrowRight class="size-5 shrink-0" />
-							{/if}
-							<span>R</span>
-						</button>
-					</div>
-
+				<div class="flex items-center justify-center gap-2 w-full">
 					<div class="flex items-center gap-1">
+						{#if selectedViewMode === 'pictures'}
+							<button
+								class={bottomActionButtonClass}
+								type="button"
+								onclick={togglePanelSide}
+								aria-pressed={isRightPanelOpen}
+								aria-label={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
+								title={isRightPanelOpen ? 'hide right to left' : 'left to right hide'}
+							>
+								<span>L</span>
+								{#if isRightPanelOpen}
+									<ArrowLeft class="size-5 shrink-0" />
+								{:else}
+									<ArrowRight class="size-5 shrink-0" />
+								{/if}
+								<span>R</span>
+							</button>
+						{:else}
+							<button class={bottomActionButtonClass} type="button" onclick={toggleStudyCardFlip} disabled={!studyCardKey} aria-pressed={isCardFlipped} aria-label="Flip card" title="Flip card">
+								<RotateCw class="size-5 shrink-0" />
+								<span>flip</span>
+							</button>
+						{/if}
+
 						<button
 							class={bottomActionButtonClass}
 							type="button"
@@ -361,7 +401,6 @@
 							title={selectedViewMode === 'pictures' ? 'Shuffle picture' : 'Shuffle card'}
 						>
 							<Shuffle class="size-5 shrink-0" />
-							<span>shuffle</span>
 						</button>
 					</div>
 				</div>
